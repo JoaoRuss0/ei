@@ -1,0 +1,44 @@
+@startuml Flexibility Emission Business Process
+title Flexibility Emission Business Process
+
+participant "Camunda" as C
+participant "Kong" as K
+participant "Prosumer\nMicroservice" as P
+participant "Telemetry\nMicroservice" as T
+participant "FlexibilityEvent\nMicroservice" as F
+database "AWS RDS" as DB
+queue "Kafka\nCluster" as KF
+
+== Read prosumers ==
+C -> K : Read Request
+K -> P : GET /prosumers (REST)
+activate P
+P --> K : Prosumer list
+deactivate P
+K --> C : Forward Response
+
+== Read latest telemetry ==
+C -> K : Read Request
+K -> T : GET /telemetry/latest (REST)
+activate T
+T --> K : Latest readings\n(soc_percent, active_power_kw, ...)
+deactivate T
+K --> C : Forward Response
+
+== Evaluate flexibility ==
+C -> K : POST /flexibility/evaluate
+K -> F : Forward Request
+activate F
+F -> F : Apply rules\n- soc > 90% AND price HIGH → Sell\n- soc < 20% → Unavailable\n- Offer financial incentive for discharge
+
+alt Flexibility event triggered
+  F -> DB : INSERT Flexibility Event (JDBC)
+  DB --> F : OK
+  F -> KF : Publish to Topic: Flexibility Event
+end
+
+F --> K : Response
+deactivate F
+K --> C : Forward Response
+
+@enduml

@@ -1,0 +1,16 @@
+@startuml Utility Operator Management Business Process
+title Utility Operator Management Business Process
+
+participant "Camunda" as C
+participant "Kong" as K
+participant "UtilityOperator\nMicroservice" as U
+database "AWS RDS" as DB
+
+C -> K : CRUD Request
+K -> U : Forward Request
+U -> DB : SQL operation
+DB -> U : Result
+U -> K : Response
+K --> C : Forward Response
+
+@enduml

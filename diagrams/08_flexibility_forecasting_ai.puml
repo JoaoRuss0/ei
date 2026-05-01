@@ -1,0 +1,48 @@
+@startuml Flexibility Forecasting AI Business Process
+title Flexibility Forecasting (AI) Business Process
+
+participant "Camunda" as C
+participant "Kong" as K
+participant "Prosumer\nMicroservice" as P
+participant "Telemetry\nMicroservice" as T
+participant "FlexibilityEvent\nMicroservice" as F
+participant "Ollama Server\n(EC2)" as O
+queue "Kafka\nCluster" as KF
+
+== Read prosumers ==
+C -> K : Read Request
+K -> P : GET /prosumers
+P --> K : Prosumer list + assets
+K --> C : Forward Response
+
+== Read latest telemetry ==
+C -> K : Read Request
+K -> T : GET /telemetry/latest
+T --> K : Latest readings
+K --> C : Forward Response
+
+== Read past Flexibility Event logs ==
+C -> K : Read Request
+K -> F : GET /flexibility/logs
+F --> K : Past flexibility event logs\n(unstructured text)
+K --> C : Forward Response
+
+== AI analysis (API-to-API via Kong) ==
+C -> K : AI Query
+K -> O : POST /api/generate\n(prompt with logs + telemetry context)
+activate O
+O -> O : Run inference\n(sentiment + success rate)
+O --> K : AI response\n(e.g. "Discharge → Grid Stable")
+deactivate O
+K --> C : Forward Response
+
+== Emit informed flexibility decision ==
+C -> K : POST /flexibility/evaluate
+K -> F : Forward Request
+activate F
+F -> KF : Publish to Topic: Flexibility Event
+F --> K : Response
+deactivate F
+K --> C : Forward Response
+
+@enduml

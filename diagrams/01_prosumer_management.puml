@@ -1,0 +1,16 @@
+@startuml Prosumer Management Business Process
+title Prosumer Management Business Process
+
+participant "Camunda" as C
+participant "Kong" as K
+participant "Prosumer\nMicroservice" as P
+database "AWS RDS" as DB
+
+C -> K : CRUD Request
+K -> P : Forward Request
+P -> DB : SQL operation
+DB -> P : Result
+P -> K : Response
+K -> C : Forward Response
+
+@enduml

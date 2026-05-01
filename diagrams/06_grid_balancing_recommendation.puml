@@ -1,0 +1,51 @@
+@startuml Grid Balancing Recommendation Business Process
+title Grid Balancing Recommendation Business Process
+
+participant "Camunda" as C
+participant "Kong" as K
+participant "Prosumer\nMicroservice" as P
+participant "AssetLink\nMicroservice" as A
+participant "Telemetry\nMicroservice" as T
+participant "UtilityOperator\nMicroservice" as U
+participant "GridBalancing\nMicroservice" as G
+queue "Kafka\nCluster" as KF
+
+== Read prosumers ==
+C -> K : Read Request
+K -> P : GET /prosumers
+P --> K : Prosumer list
+K --> C : Forward Response
+
+== Read active asset links ==
+C -> K : Read Request
+K -> A : GET /assetlinks (active)
+A --> K : Asset-Zone pairs
+K --> C : Forward Response
+
+== Read aggregated telemetry per zone ==
+C -> K : Read Request
+K -> T : GET /telemetry/aggregate?by=zone
+T --> K : Avg SoC + power per zone
+K --> C : Forward Response
+
+== Read zone constraints ==
+C -> K : Read Request
+K -> U : GET /zones/constraints
+U --> K : Max load, thresholds
+K --> C : Forward Response
+
+== Recommend balancing ==
+C -> K : POST /balancing/recommend
+K -> G : Forward Request
+activate G
+G -> G : Analyse zones\n(detect deficit / surplus)
+
+alt Zone exceeds safety threshold
+  G -> KF : Publish to Topic:\nGridBalancingRecommendation
+end
+
+G --> K : Response
+deactivate G
+K --> C : Forward Response
+
+@enduml

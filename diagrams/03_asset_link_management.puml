@@ -1,0 +1,37 @@
+@startuml Asset Link Management Business Process
+title Asset Link Management Business Process
+
+participant "Camunda" as C
+participant "Kong" as K
+participant "AssetLink\nMicroservice" as A
+database "AWS RDS" as DB
+queue "Kafka\nCluster" as KF
+participant "Telemetry\nMicroservice" as T
+
+C -> K : Create Request
+K -> A : Forward Request
+A -> DB : INSERT AssetLink
+DB --> A : OK
+A --> K : Response (AssetLinkID)
+K --> C : Forward Response
+
+C -> KF : Create topic\n"AssetLinkID-UtilityOperator"
+note right of C: via Camunda Kafka Connector
+KF --> C : Topic created OK
+
+C -> K : Activate consumer for new topic (REST)
+K -> T : Forward request
+activate T
+T -> KF : Subscribe to topic\nAssetLinkID-UtilityOperator
+KF --> T : Subscribed OK
+T --> K : Consumer active
+deactivate T
+K --> C : Forward Response
+
+note over C, T
+  On de-association: revoke security keys,
+  stop telemetry consumer, delete topic,
+  update aggregate capacity calculations
+end note
+
+@enduml

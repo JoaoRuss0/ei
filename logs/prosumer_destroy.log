@@ -1,0 +1,163 @@
+aws_security_group.instance: Refreshing state... [id=sg-016d985c18c038a1c]
+aws_instance.exampleDeployQuarkus: Refreshing state... [id=i-047144bb3b87c67cb]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  - destroy
+
+Terraform will perform the following actions:
+
+  # aws_instance.exampleDeployQuarkus will be destroyed
+  - resource "aws_instance" "exampleDeployQuarkus" {
+      - ami                                  = "ami-0bb7267a511c0a8e8" -> null
+      - arn                                  = "arn:aws:ec2:us-east-1:805327765760:instance/i-047144bb3b87c67cb" -> null
+      - associate_public_ip_address          = true -> null
+      - availability_zone                    = "us-east-1c" -> null
+      - cpu_core_count                       = 2 -> null
+      - cpu_threads_per_core                 = 1 -> null
+      - disable_api_stop                     = false -> null
+      - disable_api_termination              = false -> null
+      - ebs_optimized                        = false -> null
+      - get_password_data                    = false -> null
+      - hibernation                          = false -> null
+      - id                                   = "i-047144bb3b87c67cb" -> null
+      - instance_initiated_shutdown_behavior = "stop" -> null
+      - instance_state                       = "running" -> null
+      - instance_type                        = "t4g.small" -> null
+      - ipv6_address_count                   = 0 -> null
+      - ipv6_addresses                       = [] -> null
+      - key_name                             = "vockey" -> null
+      - monitoring                           = false -> null
+      - placement_partition_number           = 0 -> null
+      - primary_network_interface_id         = "eni-059967c29b0c7f463" -> null
+      - private_dns                          = "ip-172-31-22-150.ec2.internal" -> null
+      - private_ip                           = "172.31.22.150" -> null
+      - public_dns                           = "ec2-54-90-70-0.compute-1.amazonaws.com" -> null
+      - public_ip                            = "54.90.70.0" -> null
+      - secondary_private_ips                = [] -> null
+      - security_groups                      = [
+          - "terraform-Quarkus-instance-prosumer2026",
+        ] -> null
+      - source_dest_check                    = true -> null
+      - subnet_id                            = "subnet-093ec2bb0166315dc" -> null
+      - tags                                 = {
+          - "Name" = "terraform-deploy-QuarkusProject-prosumer"
+        } -> null
+      - tags_all                             = {
+          - "Name" = "terraform-deploy-QuarkusProject-prosumer"
+        } -> null
+      - tenancy                              = "default" -> null
+      - user_data                            = "6532a1b9c05700424141d3a980afb76a5249134e" -> null
+      - user_data_replace_on_change          = true -> null
+      - vpc_security_group_ids               = [
+          - "sg-016d985c18c038a1c",
+        ] -> null
+        # (5 unchanged attributes hidden)
+
+      - capacity_reservation_specification {
+          - capacity_reservation_preference = "open" -> null
+        }
+
+      - cpu_options {
+          - core_count       = 2 -> null
+          - threads_per_core = 1 -> null
+            # (1 unchanged attribute hidden)
+        }
+
+      - credit_specification {
+          - cpu_credits = "unlimited" -> null
+        }
+
+      - enclave_options {
+          - enabled = false -> null
+        }
+
+      - maintenance_options {
+          - auto_recovery = "default" -> null
+        }
+
+      - metadata_options {
+          - http_endpoint               = "enabled" -> null
+          - http_put_response_hop_limit = 2 -> null
+          - http_tokens                 = "required" -> null
+          - instance_metadata_tags      = "disabled" -> null
+        }
+
+      - private_dns_name_options {
+          - enable_resource_name_dns_a_record    = false -> null
+          - enable_resource_name_dns_aaaa_record = false -> null
+          - hostname_type                        = "ip-name" -> null
+        }
+
+      - root_block_device {
+          - delete_on_termination = true -> null
+          - device_name           = "/dev/xvda" -> null
+          - encrypted             = false -> null
+          - iops                  = 3000 -> null
+          - tags                  = {} -> null
+          - throughput            = 125 -> null
+          - volume_id             = "vol-037644ccd849cb839" -> null
+          - volume_size           = 8 -> null
+          - volume_type           = "gp3" -> null
+            # (1 unchanged attribute hidden)
+        }
+    }
+
+  # aws_security_group.instance will be destroyed
+  - resource "aws_security_group" "instance" {
+      - arn                    = "arn:aws:ec2:us-east-1:805327765760:security-group/sg-016d985c18c038a1c" -> null
+      - description            = "Managed by Terraform" -> null
+      - egress                 = [
+          - {
+              - cidr_blocks      = [
+                  - "0.0.0.0/0",
+                ]
+              - from_port        = 0
+              - ipv6_cidr_blocks = [
+                  - "::/0",
+                ]
+              - prefix_list_ids  = []
+              - protocol         = "-1"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 0
+                # (1 unchanged attribute hidden)
+            },
+        ] -> null
+      - id                     = "sg-016d985c18c038a1c" -> null
+      - ingress                = [
+          - {
+              - cidr_blocks      = [
+                  - "0.0.0.0/0",
+                ]
+              - from_port        = 0
+              - ipv6_cidr_blocks = [
+                  - "::/0",
+                ]
+              - prefix_list_ids  = []
+              - protocol         = "-1"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 0
+                # (1 unchanged attribute hidden)
+            },
+        ] -> null
+      - name                   = "terraform-Quarkus-instance-prosumer2026" -> null
+      - owner_id               = "805327765760" -> null
+      - revoke_rules_on_delete = false -> null
+      - tags                   = {} -> null
+      - tags_all               = {} -> null
+      - vpc_id                 = "vpc-0cc3150057eb153e2" -> null
+        # (1 unchanged attribute hidden)
+    }
+
+Plan: 0 to add, 0 to change, 2 to destroy.
+aws_instance.exampleDeployQuarkus: Destroying... [id=i-047144bb3b87c67cb]
+aws_instance.exampleDeployQuarkus: Still destroying... [id=i-047144bb3b87c67cb, 00m10s elapsed]
+aws_instance.exampleDeployQuarkus: Still destroying... [id=i-047144bb3b87c67cb, 00m20s elapsed]
+aws_instance.exampleDeployQuarkus: Still destroying... [id=i-047144bb3b87c67cb, 00m30s elapsed]
+aws_instance.exampleDeployQuarkus: Destruction complete after 31s
+aws_security_group.instance: Destroying... [id=sg-016d985c18c038a1c]
+aws_security_group.instance: Destruction complete after 1s
+
+Destroy complete! Resources: 2 destroyed.

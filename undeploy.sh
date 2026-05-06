@@ -1,49 +1,22 @@
 #!/bin/bash
 
-
 source ./access.sh
+mkdir -p logs
 
-#Terraform - Quarkus telemetry
-cd Quarkus-Terraform/telemetry
-terraform destroy -auto-approve
-cd ../..
+destroy() {
+    local name="$1"
+    local dir="$2"
+    (
+        cd "$dir" || { echo "Failed to cd to $dir"; exit 1; }
+        terraform destroy -auto-approve -no-color
+    ) > "logs/${name}_destroy.log" 2>&1
+}
 
-# #Terraform - Quarkus prosumer
-cd Quarkus-Terraform/prosumer
-terraform destroy -auto-approve
-cd ../..
+destroy telemetry        Quarkus-Terraform/telemetry        & TEL_PID=$!
+destroy prosumer         Quarkus-Terraform/prosumer         & PRO_PID=$!
+destroy utilityoperator  Quarkus-Terraform/utilityoperator  & UTO_PID=$!
+destroy assetlink        Quarkus-Terraform/assetlink        & ASL_PID=$!
+#destroy rds              RDS-Terraform                      & RDS_PID=$!
+#destroy kafka            Kafka                              & KAF_PID=$!
 
-# #Terraform - Quarkus utilityoperator
-cd Quarkus-Terraform/utilityoperator
-terraform destroy -auto-approve
-cd ../..
-
-# #Terraform - Quarkus assetlink
-cd Quarkus-Terraform/assetlink
-terraform destroy -auto-approve
-cd ../..
-
-# #Terraform - RDS
-cd RDS-Terraform
-terraform destroy -auto-approve
-cd ..
-
-# #Terraform - Camunda
-cd Camunda-Terraform
-terraform destroy -auto-approve
-cd ..
-
-# # #Terraform - Kafka
-cd Kafka
-terraform destroy -auto-approve
-cd ..
-
-# # #Terraform - Kong
-cd KongTerraform
-terraform destroy -auto-approve
-cd ..
-
-# # #Terraform - Konga
-cd KongaTerraform
-terraform destroy -auto-approve
-cd ..
+wait $TEL_PID $PRO_PID $UTO_PID $ASL_PID $RDS_PID $KAF_PID

@@ -31,11 +31,11 @@ public class UtilityOperatorResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS UtilityOperator").execute()
-        .flatMap(r -> client.query("CREATE TABLE UtilityOperator (id SERIAL PRIMARY KEY, name TEXT NOT NULL, location TEXT NOT NULL)").execute())
-        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location) VALUES ('ArcoCegoLisbon','Lisboa')").execute())
-        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location) VALUES ('PracadeBocage','Setubal')").execute())
-        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location) VALUES ('PracadaBoavista','Porto')").execute())
-        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location) VALUES ('PracaDomFranciscoGomes','Faro')").execute())
+        .flatMap(r -> client.query("CREATE TABLE UtilityOperator (id SERIAL PRIMARY KEY, name TEXT NOT NULL, location TEXT NOT NULL, iban TEXT NOT NULL)").execute())
+        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('ArcoCegoLisbon','Lisboa', '123123123')").execute())
+        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('PracadeBocage','Setubal', '123123123')").execute())
+        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('PracadaBoavista','Porto', '123123123')").execute())
+        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('PracaDomFranciscoGomes','Faro', '123123123')").execute())
         .await().indefinitely();
     }
     
@@ -54,7 +54,7 @@ public class UtilityOperatorResource {
      
     @POST
     public Uni<Response> create(UtilityOperator operator) {
-        return operator.save(client , operator.name , operator.location)
+        return operator.save(client , operator.name , operator.location, operator.iban)
                 .onItem().transform(id -> URI.create("/UtilityOperator/" + id))
                 .onItem().transform(uri -> Response.created(uri).build());
     }
@@ -68,9 +68,9 @@ public class UtilityOperatorResource {
     }
 
     @PUT
-    @Path("/{id}/{name}/{location}")
-    public Uni<Response> update(Long id , String name , String location) {
-        return UtilityOperator.update(client, id , name , location)
+    @Path("/{id}")
+    public Uni<Response> update(Long id , OperatorUpdateRequest request) {
+        return UtilityOperator.update(client, id , request.name() , request.location(), request.iban())
                 .onItem().transform(updated -> updated ? Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
                 .onItem().transform(status -> Response.status(status).build());
     }

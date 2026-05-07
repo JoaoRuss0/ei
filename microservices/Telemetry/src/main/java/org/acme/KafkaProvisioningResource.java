@@ -82,6 +82,13 @@ public class KafkaProvisioningResource {
                 .onItem().transform(ResponseBuilder::build); 
     }
 
+    @GET
+    @Path("{id}")
+    public Uni<Response> getBetweenDates(Long id) {
+        return Telemetry.findById(client, id)
+                .onItem().transform(telemetry -> telemetry != null ? Response.ok(telemetry) : Response.status(Response.Status.NOT_FOUND))
+                .onItem().transform(ResponseBuilder::build);
+    }
 }
 
 

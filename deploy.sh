@@ -104,6 +104,63 @@ deploy_utility_operator() {
     echo "http://""$addressMS"":8080/q/swagger-ui/"
 }
 
+deploy_flexibility_emission() {
+    cd microservices/FlexibilityEmission/src/main/resources
+
+    sed -i '' "/kafka.bootstrap.servers/d" application.properties
+    sed -i '' "/quarkus.rest-client.telemetry-service.url/d" application.properties
+    echo "kafka.bootstrap.servers=$addresskafka:9092" >> application.properties
+    echo "quarkus.rest-client.telemetry-service.url=http://$addressTelemetry:8080" >> application.properties
+
+    compile
+    cd ../..
+
+    cd Quarkus-Terraform/flexibility-emission
+    deploy_microservice
+
+    echo "MICROSERVICE flexibility emission IS AVAILABLE HERE:"
+    addressMS="$(terraform state show aws_instance.exampleDeployQuarkus |grep public_dns | sed "s/public_dns//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
+    echo "http://""$addressMS"":8080/q/swagger-ui/"
+}
+
+deploy_grid_balancing() {
+    cd microservices/GridBalancing/src/main/resources
+
+    sed -i '' "/kafka.bootstrap.servers/d" application.properties
+    sed -i '' "/quarkus.rest-client.telemetry-service.url/d" application.properties
+    echo "kafka.bootstrap.servers=$addresskafka:9092" >> application.properties
+    echo "quarkus.rest-client.telemetry-service.url=http://$addressTelemetry:8080" >> application.properties
+
+    compile
+    cd ../..
+
+    cd Quarkus-Terraform/grid-balancing
+    deploy_microservice
+
+    echo "MICROSERVICE grid balancing IS AVAILABLE HERE:"
+    addressMS="$(terraform state show aws_instance.exampleDeployQuarkus |grep public_dns | sed "s/public_dns//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
+    echo "http://""$addressMS"":8080/q/swagger-ui/"
+}
+
+deploy_energy_analytics() {
+    cd microservices/EnergyAnalytics/src/main/resources
+
+    sed -i '' "/kafka.bootstrap.servers/d" application.properties
+    sed -i '' "/quarkus.rest-client.telemetry-service.url/d" application.properties
+    echo "kafka.bootstrap.servers=$addresskafka:9092" >> application.properties
+    echo "quarkus.rest-client.telemetry-service.url=http://$addressTelemetry:8080" >> application.properties
+
+    compile
+    cd ../..
+
+    cd Quarkus-Terraform/energy-analytics
+    deploy_microservice
+
+    echo "MICROSERVICE grid balancing IS AVAILABLE HERE:"
+    addressMS="$(terraform state show aws_instance.exampleDeployQuarkus |grep public_dns | sed "s/public_dns//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
+    echo "http://""$addressMS"":8080/q/swagger-ui/"
+}
+
 mkdir -p logs
 
 #deploy_rds > logs/rds.log 2>&1 & RDS_PID=$!
@@ -114,8 +171,11 @@ esc=$'\e'
 export addressDB="$(cd RDS-Terraform && terraform state show aws_db_instance.example |grep address | sed "s/address//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
 export addresskafka="$(cd Kafka && terraform state show 'aws_instance.exampleKafkaConfiguration[0]'|grep public_dns | sed "s/public_dns//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
 
-deploy_telemetry > logs/telemetry.log 2>&1 & TEL_PID=$!
-deploy_asset_link > logs/assetLink.log 2>&1 & ASL_PID=$!
-deploy_prosumer > logs/prosumer.log 2>&1 & PRO_PID=$!
-deploy_utility_operator > logs/utility_operator.log 2>&1 & UTO_PID=$!
-wait $TEL_PID $ASL_PID $PRO_PID $UTO_PID
+#deploy_telemetry > logs/telemetry.log 2>&1 & TEL_PID=$!
+#deploy_asset_link > logs/assetLink.log 2>&1 & ASL_PID=$!
+#deploy_prosumer > logs/prosumer.log 2>&1 & PRO_PID=$!
+#deploy_utility_operator > logs/utility_operator.log 2>&1 & UTO_PID=$!
+deploy_flexibility_emission > logs/flexibility_emission.log 2>&1 & FXE_PID=$!
+deploy_grid_balancing > logs/grid_balancing.log 2>&1 & GRB_PID=$!
+deploy_energy_analytics > logs/energy_analytics.log 2>&1 & ENA_PID=$!
+wait $TEL_PID $ASL_PID $PRO_PID $UTO_PID $FXE_PID $GRB_PID $ENA_PID

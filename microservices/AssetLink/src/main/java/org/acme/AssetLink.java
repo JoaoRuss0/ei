@@ -6,7 +6,11 @@ import io.vertx.mutiny.mysqlclient.MySQLPool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class AssetLink {
 	
 	    public Long id;
@@ -15,7 +19,6 @@ public class AssetLink {
 
 	    public AssetLink() {
 	    }
-
 
 		public AssetLink(Long id, Long idProsumer_received, Long idUtilityOperator_received) {
 			this.id = id;

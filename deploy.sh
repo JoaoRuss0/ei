@@ -163,19 +163,19 @@ deploy_energy_analytics() {
 
 mkdir -p logs
 
-#deploy_rds > logs/rds.log 2>&1 & RDS_PID=$!
-#deploy_kafka > logs/kafka.log 2>&1 & KAFKA_PID=$!
-#wait $RDS_PID $KAFKA_PID
+deploy_rds > logs/rds.log 2>&1 & RDS_PID=$!
+deploy_kafka > logs/kafka.log 2>&1 & KAFKA_PID=$!
+wait $RDS_PID $KAFKA_PID
 
-esc=$'\e'
-export addressDB="$(cd RDS-Terraform && terraform state show aws_db_instance.example |grep address | sed "s/address//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
-export addresskafka="$(cd Kafka && terraform state show 'aws_instance.exampleKafkaConfiguration[0]'|grep public_dns | sed "s/public_dns//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
+#esc=$'\e'
+#export addressDB="$(cd RDS-Terraform && terraform state show aws_db_instance.example |grep address | sed "s/address//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
+#export addresskafka="$(cd Kafka && terraform state show 'aws_instance.exampleKafkaConfiguration[0]'|grep public_dns | sed "s/public_dns//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
 
 #deploy_telemetry > logs/telemetry.log 2>&1 & TEL_PID=$!
 #deploy_asset_link > logs/assetLink.log 2>&1 & ASL_PID=$!
 #deploy_prosumer > logs/prosumer.log 2>&1 & PRO_PID=$!
 #deploy_utility_operator > logs/utility_operator.log 2>&1 & UTO_PID=$!
-deploy_flexibility_emission > logs/flexibility_emission.log 2>&1 & FXE_PID=$!
-deploy_grid_balancing > logs/grid_balancing.log 2>&1 & GRB_PID=$!
-deploy_energy_analytics > logs/energy_analytics.log 2>&1 & ENA_PID=$!
-wait $TEL_PID $ASL_PID $PRO_PID $UTO_PID $FXE_PID $GRB_PID $ENA_PID
+#deploy_flexibility_emission > logs/flexibility_emission.log 2>&1 & FXE_PID=$!
+#deploy_grid_balancing > logs/grid_balancing.log 2>&1 & GRB_PID=$!
+#deploy_energy_analytics > logs/energy_analytics.log 2>&1 & ENA_PID=$!
+#wait $TEL_PID $ASL_PID $PRO_PID $UTO_PID $FXE_PID $GRB_PID $ENA_PID

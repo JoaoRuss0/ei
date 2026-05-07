@@ -44,7 +44,6 @@ terraform.rc
 # planout
 
 .idea/
-
 access.sh
-
 logs
+kafka-binary

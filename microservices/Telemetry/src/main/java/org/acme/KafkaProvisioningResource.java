@@ -1,5 +1,6 @@
 package org.acme;
 
+import io.smallrye.common.annotation.Blocking;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -26,6 +27,9 @@ public class KafkaProvisioningResource {
     @Inject
     @ConfigProperty(name = "myapp.schema.create", defaultValue = "true") 
     boolean schemaCreate ;
+
+    @Inject
+    KafkaConsumerTracker tracker;
 
     @ConfigProperty(name = "kafka.bootstrap.servers") 
     String kafka_servers;
@@ -64,9 +68,17 @@ public class KafkaProvisioningResource {
     @POST
     @Path("Consume")
     public String ProvisioningConsumer(Topic topic) {
-        Thread worker = new DynamicTopicConsumer(topic.TopicName , kafka_servers , client);
+
+        DynamicTopicConsumer worker = new DynamicTopicConsumer(topic.TopicName , kafka_servers , client);
         worker.start();
+        tracker.registerTopicConsumer(topic, worker);
         return "New worker started";
+    }
+
+    @POST
+    @Path("stop")
+    public void stop(Topic topic) {
+        tracker.stopTopicConsumer(topic);
     }
 
     @GET
@@ -80,14 +92,6 @@ public class KafkaProvisioningResource {
         return Telemetry.findById(client, id)
                 .onItem().transform(telemetry -> telemetry != null ? Response.ok(telemetry) : Response.status(Response.Status.NOT_FOUND)) 
                 .onItem().transform(ResponseBuilder::build); 
-    }
-
-    @GET
-    @Path("{id}")
-    public Uni<Response> getBetweenDates(Long id) {
-        return Telemetry.findById(client, id)
-                .onItem().transform(telemetry -> telemetry != null ? Response.ok(telemetry) : Response.status(Response.Status.NOT_FOUND))
-                .onItem().transform(ResponseBuilder::build);
     }
 }
 

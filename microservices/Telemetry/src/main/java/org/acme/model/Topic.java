@@ -1,10 +1,20 @@
 package org.acme.model;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public class Topic {
     public String TopicName;
-    public Topic() {  }
-    public Topic(String topicName) {  TopicName = topicName;  }
+
+    public Topic() {
+    }
+
+    public Topic(String topicName) {
+        TopicName = topicName;
+    }
+
     @Override
-    public String toString() 
-    {  return "Topic [TopicName=" + TopicName + "]";  }
+    public String toString() {
+        return "Topic [TopicName=" + TopicName + "]";
+    }
 }

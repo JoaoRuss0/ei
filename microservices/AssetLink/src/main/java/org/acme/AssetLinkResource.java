@@ -1,6 +1,8 @@
 package org.acme;
 
 import java.net.URI;
+
+import io.smallrye.common.annotation.Blocking;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -21,6 +23,9 @@ public class AssetLinkResource {
     @Inject
     @ConfigProperty(name = "myapp.schema.create", defaultValue = "true") 
     boolean schemaCreate ;
+
+    @Inject
+    KafkaTopicService kafkaTopicService;
 
     void config(@Observes StartupEvent ev) {
         if (schemaCreate) {
@@ -82,5 +87,14 @@ public class AssetLinkResource {
                 .onItem().transform(updated -> updated ? Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
                 .onItem().transform(status -> Response.status(status).build());
     }
-    
+
+    @POST
+    @Path("topic/{id}/{utilityOperator}")
+    @Blocking
+    public Response createTopic(Long id, String utilityOperator) {
+        AssetLink link = AssetLink.findById(client, id).await().indefinitely();
+        if (link == null) return Response.status(Response.Status.NOT_FOUND).build();
+        kafkaTopicService.createAssetLinkTopic(id, utilityOperator);
+        return Response.noContent().build();
+    }
 }

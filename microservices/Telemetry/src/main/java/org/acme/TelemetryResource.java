@@ -15,8 +15,10 @@ import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
+import java.util.Collection;
+
 @Path("Telemetry")
-public class KafkaProvisioningResource {
+public class TelemetryResource {
 
     @Inject
     io.vertx.mutiny.mysqlclient.MySQLPool client;
@@ -81,11 +83,9 @@ public class KafkaProvisioningResource {
     }
 
     @GET
-    @Path("{id}")
-    public Uni<Response> getSingle(Long id) {
-        return Telemetry.findById(client, id)
-                .onItem().transform(telemetry -> telemetry != null ? Response.ok(telemetry) : Response.status(Response.Status.NOT_FOUND))
-                .onItem().transform(ResponseBuilder::build);
+    @Path("latest")
+    public Multi<Telemetry> getSingle(Collection<Long> assetIds) {
+        return Telemetry.findLatestForAssetIds(client, assetIds);
     }
 }
 

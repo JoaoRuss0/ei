@@ -12,6 +12,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Path("GridCell")
 public class GridCellResource {
@@ -32,9 +33,9 @@ public class GridCellResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS GridCell").execute()
-        .flatMap(r -> client.query("CREATE TABLE GridCell (id SERIAL PRIMARY KEY, address TEXT NOT NULL, postal_code TEXT NOT NULL, peak_hours_start DATETIME NOT NULL , peak_hours_end DATETIME NOT NULL , max_load BIGINT NOT NULL , operator_id BIGINT UNSIGNED NOT NULL, FOREIGN KEY (operator_id) REFERENCES UtilityOperator(id))").execute())
-        .flatMap(r -> client.query("INSERT INTO GridCell (address, postal_code, peak_hours_start, peak_hours_end, max_load, operator_id) VALUES ('Rua do Figo', '2222-232', '2026-01-01 18:00:00', '2026-01-01 21:00:00', 10, 1)").execute())
-        .flatMap(r -> client.query("INSERT INTO GridCell (address, postal_code, peak_hours_start, peak_hours_end, max_load, operator_id) VALUES ('Rua da Pera', '3142-521', '2026-01-01 09:30:00', '2026-01-01 12:00:00', 50, 2)").execute())
+        .flatMap(r -> client.query("CREATE TABLE GridCell (id VARCHAR(255) PRIMARY KEY, address TEXT NOT NULL, postal_code TEXT NOT NULL, peak_hours_start DATETIME NOT NULL , peak_hours_end DATETIME NOT NULL , max_load BIGINT NOT NULL , operator_id BIGINT UNSIGNED NOT NULL, FOREIGN KEY (operator_id) REFERENCES UtilityOperator(id))").execute())
+        .flatMap(r -> client.query("INSERT INTO GridCell (id, address, postal_code, peak_hours_start, peak_hours_end, max_load, operator_id) VALUES ('PORTO_NORTH', 'Rua do Figo', '2222-232', '2026-01-01 18:00:00', '2026-01-01 21:00:00', 10, 1)").execute())
+        .flatMap(r -> client.query("INSERT INTO GridCell (id, address, postal_code, peak_hours_start, peak_hours_end, max_load, operator_id) VALUES ('LISBON_SOUTH', 'Rua da Pera', '3142-521', '2026-01-01 09:30:00', '2026-01-01 12:00:00', 50, 2)").execute())
         .await().indefinitely();
     }
 
@@ -45,7 +46,7 @@ public class GridCellResource {
     
     @GET
     @Path("{id}")
-    public Uni<Response> getSingle(Long id) {
+    public Uni<Response> getSingle(String id) {
         return GridCell.findById(client, id)
                 .onItem().transform(gridCell -> gridCell != null ? Response.ok(gridCell) : Response.status(Response.Status.NOT_FOUND))
                 .onItem().transform(ResponseBuilder::build); 
@@ -60,7 +61,7 @@ public class GridCellResource {
     
     @DELETE
     @Path("{id}")
-    public Uni<Response> delete(Long id) {
+    public Uni<Response> delete(String id) {
         return GridCell.delete(client, id)
                 .onItem().transform(deleted -> deleted ? Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
                 .onItem().transform(status -> Response.status(status).build());
@@ -68,10 +69,15 @@ public class GridCellResource {
 
     @PUT
     @Path("/{id}")
-    public Uni<Response> update(Long id , GridUpdateRequest request) {
+    public Uni<Response> update(String id , GridUpdateRequest request) {
         return GridCell.update(client, id, request.address(), request.postalCode(), request.peakHoursStart(), request.peakHoursEnd(), request.maxLoad(), request.operatorId())
                 .onItem().transform(updated -> updated ? Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
                 .onItem().transform(status -> Response.status(status).build());
     }
-    
+
+    @GET
+    @Path("by-ids")
+    public Multi<GridCell> getByCellIds(Collection<Long> ids) {
+        return GridCell.findByIds(client, ids);
+    }
 }

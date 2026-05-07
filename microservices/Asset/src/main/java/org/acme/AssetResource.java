@@ -1,0 +1,76 @@
+package org.acme;
+
+import io.quarkus.runtime.StartupEvent;
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import java.net.URI;
+
+@Path("Asset")
+public class AssetResource {
+
+    @Inject
+    io.vertx.mutiny.mysqlclient.MySQLPool client;
+    
+    @Inject
+    @ConfigProperty(name = "myapp.schema.create", defaultValue = "true") 
+    boolean schemaCreate;
+
+    void config(@Observes StartupEvent ev) {
+        if (schemaCreate) {
+            initdb();
+        }
+    }
+
+    private void initdb() {
+        // In a production environment this configuration SHOULD NOT be used
+        client.query("DROP TABLE IF EXISTS Asset").execute()
+        .flatMap(r -> client.query("CREATE TABLE Asset (id SERIAL PRIMARY KEY, name TEXT NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, FOREIGN KEY (prosumer_id) REFERENCES Prosumer(id))").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset (name, prosumer_id) VALUES ('asset-1', 1)").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset (name, prosumer_id) VALUES ('asset-2', 1)").execute())
+        .await().indefinitely();
+    }
+
+    @GET
+    public Multi<Asset> get() {
+        return Asset.findAll(client);
+    }
+    
+    @GET
+    @Path("{id}")
+    public Uni<Response> getSingle(Long id) {
+        return Asset.findById(client, id)
+                .onItem().transform(asset -> asset != null ? Response.ok(asset) : Response.status(Response.Status.NOT_FOUND))
+                .onItem().transform(ResponseBuilder::build); 
+    }
+
+    @POST
+    public Uni<Response> create(Asset asset) {
+        return asset.save(client)
+                .onItem().transform(id -> URI.create("/Asset/" + id))
+                .onItem().transform(uri -> Response.created(uri).build());
+    }
+    
+    @DELETE
+    @Path("{id}")
+    public Uni<Response> delete(Long id) {
+        return Asset.delete(client, id)
+                .onItem().transform(deleted -> deleted ? Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
+                .onItem().transform(status -> Response.status(status).build());
+    }
+
+    @PUT
+    @Path("/{id}")
+    public Uni<Response> update(Long id , Asset asset) {
+        return Asset.update(client, id, asset.getName(), asset.getProsumerId())
+                .onItem().transform(updated -> updated ? Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
+                .onItem().transform(status -> Response.status(status).build());
+    }
+    
+}

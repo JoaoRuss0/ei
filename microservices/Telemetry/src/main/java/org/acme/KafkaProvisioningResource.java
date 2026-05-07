@@ -54,7 +54,8 @@ public class KafkaProvisioningResource {
                         + " Plug_Status TEXT NOT NULL, "
                         + " Charging_Rate FLOAT, "
                         + " Session_Energy FLOAT, "
-                        + " EV_SoC FLOAT)").execute())
+                        + " EV_SoC FLOAT, "
+                        + " FOREIGN KEY (asset_id) REFERENCES Asset(id))").execute())
                 .flatMap(r -> client.query("DROP TABLE IF EXISTS TopicSubscription").execute())
                 .flatMap(r -> client.query("CREATE TABLE TopicSubscription (topic_name VARCHAR(255) PRIMARY KEY, owner_service TEXT NOT NULL)").execute())
                 .await().indefinitely();

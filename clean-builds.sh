@@ -15,3 +15,11 @@ cd ../..
 cd microservices/UtilityOperator
 mvn clean
 cd ../..
+
+cd microservices/Asset
+mvn clean
+cd ../..
+
+cd microservices/GridCell
+mvn clean
+cd ../..

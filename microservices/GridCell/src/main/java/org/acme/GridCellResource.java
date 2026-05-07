@@ -32,9 +32,9 @@ public class GridCellResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS GridCell").execute()
-        .flatMap(r -> client.query("CREATE TABLE GridCell (id SERIAL PRIMARY KEY, Location TEXT NOT NULL, peak_hours_start DATETIME, peak_hours_end DATETIME, max_load BIGINT, operator_id BIGINT UNSIGNED NOT NULL, FOREIGN KEY (operator_id) REFERENCES UtilityOperator(id))").execute())
-        .flatMap(r -> client.query("INSERT INTO GridCell (Location, peak_hours_start, peak_hours_end, max_load, operator_id) VALUES ('Lisbon', '2026-01-01 18:00:00', '2026-01-01 21:00:00', 10, 1)").execute())
-        .flatMap(r -> client.query("INSERT INTO GridCell (Location, peak_hours_start, peak_hours_end, max_load, operator_id) VALUES ('Porto', '2026-01-01 09:30:00', '2026-01-01 12:00:00', 50, 2)").execute())
+        .flatMap(r -> client.query("CREATE TABLE GridCell (id SERIAL PRIMARY KEY, address TEXT NOT NULL, postal_code TEXT NOT NULL, peak_hours_start DATETIME NOT NULL , peak_hours_end DATETIME NOT NULL , max_load BIGINT NOT NULL , operator_id BIGINT UNSIGNED NOT NULL, FOREIGN KEY (operator_id) REFERENCES UtilityOperator(id))").execute())
+        .flatMap(r -> client.query("INSERT INTO GridCell (address, postal_code, peak_hours_start, peak_hours_end, max_load, operator_id) VALUES ('Rua do Figo', '2222-232', '2026-01-01 18:00:00', '2026-01-01 21:00:00', 10, 1)").execute())
+        .flatMap(r -> client.query("INSERT INTO GridCell (address, postal_code, peak_hours_start, peak_hours_end, max_load, operator_id) VALUES ('Rua da Pera', '3142-521', '2026-01-01 09:30:00', '2026-01-01 12:00:00', 50, 2)").execute())
         .await().indefinitely();
     }
 
@@ -53,7 +53,7 @@ public class GridCellResource {
      
     @POST
     public Uni<Response> create(GridCell gridCell) {
-        return gridCell.save(client , gridCell.location , gridCell.peakHoursStartTime, gridCell.peakHoursEndTime, gridCell.maxLoad, gridCell.operatorId)
+        return gridCell.save(client , gridCell.address, gridCell.postalCode , gridCell.peakHoursStartTime, gridCell.peakHoursEndTime, gridCell.maxLoad, gridCell.operatorId)
                 .onItem().transform(id -> URI.create("/GridCell/" + id))
                 .onItem().transform(uri -> Response.created(uri).build());
     }
@@ -69,7 +69,7 @@ public class GridCellResource {
     @PUT
     @Path("/{id}")
     public Uni<Response> update(Long id , GridUpdateRequest request) {
-        return GridCell.update(client, id, request.location(), request.peakHoursStart(), request.peakHoursEnd(), request.maxLoad(), request.operatorId())
+        return GridCell.update(client, id, request.address(), request.postalCode(), request.peakHoursStart(), request.peakHoursEnd(), request.maxLoad(), request.operatorId())
                 .onItem().transform(updated -> updated ? Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
                 .onItem().transform(status -> Response.status(status).build());
     }

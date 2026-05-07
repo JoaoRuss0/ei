@@ -3,7 +3,8 @@ package org.acme;
 import java.time.LocalDateTime;
 
 public record GridUpdateRequest (
-        String location,
+        String address,
+        String postalCode,
         LocalDateTime peakHoursStart,
         LocalDateTime peakHoursEnd,
         Long maxLoad,

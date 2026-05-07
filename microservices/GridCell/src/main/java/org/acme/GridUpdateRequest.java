@@ -6,6 +6,7 @@ public record GridUpdateRequest (
         String location,
         LocalDateTime peakHoursStart,
         LocalDateTime peakHoursEnd,
-        Long maxLoad
+        Long maxLoad,
+        Long operatorId
 )
 {}

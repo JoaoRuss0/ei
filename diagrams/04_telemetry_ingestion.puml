@@ -1,28 +1,10 @@
-@startuml Telemetry Ingestion Business Process
-title Telemetry Ingestion Business Process
+@startuml TelemetryIngestion
+title Telemetry Ingestion
 
-participant "IoT / Event\nProducer" as IoT
-queue "Kafka\nCluster" as KF
-participant "Telemetry\nMicroservice" as T
-database "AWS RDS" as DB
+participant "Telemetry Microservice" as Tel
+participant Kafka
 
-IoT -> KF : Produce telemetry JSON\n(topic: AssetLinkID-UtilityOperator)
-
-loop Continuous polling — for each subscribed topic
-  KF -> T : Poll messages (kafka-clients)
-  activate T
-  T -> T : Deserialise JSON
-  T -> T : Route by asset_type field\n(BATTERY / SOLAR / EV_CHARGER)
-  T -> DB : INSERT time-series row (JDBC)
-  DB --> T : OK
-  T -> KF : Commit offset
-  deactivate T
-end
-
-note over T, DB
-  REST endpoint also available for other
-  services to query stored telemetry.
-  No Camunda orchestration — pure event-driven flow.
-end note
-
+note right of Kafka : New Event
+Tel -> Kafka   : Cosume Event
+note right of Tel : Store Event
 @enduml

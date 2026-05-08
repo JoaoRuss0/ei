@@ -6,6 +6,7 @@ import io.smallrye.common.annotation.Blocking;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
@@ -25,7 +26,7 @@ public class AssetLinkResource {
     boolean schemaCreate ;
 
     @Inject
-    KafkaTopicService kafkaTopicService;
+    KafkaTopicService topicService;
 
     void config(@Observes StartupEvent ev) {
         if (schemaCreate) {
@@ -80,21 +81,23 @@ public class AssetLinkResource {
                 .onItem().transform(status -> Response.status(status).build());
     }
 
-    @PUT
-    @Path("/{id}/{idProsumer}/{idUtilityOperator}")
-    public Uni<Response> update(Long id , Long idProsumer , Long idUtilityOperator ) {
-        return AssetLink.update(client, id, idProsumer , idUtilityOperator )
-                .onItem().transform(updated -> updated ? Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
-                .onItem().transform(status -> Response.status(status).build());
-    }
-
     @POST
     @Path("topic/{id}/{utilityOperator}")
     @Blocking
     public Response createTopic(Long id, String utilityOperator) {
         AssetLink link = AssetLink.findById(client, id).await().indefinitely();
         if (link == null) return Response.status(Response.Status.NOT_FOUND).build();
-        kafkaTopicService.createAssetLinkTopic(id, utilityOperator);
+        topicService.createAssetLinkTopic(link, utilityOperator);
+        return Response.noContent().build();
+    }
+
+    @DELETE
+    @Path("topic/{id}/{utilityOperator}")
+    @Blocking
+    public Response deleteTopic(Long id, String utilityOperator) {
+        AssetLink link = AssetLink.findById(client, id).await().indefinitely();
+        if (link == null) return Response.noContent().build();
+        topicService.deleteAssetLinkTopic(link, utilityOperator);
         return Response.noContent().build();
     }
 }

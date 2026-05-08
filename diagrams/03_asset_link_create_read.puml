@@ -1,0 +1,32 @@
+@startuml AssetLinkManagement
+title Asset Link Creation/Reading Business Process
+
+participant Camunda
+participant Kong
+participant "AssetLink Microservice" as Link
+participant "Telemetry Microservice" as Tel
+participant Kafka
+
+Camunda -> Kong : Create/Read Request
+Kong -> Link : Forward Create/Read Request
+note right of Link : Process Request
+Link -> Kong : Response
+Kong -> Camunda : Forward Response
+
+note left of Camunda : If the Request is Create, continue
+
+Camunda -> Kong : Create Topic Request
+Kong -> Link : Forward Create Topic Request
+Link -> Kafka : Delete Topic (AssetID-UtilityOperator)
+note right of Kafka : Create Topic 'AssetLinkID-UtilityOperator'
+Kafka -> Link : Response
+Link -> Kong : Response
+Kong -> Camunda : Forward Response
+
+Camunda -> Kong : Consume Topic Request
+Kong -> Tel : Forward Consume Topic Request
+note right of Tel : Start Consumer Thread
+Tel -> Kafka : Consume Topic
+Tel -> Kong : Response
+Kong -> Camunda : Forward Response
+@enduml

@@ -1,8 +1,10 @@
 package org.acme;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.common.errors.TopicExistsException;
+import org.apache.kafka.common.errors.UnknownTopicOrPartitionException;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.util.Properties;
@@ -18,8 +20,8 @@ public class KafkaTopicService {
     @ConfigProperty(name = "kafka.bootstrap.servers")
     String bootstrapServers;
 
-    public void createAssetLinkTopic(Long assetLinkId, String utilityOperator) {
-        String topicName = assetLinkId + "-" + utilityOperator;
+    public void createAssetLinkTopic(AssetLink link, String utilityOperator) {
+        String topicName = link.getId() + "-" + utilityOperator;
 
         Properties props = new Properties();
         props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -33,6 +35,22 @@ public class KafkaTopicService {
                 return;
             }
             throw new RuntimeException("Failed to create topic " + topicName, e);
+        }
+    }
+
+    public void deleteAssetLinkTopic(AssetLink link, String utilityOperator) {
+        String topicName = link.getId() + "-" + utilityOperator;
+
+        Properties props = new Properties();
+        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+
+        try (AdminClient admin = AdminClient.create(props)) {
+            admin.deleteTopics(Collections.singleton(topicName)).all().get();
+        } catch (InterruptedException | ExecutionException e) {
+            if (e.getCause() instanceof UnknownTopicOrPartitionException) {
+                return;
+            }
+            throw new RuntimeException("Failed to delete topic " + topicName, e);
         }
     }
 }

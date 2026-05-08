@@ -6,6 +6,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
 
@@ -84,7 +85,7 @@ public class TelemetryResource {
 
     @GET
     @Path("latest")
-    public Multi<Telemetry> getSingle(Collection<Long> assetIds) {
+    public Multi<Telemetry> getSingle(@QueryParam("assetId") Collection<Long> assetIds) {
         return Telemetry.findLatestForAssetIds(client, assetIds);
     }
 }

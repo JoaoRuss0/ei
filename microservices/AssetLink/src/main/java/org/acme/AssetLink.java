@@ -65,9 +65,4 @@ public class AssetLink {
 	        return client.preparedQuery("DELETE FROM AssetLink WHERE id = ?").execute(Tuple.of(id_R))
 	                .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1); 
 	    }
-	    
-	    public static Uni<Boolean> update(MySQLPool client, Long id_R, Long idProsumer_R , Long idUtilityOperator_R ) {
-	        return client.preparedQuery("UPDATE AssetLink SET idProsumer = ? , idUtilityOperator = ? WHERE id = ?").execute(Tuple.of( idProsumer_R , idUtilityOperator_R,id_R))
-	        		.onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1 ); 
-	    }  
 }

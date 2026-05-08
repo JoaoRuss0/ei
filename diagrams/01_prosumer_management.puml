@@ -3,13 +3,13 @@ title Prosumer Management Business Process
 
 participant "Camunda" as C
 participant "Kong" as K
-participant "Prosumer\nMicroservice" as P
-database "AWS RDS" as DB
+participant "Prosumer Microservice" as P
 
 C -> K : CRUD Request
-K -> P : Forward Request
-P -> DB : SQL operation
-DB -> P : Result
+K -> P : Forward CRUD Request
+note right of P
+  Process request
+end note
 P -> K : Response
 K -> C : Forward Response
 

@@ -65,12 +65,9 @@ public class AssetResource {
                 .onItem().transform(status -> Response.status(status).build());
     }
 
-    @PUT
-    @Path("/{id}")
-    public Uni<Response> update(Long id , Asset asset) {
-        return Asset.update(client, id, asset.getName(), asset.getProsumerId())
-                .onItem().transform(updated -> updated ? Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
-                .onItem().transform(status -> Response.status(status).build());
+    @GET
+    @Path("by-prosumer/{id}")
+    public Multi<Asset> findByProsumerId(Long prosumerId) {
+        return Asset.findByProsumerId(client, prosumerId);
     }
-    
 }

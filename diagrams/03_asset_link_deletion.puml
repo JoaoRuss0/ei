@@ -1,0 +1,27 @@
+@startuml AssetLinkDeletion
+title Asset Link Deletion Business Process
+
+participant Camunda
+participant Kong
+participant "AssetLink Microservice" as Link
+participant "Telemetry Microservice" as Tel
+participant Kafka
+
+Camunda -> Kong : Stop Consuming Request
+Kong -> Tel : Forward Stop Consuming Request
+note right of Tel : Stop Consumer Thread
+Tel -> Kong : Response
+Kong -> Camunda : Forward Response
+
+Camunda -> Kong : Delete Topic Request
+Kong -> Kafka : Forward Delete Topic Request
+note right of Kafka : Delete Topic
+Kafka -> Kong : Response
+Kong -> Camunda : Forward Response
+
+Camunda -> Kong : Delete Request
+Kong -> Link : Forward Delete Request
+note right of Link : Delete Asset Link
+Link -> Kong : Response
+Kong -> Camunda : Forward Response
+@enduml

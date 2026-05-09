@@ -6,7 +6,7 @@ import io.vertx.mutiny.mysqlclient.MySQLPool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
-import java.sql.Timestamp;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -113,7 +113,7 @@ public class Telemetry
     }
 
 
-    public static Multi<Telemetry> findLatestForAssetIds(MySQLPool client, Collection<AssetIdAndGridCell> toSearch) {
+    public static Multi<Telemetry> findLatestForAssetIdsGridCellPair(MySQLPool client, Collection<AssetIdAndGridCell> toSearch) {
         if (toSearch.isEmpty()) return Multi.createFrom().empty();
 
         String pairPlaceholders = toSearch.stream()
@@ -138,6 +138,13 @@ public class Telemetry
         }
 
         return client.preparedQuery(query).execute(params)
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(Telemetry::from);
+    }
+
+    public static Multi<Telemetry> findLastHourEvents(MySQLPool client) {
+        return client.query("SELECT * FROM Telemetry WHERE timeStamp > NOW() - INTERVAL 1 HOUR")
+                .execute()
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
                 .onItem().transform(Telemetry::from);
     }

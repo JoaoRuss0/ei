@@ -1,46 +1,44 @@
-@startuml Energy Analytics Business Process
+@startuml EnergyAnalytics
 title Energy Analytics Business Process
 
-participant "Camunda" as C
-participant "Kong" as K
-participant "Prosumer\nMicroservice" as P
-participant "UtilityOperator\nMicroservice" as U
-participant "Telemetry\nMicroservice" as T
-participant "EnergyAnalytics\nMicroservice" as E
-queue "Kafka\nCluster" as KF
+/'
+Get all assets using the Asset Microservice. GET /Asset
+Get last hour telemetry events using the Telemetry Microservice. GET /Telemetry/last-hour
+Send to Energy Analytics Microservice for processing. POST /EnergyAnalytics/analyse
 
-== Read prosumers ==
-C -> K : Read Request
-K -> P : GET /prosumers
-P --> K : Prosumer list
-K --> C : Forward Response
+The business process does not need to query the Prosumer or Utility Operator (and even Grid Cell) microservices
+- as it is in the project statement - since all the information we need can be obtained from the previous endpoints.
+The asset_id to prosumer_id mapping is already carried by the asset records, and the grid_cell_id is already carried
+by each telemetry event.
+'/
 
-== Read zones ==
-C -> K : Read Request
-K -> U : GET /zones
-U --> K : Zone list
-K --> C : Forward Response
 
-== Read telemetry (time range) ==
-C -> K : Read Request
-K -> T : GET /telemetry?range=...
-T --> K : Time-series records
-K --> C : Forward Response
+participant Camunda
+participant Kong
+participant "Asset Microservice" as Asset
+participant "Telemetry Microservice" as Tel
+participant "Energy Analytics Microservice" as EA
+participant Kafka
 
-== Compute and publish analytics ==
-C -> K : POST /analytics/compute
-K -> E : Forward Request
-activate E
-E -> E : Compute aggregates\n- Energy Discharged by Zone\n- Generated Energy by Prosumer\n- Consumed Energy by Prosumer\n- Average SoC
+Camunda -> Kong : Read All Assets Request
+Kong -> Asset : Forward Request
+note right of Asset : Process request
+Asset -> Kong : Response
+Kong -> Camunda : Forward Response
 
-E -> KF : Publish to "Energy Discharged by Zone"
-E -> KF : Publish to "Generated Energy by Prosumer"
-E -> KF : Publish to "Consumed Energy by Prosumer"
-E -> KF : Publish to "Average SoC"
-KF --> E : Published OK
+Camunda -> Kong : Read Last Hour Telemetry Events Request
+Kong -> Tel : Forward Request
+note right of Tel : Process request
+Tel -> Kong : Response
+Kong -> Camunda : Forward Response
 
-E --> K : Response
-deactivate E
-K --> C : Forward Response
-
+Camunda -> Kong : Compute Request
+Kong -> EA : Forward Request
+note right of EA : Process request
+EA -> Kafka : Produce to Topic: energy-discharged-by-zone
+EA -> Kafka : Produce to Topic: generated-energy-by-prosumer
+EA -> Kafka : Produce to Topic: consumed-energy-by-prosumer
+EA -> Kafka : Produce to Topic: average-soc-by-zone
+EA -> Kong : Response
+Kong -> Camunda : Forward Response
 @enduml

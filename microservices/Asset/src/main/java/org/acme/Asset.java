@@ -46,12 +46,12 @@ public class Asset {
     }
 
     public Uni<Boolean> save(MySQLPool client) {
-        return client.preparedQuery("INSERT INTO Asset(name, prosumer_id, grid_cell_id) VALUES (?,?,?)").execute(Tuple.of(this.name, this.prosumerId, this.gridCellId))
+        return client.preparedQuery("INSERT INTO Asset(name, prosumer_id, grid_cell_id, asset_type) VALUES (?,?,?,?)").execute(Tuple.of(this.name, this.prosumerId, this.gridCellId, this.type.name()))
                 .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
     }
 
     public Uni<Boolean> update(MySQLPool client, Long id) {
-        return client.preparedQuery("UPDATE Asset SET name = ?, prosumer_id = ?, grid_cell_id = ? WHERE id = ?").execute(Tuple.of(this.name, this.prosumerId, this.gridCellId, id))
+        return client.preparedQuery("UPDATE Asset SET name = ?, prosumer_id = ?, grid_cell_id = ?, asset_type = ? WHERE id = ?").execute(Tuple.of(this.name, this.prosumerId, this.gridCellId, this.type.name(), id))
                 .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
     }
 

@@ -39,9 +39,9 @@ public class FlexibilityEmissionResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS FlexibilityEvent").execute()
-        .flatMap(r -> client.query("CREATE TABLE FlexibilityEvent (id SERIAL PRIMARY KEY, asset_id BIGINT UNSIGNED NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, event_type VARCHAR(255) NOT NULL, event_time DATETIME NOT NULL , FOREIGN KEY (prosumer_id) REFERENCES Prosumer(id), FOREIGN KEY (prosumer_id) REFERENCES Asset(id))").execute())
-        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type, event_time) VALUES ('asset-1', 1, 'UNAVAILABLE', '2020-10-10T20:00')").execute())
-        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type, event_time) VALUES ('asset-2', 1, 'SELL', '2020-10-10T21:00')").execute())
+        .flatMap(r -> client.query("CREATE TABLE FlexibilityEvent (id SERIAL PRIMARY KEY, asset_id BIGINT UNSIGNED NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, event_type VARCHAR(255) NOT NULL, event_time DATETIME NOT NULL , FOREIGN KEY (prosumer_id) REFERENCES Prosumer(id), FOREIGN KEY (asset_id) REFERENCES Asset(id))").execute())
+        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type, event_time) VALUES ('asset-1', 1, 'UNAVAILABLE', '2020-10-10 20:00')").execute())
+        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type, event_time) VALUES ('asset-2', 1, 'SELL', '2020-10-10 21:00')").execute())
         .await().indefinitely();
     }
 
@@ -50,7 +50,7 @@ public class FlexibilityEmissionResource {
         return FlexibilityEvent.findAll(client);
     }
     
-    @GET
+    @POST
     @Path("/evaluate")
     @Blocking
     public Response evaluate(EvaluateRequestDTO dto) {
@@ -68,7 +68,7 @@ public class FlexibilityEmissionResource {
                 boolean result = newEvent.save(client).await().indefinitely();
                 if (!result) return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 
-                offerEmitter.send(newEvent.toString());
+                offerEmitter.send(newEvent.toJson());
                 continue;
             }
 
@@ -79,6 +79,7 @@ public class FlexibilityEmissionResource {
             if (!result) return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             offerEmitter.send(newEvent.toString());
         }
-        return Response.noContent().build();
+
+        return Response.ok().build();
     }
 }

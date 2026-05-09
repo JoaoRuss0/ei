@@ -34,11 +34,17 @@ public class FlexibilityEvent {
     }
 
     public FlexibilityEvent(Long id, Long assetId, Long prosumerId, FlexibilityEventType eventType, LocalDateTime eventTime) {
-        this.id = nextId.getAndIncrement();
+        this.id = id;
         this.assetId = assetId;
         this.eventTime = eventTime;
         this.prosumerId = prosumerId;
         this.eventType = eventType;
+    }
+
+    public String toJson() {
+        return String.format(
+                "{\"id\":%d,\"assetId\":%d,\"prosumerId\":%d,\"eventTime\":\"%s\",\"eventType\":\"%s\"}",
+                id, assetId, prosumerId, eventTime.toString(), eventType.name());
     }
 
     private static FlexibilityEvent from(Row row) {

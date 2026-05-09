@@ -40,11 +40,11 @@ public class GridBalancingRecommendation {
     }
 
     public Uni<Boolean> save(MySQLPool client) {
-        return client.preparedQuery("INSERT INTO GridBalancingRecommendation(grid_cell_from_id, grid_cell_to_id, transfer_kw, timestamp) VALUES (?,?,?)").execute(Tuple.of(this.gridCellFromId, this.gridCellToId, this.transferKw, this.timestamp))
+        return client.preparedQuery("INSERT INTO GridBalancingRecommendation(grid_cell_from_id, grid_cell_to_id, transfer_kw, timestamp) VALUES (?,?,?,?)").execute(Tuple.of(this.gridCellFromId, this.gridCellToId, this.transferKw, this.timestamp))
                 .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
     }
 
     public String toJson() {
-        return String.format("{\"from\":\"%s\",\"to\":\"%s\",\"transfer_kw\":%.2f}", this.gridCellFromId, this.gridCellToId, this.transferKw);
+        return String.format("{\"from\":\"%s\",\"to\":\"%s\",\"transfer_kw\":%f,\"timestamp\":%s}", this.gridCellFromId, this.gridCellToId, this.transferKw, this.timestamp.toString());
     }
 }

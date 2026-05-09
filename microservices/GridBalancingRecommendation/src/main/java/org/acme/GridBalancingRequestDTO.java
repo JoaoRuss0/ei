@@ -2,7 +2,7 @@ package org.acme;
 
 import java.util.Collection;
 
-public record AnalyseRequestDTO(
+public record GridBalancingRequestDTO(
    Collection<TelemetryEvent> events,
    Collection<GridCellData> cells
 ) {}

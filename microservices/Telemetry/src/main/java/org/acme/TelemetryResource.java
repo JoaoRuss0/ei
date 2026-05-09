@@ -6,15 +6,11 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.ResponseBuilder;
 
 import org.acme.model.Topic;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
-import io.smallrye.mutiny.Uni;
 
 import java.util.Collection;
 
@@ -87,8 +83,14 @@ public class TelemetryResource {
 
     @GET
     @Path("latest")
-    public Multi<Telemetry> getSingle(Collection<AssetIdAndGridCell> toSearch) {
-        return Telemetry.findLatestForAssetIds(client, toSearch);
+    public Multi<Telemetry> getLatest(Collection<AssetIdAndGridCell> toSearch) {
+        return Telemetry.findLatestForAssetIdsGridCellPair(client, toSearch);
+    }
+
+    @GET
+    @Path("last-hour")
+    public Multi<Telemetry> getLastHourEvents() {
+        return Telemetry.findLastHourEvents(client);
     }
 }
 

@@ -1,8 +1,5 @@
 package org.acme;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -11,12 +8,10 @@ import io.smallrye.reactive.messaging.annotations.Channel;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
-import io.smallrye.mutiny.Uni;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.ResponseBuilder;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 @Path("AssetLink")
@@ -55,9 +50,9 @@ public class GrigBalancingRecommendationResource {
     }
 
     @POST
-    @Path("analyse")
+    @Path("balance")
     @Blocking
-    public void analyse(AnalyseRequestDTO dto) {
+    public Response balance(GridBalancingRequestDTO dto) {
 
         Map<String, Double> loadByCell = dto.events().stream()
                 .collect(Collectors.groupingBy(
@@ -94,6 +89,8 @@ public class GrigBalancingRecommendationResource {
                 if (overload <= 0) break;
             }
         }
+
+        return Response.ok().build();
     }
 
     private double contribution(TelemetryEvent t) {

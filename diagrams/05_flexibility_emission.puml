@@ -6,7 +6,7 @@ In order to emit flexibility events we need to fetch prosumers. GET /Prosumer
 For the prosumer, fetch its active (has a grid cell id) BATTERY assets. GET /Asset/active/by-prosumer/{id}
 Fetch latest telemetry events for the assets in the corresponding grid cell ids. GET /Telemetry/latest
 We then get the grid cell's data which includes the peak hours range. GET /GridCell/by-ids?ids=<id>
-From then on, we send the events and grid cell data to the Flexibility Emission Microservice. GET /FlexibilityEmission/evaluate
+From then on, we send the events and grid cell data to the Flexibility Emission Microservice. POST /FlexibilityEmission/evaluate
 Which will either
  - Send an event marking the asset as unavailable
  - Send an event telling the prosumer to sell

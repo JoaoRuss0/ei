@@ -7,7 +7,7 @@ Get active assets in those grid cells using the Asset Microservice. GET /Asset/a
 Get latest telemetry events for those assets in current grid cells using the Telemetry Microservice. GET /Telemetry/latest
 Send to Grid Balancing Microservice for processing and produce balancing events. POST /balance
 
-The business process does not need to query the Prosumer, Utility Operator and Asset Link microservices - as it is is
+The business process does not need to query the Prosumer, Utility Operator and Asset Link microservices - as it is in
 the project statement - since all the information we need can be obtained from the previous endpoints.
 '/
 

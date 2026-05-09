@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.smallrye.common.annotation.Blocking;
+import io.smallrye.reactive.messaging.MutinyEmitter;
 import io.smallrye.reactive.messaging.annotations.Channel;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
@@ -12,7 +13,6 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
-import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 @Path("AssetLink")
 public class GrigBalancingRecommendationResource {
@@ -27,7 +27,7 @@ public class GrigBalancingRecommendationResource {
     boolean schemaCreate ;
 
     @Channel("balancing-recommendation")
-    Emitter<String> recommendationEmitter;
+    MutinyEmitter<String> recommendationEmitter;
 
     void config(@Observes StartupEvent ev) {
         if (schemaCreate) {

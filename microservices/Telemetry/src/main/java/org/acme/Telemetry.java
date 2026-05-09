@@ -148,4 +148,16 @@ public class Telemetry
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
                 .onItem().transform(Telemetry::from);
     }
+
+
+    public static Multi<Telemetry> findForAssetIdAroundTimestamp(MySQLPool client, Long assetId, LocalDateTime timestamp, int n) {
+        return client.preparedQuery(
+                        "(SELECT * FROM Telemetry WHERE asset_id = ? AND timeStamp <= ? ORDER BY timeStamp DESC LIMIT ?) " +
+                                "UNION " +
+                                "(SELECT * FROM Telemetry WHERE asset_id = ? AND timeStamp > ? ORDER BY timeStamp LIMIT ?) " +
+                                "ORDER BY timeStamp ")
+                .execute(Tuple.of(assetId, timestamp, n, assetId, timestamp, n))
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(Telemetry::from);
+    }
 }

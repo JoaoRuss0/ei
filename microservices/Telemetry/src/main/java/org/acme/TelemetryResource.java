@@ -3,15 +3,14 @@ package org.acme;
 import io.smallrye.common.annotation.Blocking;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
+import jakarta.ws.rs.*;
 
 import org.acme.model.Topic;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Path("Telemetry")
@@ -91,6 +90,12 @@ public class TelemetryResource {
     @Path("last-hour")
     public Multi<Telemetry> getLastHourEvents() {
         return Telemetry.findLastHourEvents(client);
+    }
+
+    @GET
+    @Path("asset/{assetId}/around/{timestamp}/")
+    public Multi<Telemetry> getAssetEventAroundTimestmap(@QueryParam("assetId") Long assetId, @PathParam("timestamp") LocalDateTime timestamp) {
+        return Telemetry.findForAssetIdAroundTimestamp(client, assetId, timestamp, 10);
     }
 }
 

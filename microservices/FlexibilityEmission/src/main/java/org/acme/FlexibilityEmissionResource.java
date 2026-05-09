@@ -4,6 +4,7 @@ import io.quarkus.runtime.StartupEvent;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.smallrye.reactive.messaging.MutinyEmitter;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -24,7 +25,7 @@ public class FlexibilityEmissionResource {
     io.vertx.mutiny.mysqlclient.MySQLPool client;
 
     @Channel("flexibility-offers")
-    Emitter<String> offerEmitter;
+    MutinyEmitter<String> offerEmitter;
 
     @Inject
     @ConfigProperty(name = "myapp.schema.create", defaultValue = "true") 

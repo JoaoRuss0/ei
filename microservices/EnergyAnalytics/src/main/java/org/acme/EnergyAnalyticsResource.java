@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.smallrye.reactive.messaging.MutinyEmitter;
 import io.smallrye.reactive.messaging.annotations.Blocking;
 import io.smallrye.reactive.messaging.annotations.Channel;
 import jakarta.enterprise.event.Observes;
@@ -23,16 +24,16 @@ public class EnergyAnalyticsResource {
     io.vertx.mutiny.mysqlclient.MySQLPool client;
 
     @Channel("energy-discharged-by-zone")
-    Emitter<String> discargedEmitter;
+    MutinyEmitter<String> discargedEmitter;
 
     @Channel("generated-energy-by-prosumer")
-    Emitter<String> generatedEmitter;
+    MutinyEmitter<String> generatedEmitter;
 
     @Channel("consumed-energy-by-prosumer")
-    Emitter<String> consumedEmitter;
+    MutinyEmitter<String> consumedEmitter;
 
     @Channel("average-soc")
-    Emitter<String> averageSocEmitter;
+    MutinyEmitter<String> averageSocEmitter;
 
     @Inject
     @ConfigProperty(name = "myapp.schema.create", defaultValue = "true") 
@@ -91,7 +92,7 @@ public class EnergyAnalyticsResource {
         return Response.ok().build();
     }
 
-    private <K> void publishAndSave(EnergyAnalyticsType type, Map<K, Double> data, Emitter<String> emitter, LocalDateTime ts) {
+    private <K> void publishAndSave(EnergyAnalyticsType type, Map<K, Double> data, MutinyEmitter<String> emitter, LocalDateTime ts) {
         data.forEach((k, v) -> {
             EnergyAnalytics event = new EnergyAnalytics(type, String.valueOf(k), v, ts);
             event.save(client).subscribe().with(ok -> {}, err -> System.err.println("Save failed: " + err));

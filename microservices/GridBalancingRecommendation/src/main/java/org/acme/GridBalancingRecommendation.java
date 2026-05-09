@@ -8,48 +8,43 @@ import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 public class GridBalancingRecommendation {
-	
-	    public Long id;
-		public Long idProsumer;
-		public Long idUtilityOperator;
 
-		private static GridBalancingRecommendation from(Row row) {
-	        return new GridBalancingRecommendation(row.getLong("id"), row.getLong("idProsumer") , row.getLong("idUtilityOperator"));
-	    }
-	    
-	    public static Multi<GridBalancingRecommendation> findAll(MySQLPool client) {
-	        return client.query("SELECT id, idProsumer, idUtilityOperator  FROM AssetLink ORDER BY id ASC").execute()
-	                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
-	                .onItem().transform(GridBalancingRecommendation::from);
-	    }
-	    
-	    public static Uni<GridBalancingRecommendation> findById(MySQLPool client, Long id) {
-	        return client.preparedQuery("SELECT id, idProsumer, idUtilityOperator  FROM AssetLink WHERE id = ?").execute(Tuple.of(id)) 
-	                .onItem().transform(RowSet::iterator) 
-	                .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : null); 
-	    }
+    public String gridCellFromId;
+    public String gridCellToId;
+    public Double transferKw;
+    public LocalDateTime timestamp;
 
-		public static Uni<GridBalancingRecommendation> findById2(MySQLPool client, Long idProsumer_R , Long idUtilityOperator_R) {
-	        return client.preparedQuery("SELECT id, idProsumer, idUtilityOperator FROM AssetLink WHERE idProsumer = ? AND idUtilityOperator = ?").execute(Tuple.of(idProsumer_R , idUtilityOperator_R)) 
-	                .onItem().transform(RowSet::iterator) 
-	                .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : null); 
-					
-	    }
+    public GridBalancingRecommendation(String gridCellFromId, String gridCellToId, Double transferKw) {
+        this.gridCellFromId = gridCellFromId;
+        this.gridCellToId = gridCellToId;
+        this.transferKw = transferKw;
+        this.timestamp = LocalDateTime.now();
+    }
 
-	    public Uni<Boolean> save(MySQLPool client , Long idProsumer_R , Long idUtilityOperator_R) 
-		{
-	        return client.preparedQuery("INSERT INTO AssetLink(idProsumer,idUtilityOperator) VALUES (?,?)").execute(Tuple.of( idProsumer_R , idUtilityOperator_R))
-	        		.onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1 ); 
-	    }
-	    
-	    public static Uni<Boolean> delete(MySQLPool client, Long id_R) {
-	        return client.preparedQuery("DELETE FROM AssetLink WHERE id = ?").execute(Tuple.of(id_R))
-	                .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1); 
-	    }
+    private static GridBalancingRecommendation from(Row row) {
+        return new GridBalancingRecommendation(row.getString("grid_cell_from_id"), row.getString("grid_cell_to_id"), row.getDouble("transfer_kw"), row.getLocalDateTime("timestamp"));
+    }
+
+    public static Multi<GridBalancingRecommendation> findAll(MySQLPool client) {
+        return client.query("SELECT *  FROM GridBalancingRecommendation").execute()
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(GridBalancingRecommendation::from);
+    }
+
+    public Uni<Boolean> save(MySQLPool client) {
+        return client.preparedQuery("INSERT INTO GridBalancingRecommendation(grid_cell_from_id, grid_cell_to_id, transfer_kw, timestamp) VALUES (?,?,?)").execute(Tuple.of(this.gridCellFromId, this.gridCellToId, this.transferKw, this.timestamp))
+                .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
+    }
+
+    public String toJson() {
+        return String.format("{\"from\":\"%s\",\"to\":\"%s\",\"transfer_kw\":%.2f}", this.gridCellFromId, this.gridCellToId, this.transferKw);
+    }
 }

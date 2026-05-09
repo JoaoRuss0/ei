@@ -32,7 +32,7 @@ public class AssetResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS Asset").execute()
-        .flatMap(r -> client.query("CREATE TABLE Asset (id SERIAL PRIMARY KEY, name TEXT NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, grid_cell_id TEXT, asset_type ENUM('BATTERY','SOLAR','EV_CHARGER') NOT NULL, FOREIGN KEY (prosumer_id) REFERENCES Prosumer(id), FOREIGN KEY (grid_cell_id) REFERENCES GridCell(id))").execute())
+        .flatMap(r -> client.query("CREATE TABLE Asset (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, grid_cell_id VARCHAR(255), asset_type ENUM('BATTERY','SOLAR','EV_CHARGER') NOT NULL, FOREIGN KEY (prosumer_id) REFERENCES Prosumer(id), FOREIGN KEY (grid_cell_id) REFERENCES GridCell(id))").execute())
         .flatMap(r -> client.query("INSERT INTO Asset(name, prosumer_id, grid_cell_id, asset_type) VALUES ('asset-1', 1, 'PORTO_NORTH', 'BATTERY')").execute())
         .flatMap(r -> client.query("INSERT INTO Asset(name, prosumer_id, grid_cell_id, asset_type) VALUES ('asset-2', 1, 'PORTO_NORTH', 'BATTERY')").execute())
         .await().indefinitely();

@@ -31,7 +31,7 @@ public class UtilityOperatorResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS UtilityOperator").execute()
-        .flatMap(r -> client.query("CREATE TABLE UtilityOperator (id SERIAL PRIMARY KEY, name TEXT NOT NULL, location TEXT NOT NULL, iban TEXT NOT NULL)").execute())
+        .flatMap(r -> client.query("CREATE TABLE UtilityOperator (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL, iban VARCHAR(255) NOT NULL)").execute())
         .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('ArcoCegoLisbon','Lisboa', '123123123')").execute())
         .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('PracadeBocage','Setubal', '123123123')").execute())
         .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('PracadaBoavista','Porto', '123123123')").execute())

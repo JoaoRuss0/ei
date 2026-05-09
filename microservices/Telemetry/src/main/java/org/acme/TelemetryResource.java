@@ -42,26 +42,26 @@ public class TelemetryResource {
                 .flatMap(r -> client.query("CREATE TABLE Telemetry (id SERIAL PRIMARY KEY,   "
                         + " timeStamp DATETIME, "
                         + " asset_id BIGINT UNSIGNED, "
-                        + " grid_cell_id TEXT NOT NULL, "
-                        + " asset_type TEXT NOT NULL,  "
+                        + " grid_cell_id VARCHAR(255) NOT NULL, "
+                        + " asset_type VARCHAR(255) NOT NULL,  "
                         + " State_of_Charge	FLOAT, "
                         + " Available_Energy FLOAT, "
                         + " Current_Output	FLOAT, "
                         + " Max_Capacity	FLOAT, "
                         + " State_of_Health	FLOAT, "
-                        + " Status TEXT NOT NULL, "
+                        + " Status VARCHAR(255) NOT NULL, "
                         + " Current_Generation FLOAT, "
                         + " Daily_Total FLOAT, "
                         + " Grid_Voltage FLOAT, "
                         + " Frequency FLOAT, "
-                        + " Plug_Status TEXT NOT NULL, "
+                        + " Plug_Status VARCHAR(255) NOT NULL, "
                         + " Charging_Rate FLOAT, "
                         + " Session_Energy FLOAT, "
                         + " EV_SoC FLOAT, "
                         + " FOREIGN KEY (asset_id) REFERENCES Asset(id),"
                         + " FOREIGN KEY (grid_cell_id) REFERENCES GridCell(id))").execute())
                 .flatMap(r -> client.query("DROP TABLE IF EXISTS TopicSubscription").execute())
-                .flatMap(r -> client.query("CREATE TABLE TopicSubscription (topic_name VARCHAR(255) PRIMARY KEY, owner_service TEXT NOT NULL)").execute())
+                .flatMap(r -> client.query("CREATE TABLE TopicSubscription (topic_name VARCHAR(255) PRIMARY KEY, owner_service VARCHAR(255) NOT NULL)").execute())
                 .await().indefinitely();
     }
 

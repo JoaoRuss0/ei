@@ -42,15 +42,13 @@ public class GrigBalancingRecommendationResource {
     
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
-        client.query("DROP TABLE IF EXISTS AssetLink").execute()
-        .flatMap(r -> client.query("CREATE TABLE GridBalancingRecommendation (id SERIAL PRIMARY KEY, event_time DATETIME NOT NULL)").execute())
-        .flatMap(r -> client.query(" INSERT INTO GridBalancingRecommendation (event_time) VALUES ('2020-04-12T02:11')").execute())
-        .flatMap(r -> client.query(" INSERT INTO GridBalancingRecommendation (event_time) VALUES ('2012-10-10T21:21')").execute())
-        .flatMap(r -> client.query(" INSERT INTO GridBalancingRecommendation (event_time) VALUES ('2015-11-11T01:41')").execute())
-        .flatMap(r -> client.query(" INSERT INTO GridBalancingRecommendation (event_time) VALUES ('2030-22-10T20:51')").execute())
+        client.query("DROP TABLE IF EXISTS GridBalancingRecommendation").execute()
+        .flatMap(r -> client.query("CREATE TABLE GridBalancingRecommendation (grid_cell_from_id VARCHAR(255) NOT NULL, grid_cell_to_id VARCHAR(255) NOT NULL, transfer_kw DOUBLE NOT NULL, timestamp DATETIME NOT NULL, UNIQUE KEY UK_EVENT (grid_cell_from_id, grid_cell_to_id, timestamp))").execute())
+        .flatMap(r -> client.query(" INSERT INTO GridBalancingRecommendation (grid_cell_from_id, grid_cell_to_id, transfer_kw, timestamp) VALUES ('PORTO_NORTH', 'LISBON_SOUTH', 10.0, '2020-04-12 02:11')").execute())
+        .flatMap(r -> client.query(" INSERT INTO GridBalancingRecommendation (grid_cell_from_id, grid_cell_to_id, transfer_kw, timestamp) VALUES ('PORTO_NORTH', 'LISBON_SOUTH', 10.0, '2012-10-10 21:21')").execute())
         .await().indefinitely();
     }
-    
+
     @GET
     public Multi<GridBalancingRecommendation> get() {
         return GridBalancingRecommendation.findAll(client);
@@ -85,7 +83,9 @@ public class GrigBalancingRecommendationResource {
                 if (headroom <= 0) continue;
 
                 double transfer = Math.min(overload, headroom);
-                recommendationEmitter.send(toJson(new Recommendation(cell.id(), neighbour.id(), transfer)));
+                GridBalancingRecommendation recommendation = new GridBalancingRecommendation(cell.id(), neighbour.id(), transfer);
+                recommendation.save(client);
+                recommendationEmitter.send(recommendation.toJson());
 
                 loadByCell.merge(cell.id(), -transfer, Double::sum);
                 loadByCell.merge(neighbour.id(), transfer, Double::sum);
@@ -104,10 +104,4 @@ public class GrigBalancingRecommendationResource {
             default -> 0;
         };
     }
-
-    private static String toJson(Recommendation r) {
-        return String.format("{\"from\":\"%s\",\"to\":\"%s\",\"amount_kw\":%.2f}",
-                r.from(), r.to(), r.amountKw());
-    }
-
 }

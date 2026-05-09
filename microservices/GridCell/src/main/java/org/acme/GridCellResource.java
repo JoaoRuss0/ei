@@ -33,7 +33,7 @@ public class GridCellResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS GridCell").execute()
-        .flatMap(r -> client.query("CREATE TABLE GridCell (id VARCHAR(255) PRIMARY KEY, address TEXT NOT NULL, postal_code TEXT NOT NULL, peak_hours_start DATETIME NOT NULL , peak_hours_end DATETIME NOT NULL , max_load BIGINT NOT NULL , operator_id BIGINT UNSIGNED NOT NULL, x_coords BIGINT NOT NULL, y_coords BIGINT NOT NULL , FOREIGN KEY (operator_id) REFERENCES UtilityOperator(id), UNIQUE KEY UK_COORDS (x_coords, y_coords) )").execute())
+        .flatMap(r -> client.query("CREATE TABLE GridCell (id VARCHAR(255) PRIMARY KEY, address VARCHAR(255) NOT NULL, postal_code VARCHAR(255) NOT NULL, peak_hours_start DATETIME NOT NULL , peak_hours_end DATETIME NOT NULL , max_load BIGINT NOT NULL , operator_id BIGINT UNSIGNED NOT NULL, x_coords BIGINT NOT NULL, y_coords BIGINT NOT NULL , FOREIGN KEY (operator_id) REFERENCES UtilityOperator(id), UNIQUE KEY UK_COORDS (x_coords, y_coords) )").execute())
         .flatMap(r -> client.query("INSERT INTO GridCell (id, address, postal_code, peak_hours_start, peak_hours_end, max_load, x_coords, y_coords, operator_id) VALUES ('PORTO_NORTH', 'Rua do Figo', '2222-232', '2026-01-01 18:00:00', '2026-01-01 21:00:00', 10, 1, 1, 1)").execute())
         .flatMap(r -> client.query("INSERT INTO GridCell (id, address, postal_code, peak_hours_start, peak_hours_end, max_load, x_coords, y_coords, operator_id) VALUES ('LISBON_SOUTH', 'Rua da Pera', '3142-521', '2026-01-01 09:30:00', '2026-01-01 12:00:00', 50, 1, 0, 2)").execute())
         .await().indefinitely();

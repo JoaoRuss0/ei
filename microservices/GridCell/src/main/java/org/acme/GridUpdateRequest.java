@@ -5,9 +5,11 @@ import java.time.LocalDateTime;
 public record GridUpdateRequest (
         String address,
         String postalCode,
-        LocalDateTime peakHoursStart,
-        LocalDateTime peakHoursEnd,
+        LocalDateTime peakHoursStartTime,
+        LocalDateTime peakHoursEndTime,
         Long maxLoad,
-        Long operatorId
+        Long operatorId,
+        Long xCoords,
+        Long yCoords
 )
 {}

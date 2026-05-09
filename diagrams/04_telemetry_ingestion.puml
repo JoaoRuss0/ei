@@ -6,5 +6,6 @@ participant Kafka
 
 note right of Kafka : New Event
 Tel -> Kafka   : Cosume Event
+Tel <- Kafka
 note right of Tel : Store Event
 @enduml

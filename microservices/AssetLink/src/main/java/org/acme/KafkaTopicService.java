@@ -20,8 +20,8 @@ public class KafkaTopicService {
     @ConfigProperty(name = "kafka.bootstrap.servers")
     String bootstrapServers;
 
-    public void createAssetLinkTopic(AssetLink link, String utilityOperator) {
-        String topicName = link.getId() + "-" + utilityOperator;
+    public void createAssetLinkTopic(Long assetId, String gridCellId) {
+        String topicName = assetId.toString() + "-" + gridCellId;
 
         Properties props = new Properties();
         props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -38,8 +38,8 @@ public class KafkaTopicService {
         }
     }
 
-    public void deleteAssetLinkTopic(AssetLink link, String utilityOperator) {
-        String topicName = link.getId() + "-" + utilityOperator;
+    public void deleteAssetLinkTopic(Long assetId, String gridCellId) {
+        String topicName = assetId.toString() + "-" + gridCellId;
 
         Properties props = new Properties();
         props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);

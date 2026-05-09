@@ -6,7 +6,7 @@ participant Kong
 participant "Utility Operator Microservice" as MS
 
 Camunda -> Kong : CRUD Request
-Kong -> MS : Forward CRUD Request
+Kong -> MS : Forward Request
 note right of MS : Process request
 MS -> Kong : Response
 Kong -> Camunda : Forward Response

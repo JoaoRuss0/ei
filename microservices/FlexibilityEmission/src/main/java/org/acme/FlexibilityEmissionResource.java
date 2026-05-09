@@ -39,9 +39,9 @@ public class FlexibilityEmissionResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS FlexibilityEvent").execute()
-        .flatMap(r -> client.query("CREATE TABLE FlexibilityEvent (id SERIAL PRIMARY KEY, asset_id BIGINT UNSIGNED NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, event_type TEXT NOT NULL, FOREIGN KEY (prosumer_id) REFERENCES Prosumer(id), FOREIGN KEY (prosumer_id) REFERENCES Asset(id))").execute())
-        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type) VALUES ('asset-1', 1, 'UNAVAILABLE')").execute())
-        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type) VALUES ('asset-2', 1, 'SELL')").execute())
+        .flatMap(r -> client.query("CREATE TABLE FlexibilityEvent (id SERIAL PRIMARY KEY, asset_id BIGINT UNSIGNED NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, event_type TEXT NOT NULL, event_time DATETIME NOT NULL , FOREIGN KEY (prosumer_id) REFERENCES Prosumer(id), FOREIGN KEY (prosumer_id) REFERENCES Asset(id))").execute())
+        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type, event_time) VALUES ('asset-1', 1, 'UNAVAILABLE', '2020-10-10T20:00')").execute())
+        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type, event_time) VALUES ('asset-2', 1, 'SELL', '2020-10-10T21:00')").execute())
         .await().indefinitely();
     }
 

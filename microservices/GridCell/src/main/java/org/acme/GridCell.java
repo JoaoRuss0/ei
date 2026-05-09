@@ -19,60 +19,79 @@ import java.util.stream.Collectors;
 @Setter
 @ToString
 public class GridCell {
-	
-	    public String id;
-		public String address;
-		public String postalCode;
-		public LocalDateTime peakHoursStartTime;
-		public LocalDateTime peakHoursEndTime;
-		public Long maxLoad;
-		public Long operatorId;
 
-		private static GridCell from(Row row) {
-	        return new GridCell(row.getString("id"), row.getString("address"), row.getString("postal_code") , row.getLocalDateTime("peak_hours_start"), row.getLocalDateTime("peak_hours_end"), row.getLong("max_load"), row.getLong("operator_id"));
-	    }
-	    
-	    public static Multi<GridCell> findAll(MySQLPool client) {
-	        return client.query("SELECT id, address, postal_code, peak_hours_start, peak_hours_end, max_load, operator_id FROM GridCell ORDER BY id ASC").execute()
-	                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
-	                .onItem().transform(GridCell::from);
-	    }
-	    
-	    public static Uni<GridCell> findById(MySQLPool client, String id) {
-	        return client.preparedQuery("SELECT id, address, postal_code, peak_hours_start, peak_hours_end, max_load, operator_id FROM GridCell WHERE id = ?").execute(Tuple.of(id))
-	                .onItem().transform(RowSet::iterator) 
-	                .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : null); 
-	    }
+    public String id;
+    public String address;
+    public String postalCode;
+    public LocalDateTime peakHoursStartTime;
+    public LocalDateTime peakHoursEndTime;
+    public Long maxLoad;
+    public Long operatorId;
+    public Long xCoords;
+    public Long yCoords;
 
-	    public static Uni<Boolean> delete(MySQLPool client, String id_R) {
-	        return client.preparedQuery("DELETE FROM GridCell WHERE id = ?").execute(Tuple.of(id_R))
-	                .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
-	    }
+    private static GridCell from(Row row) {
+        return new GridCell(row.getString("id"), row.getString("address"),
+                row.getString("postal_code"), row.getLocalDateTime("peak_hours_start"),
+                row.getLocalDateTime("peak_hours_end"), row.getLong("max_load"),
+                row.getLong("operator_id"), row.getLong("xCoords"), row.getLong("yCoords"));
+    }
 
-	    public Uni<Boolean> save(MySQLPool client , String address, String postalCode , LocalDateTime peakHoursStartTime, LocalDateTime peakHoursEndTime, Long maxLoad, Long operatorId)
-		{
-	        return client.preparedQuery("INSERT INTO GridCell(address, postal_code,peak_hours_start,peak_hours_end, max_load, operator_id) VALUES (?,?,?,?,?,?)").execute(Tuple.of( address, postalCode , peakHoursStartTime, peakHoursEndTime, maxLoad, operatorId))
-	        		.onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1 );
-	    }
+    public static Multi<GridCell> findAll(MySQLPool client) {
+        return client.query("SELECT * FROM GridCell ORDER BY id ASC").execute()
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(GridCell::from);
+    }
 
-	    public static Uni<Boolean> update(MySQLPool client, String id, String address, String postalCode, LocalDateTime peakHoursStartTime, LocalDateTime peakHoursEndTime,  Long maxLoad, Long operatorId) {
-			Tuple params = Tuple.tuple(List.of(address, postalCode, peakHoursStartTime, peakHoursEndTime, maxLoad, operatorId, id));
-	        return client.preparedQuery("UPDATE GridCell SET address = ?, postal_code = ? , peak_hours_start = ?, peak_hours_end = ?, max_load = ?, operator_id = ? WHERE id = ?")
-					.execute(params)
-	        		.onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1 ); 
-	    }
+    public static Uni<GridCell> findById(MySQLPool client, String id) {
+        return client.preparedQuery("SELECT * FROM GridCell WHERE id = ?").execute(Tuple.of(id))
+                .onItem().transform(RowSet::iterator)
+                .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : null);
+    }
 
-	public static Multi<GridCell> findByIds(MySQLPool client, Collection<Long> ids) {
-		if (ids.isEmpty()) return Multi.createFrom().empty();
+    public static Uni<Boolean> delete(MySQLPool client, String id_R) {
+        return client.preparedQuery("DELETE FROM GridCell WHERE id = ?").execute(Tuple.of(id_R))
+                .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
+    }
 
-		String placeholders = ids.stream().map(i -> "?").collect(Collectors.joining(","));
-		String query = "SELECT * FROM GridCell WHERE id IN (" + placeholders + ")";
+    public Uni<Boolean> save(MySQLPool client) {
+        Tuple params = Tuple.tuple(List.of(address, postalCode, peakHoursStartTime, peakHoursEndTime, maxLoad, operatorId, xCoords, yCoords));
+        return client.preparedQuery("INSERT INTO GridCell(address, postal_code,peak_hours_start,peak_hours_end, max_load, operator_id, x_cords, y_coords) VALUES (?,?,?,?,?,?,?,?)").execute(params)
+                .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
+    }
 
-		Tuple params = Tuple.tuple();
-		ids.forEach(params::addLong);
+    public static Uni<Boolean> update(MySQLPool client, String id, GridUpdateRequest request) {
+        Tuple params = Tuple.tuple(List.of(request.address(), request.postalCode(), request.peakHoursStartTime(), request.peakHoursEndTime(), request.maxLoad(), request.operatorId(), request.xCoords(), request.yCoords(), id));
+        return client.preparedQuery("UPDATE GridCell SET address = ?, postal_code = ? , peak_hours_start = ?, peak_hours_end = ?, max_load = ?, operator_id = ?, x_coords = ?, y_coords = ? WHERE id = ?")
+                .execute(params)
+                .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
+    }
 
-		return client.preparedQuery(query).execute(params)
-				.onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
-				.onItem().transform(GridCell::from);
-	}
+    public static Multi<GridCell> findByIds(MySQLPool client, Collection<Long> ids) {
+        if (ids.isEmpty()) return Multi.createFrom().empty();
+
+        String placeholders = ids.stream().map(i -> "?").collect(Collectors.joining(","));
+        String query = "SELECT * FROM GridCell WHERE id IN (" + placeholders + ")";
+
+        Tuple params = Tuple.tuple();
+        ids.forEach(params::addLong);
+
+        return client.preparedQuery(query).execute(params)
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(GridCell::from);
+    }
+
+    public static Multi<GridCell> findByOperatorIds(MySQLPool client, Collection<Long> operatorIds) {
+        if (operatorIds.isEmpty()) return Multi.createFrom().empty();
+
+        String placeholders = operatorIds.stream().map(i -> "?").collect(Collectors.joining(","));
+        String query = "SELECT * FROM GridCell WHERE operator_id IN (" + placeholders + ")";
+
+        Tuple params = Tuple.tuple();
+        operatorIds.forEach(params::addLong);
+
+        return client.preparedQuery(query).execute(params)
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(GridCell::from);
+    }
 }

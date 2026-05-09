@@ -1,30 +1,52 @@
 @startuml AssetLinkManagement
 title Asset Link Creation/Reading Business Process
 
+/'
+In order to create an asset link we need to first make a contract between the prosumer and utility operator. POST /AssetLink
+Fetch all potential grid cells from the contracted Utility Operator. GET /GridCells/by-operator-ids?operatorIds=<id>
+Assign a grid cell to the asset(s) using the Asset MicroService PUT /Asset
+Create a new topic(s) in Kafka using the AssetLink microservice POST /AssetLink/topic/{assetId}/{gridCellId}
+Activate the consumption of said topic(s) by the Telemetry Microservice POST /Telemetry/consume
+'/
+
 participant Camunda
 participant Kong
 participant "AssetLink Microservice" as Link
-participant "Telemetry Microservice" as Tel
+participant "Grid Cell Microservice" as GC
+participant "Asset Microservice" as Asset
 participant Kafka
+participant "Telemetry Microservice" as Tel
 
 Camunda -> Kong : Create/Read Request
-Kong -> Link : Forward Create/Read Request
+Kong -> Link : Forward Request
 note right of Link : Process Request
 Link -> Kong : Response
 Kong -> Camunda : Forward Response
 
 note left of Camunda : If the Request is Create, continue
 
+Camunda -> Kong : Read related Utility Operator's Grid Cells Request
+Kong -> GC : Forward Request
+note right of GC : Process request
+GC -> Kong : Response
+Kong -> Camunda : Forward Response
+
+Camunda -> Kong : Update Asset's Grid Cell Id Request
+Kong -> Asset : Forward Request
+note right of Asset : Process request
+Asset -> Kong : Response
+Kong -> Camunda : Forward Response
+
 Camunda -> Kong : Create Topic Request
-Kong -> Link : Forward Create Topic Request
-Link -> Kafka : Delete Topic (AssetID-UtilityOperator)
-note right of Kafka : Create Topic 'AssetLinkID-UtilityOperator'
+Kong -> Link : Forward Request
+Link -> Kafka : Create Topic (AssetID-GridCellId)
+note right of Kafka : Create Topic 'AssetID-GridCellId'
 Kafka -> Link : Response
 Link -> Kong : Response
 Kong -> Camunda : Forward Response
 
 Camunda -> Kong : Consume Topic Request
-Kong -> Tel : Forward Consume Topic Request
+Kong -> Tel : Forward Request
 note right of Tel : Start Consumer Thread
 Tel -> Kafka : Consume Topic
 Tel -> Kong : Response

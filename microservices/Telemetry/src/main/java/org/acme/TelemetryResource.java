@@ -42,8 +42,8 @@ public class TelemetryResource {
                 .flatMap(r -> client.query("CREATE TABLE Telemetry (id SERIAL PRIMARY KEY,   "
                         + " timeStamp DATETIME, "
                         + " asset_id BIGINT UNSIGNED, "
-                        + " asset_type TEXT NOT NULL,  "
                         + " grid_cell_id TEXT NOT NULL, "
+                        + " asset_type TEXT NOT NULL,  "
                         + " State_of_Charge	FLOAT, "
                         + " Available_Energy FLOAT, "
                         + " Current_Output	FLOAT, "
@@ -58,14 +58,15 @@ public class TelemetryResource {
                         + " Charging_Rate FLOAT, "
                         + " Session_Energy FLOAT, "
                         + " EV_SoC FLOAT, "
-                        + " FOREIGN KEY (asset_id) REFERENCES Asset(id))").execute())
+                        + " FOREIGN KEY (asset_id) REFERENCES Asset(id),"
+                        + " FOREIGN KEY (grid_cell_id) REFERENCES GridCell(id))").execute())
                 .flatMap(r -> client.query("DROP TABLE IF EXISTS TopicSubscription").execute())
                 .flatMap(r -> client.query("CREATE TABLE TopicSubscription (topic_name VARCHAR(255) PRIMARY KEY, owner_service TEXT NOT NULL)").execute())
                 .await().indefinitely();
     }
 
     @POST
-    @Path("Consume")
+    @Path("consume")
     @Blocking
     public String ProvisioningConsumer(Topic topic) {
         service.consume(topic);
@@ -74,6 +75,7 @@ public class TelemetryResource {
 
     @POST
     @Path("stop")
+    @Blocking
     public void stop(Topic topic) {
         service.stop(topic);
     }
@@ -85,8 +87,8 @@ public class TelemetryResource {
 
     @GET
     @Path("latest")
-    public Multi<Telemetry> getSingle(@QueryParam("assetId") Collection<Long> assetIds) {
-        return Telemetry.findLatestForAssetIds(client, assetIds);
+    public Multi<Telemetry> getSingle(Collection<AssetIdAndGridCell> toSearch) {
+        return Telemetry.findLatestForAssetIds(client, toSearch);
     }
 }
 

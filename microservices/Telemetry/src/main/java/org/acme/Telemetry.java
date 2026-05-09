@@ -113,21 +113,29 @@ public class Telemetry
     }
 
 
-    public static Multi<Telemetry> findLatestForAssetIds(MySQLPool client, Collection<Long> assetIds) {
-        if (assetIds.isEmpty()) return Multi.createFrom().empty();
+    public static Multi<Telemetry> findLatestForAssetIds(MySQLPool client, Collection<AssetIdAndGridCell> toSearch) {
+        if (toSearch.isEmpty()) return Multi.createFrom().empty();
 
-        String placeholders = assetIds.stream().map(s -> "?").collect(Collectors.joining(","));
+        String pairPlaceholders = toSearch.stream()
+                .map(p -> "(?, ?)")
+                .collect(Collectors.joining(","));
+
         String query =
                 "SELECT t.* FROM Telemetry t " +
                         "INNER JOIN ( " +
-                        "  SELECT asset_id, MAX(timeStamp) AS max_ts " +
+                        "  SELECT asset_id, grid_cell_id, MAX(timeStamp) AS max_ts " +
                         "  FROM Telemetry " +
-                        "  WHERE asset_id IN (" + placeholders + ") " +
-                        "  GROUP BY asset_id " +
-                        ") latest ON t.asset_id = latest.asset_id AND t.timeStamp = latest.max_ts";
+                        "  WHERE (asset_id, grid_cell_id) IN (" + pairPlaceholders + ") " +
+                        "  GROUP BY asset_id, grid_cell_id " +
+                        ") latest ON t.asset_id = latest.asset_id " +
+                        "       AND t.grid_cell_id = latest.grid_cell_id " +
+                        "       AND t.timeStamp = latest.max_ts";
 
         Tuple params = Tuple.tuple();
-        assetIds.forEach(params::addLong);
+        for (AssetIdAndGridCell p : toSearch) {
+            params.addLong(p.assetId());
+            params.addString(p.gridCellId());
+        }
 
         return client.preparedQuery(query).execute(params)
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))

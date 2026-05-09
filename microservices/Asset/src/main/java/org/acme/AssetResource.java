@@ -11,6 +11,7 @@ import jakarta.ws.rs.core.Response.ResponseBuilder;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.net.URI;
+import java.util.Collection;
 
 @Path("Asset")
 public class AssetResource {
@@ -31,9 +32,9 @@ public class AssetResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS Asset").execute()
-        .flatMap(r -> client.query("CREATE TABLE Asset (id SERIAL PRIMARY KEY, name TEXT NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, FOREIGN KEY (prosumer_id) REFERENCES Prosumer(id))").execute())
-        .flatMap(r -> client.query("INSERT INTO Asset (name, prosumer_id) VALUES ('asset-1', 1)").execute())
-        .flatMap(r -> client.query("INSERT INTO Asset (name, prosumer_id) VALUES ('asset-2', 1)").execute())
+        .flatMap(r -> client.query("CREATE TABLE Asset (id SERIAL PRIMARY KEY, name TEXT NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, grid_cell_id TEXT, asset_type ENUM('BATTERY','SOLAR','EV_CHARGER') NOT NULL, FOREIGN KEY (prosumer_id) REFERENCES Prosumer(id), FOREIGN KEY (grid_cell_id) REFERENCES GridCell(id))").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset(name, prosumer_id, grid_cell_id, asset_type) VALUES ('asset-1', 1, 'PORTO_NORTH', 'BATTERY')").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset(name, prosumer_id, grid_cell_id, asset_type) VALUES ('asset-2', 1, 'PORTO_NORTH', 'BATTERY')").execute())
         .await().indefinitely();
     }
 
@@ -56,7 +57,15 @@ public class AssetResource {
                 .onItem().transform(id -> URI.create("/Asset/" + id))
                 .onItem().transform(uri -> Response.created(uri).build());
     }
-    
+
+    @POST
+    @Path("{id}")
+    public Uni<Response> update(Long id, Asset asset) {
+        return asset.update(client, id)
+                .onItem().transform(updated -> updated ? Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
+                .onItem().transform(status -> Response.status(status).build());
+    }
+
     @DELETE
     @Path("{id}")
     public Uni<Response> delete(Long id) {
@@ -65,9 +74,16 @@ public class AssetResource {
                 .onItem().transform(status -> Response.status(status).build());
     }
 
+
     @GET
-    @Path("by-prosumer/{id}")
-    public Multi<Asset> findByProsumerId(Long prosumerId) {
-        return Asset.findByProsumerId(client, prosumerId);
+    @Path("active/by-grid-cell-ids")
+    public Multi<Asset> getByCellIds(@QueryParam("cellIds") Collection<String> cellIds) {
+        return Asset.findActiveByGridCellIds(client, cellIds);
+    }
+
+    @GET
+    @Path("active/by-prosumer/{id}")
+    public Multi<Asset> findActiveBatteriesByProsumerId(Long prosumerId) {
+        return Asset.findActiveBatteriesByProsumerId(client, prosumerId);
     }
 }

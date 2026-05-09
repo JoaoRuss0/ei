@@ -1,41 +1,53 @@
 @startuml FlexibilityEmission
 title Flexibility Emission Business Process
 
+/'
+In order to emit flexibility events we need to fetch prosumers. GET /Prosumer
+For the prosumer, fetch its active (has a grid cell id) BATTERY assets. GET /Asset/active/by-prosumer/{id}
+Fetch latest telemetry events for the assets in the corresponding grid cell ids. GET /Telemetry/latest
+We then get the grid cell's data which includes the peak hours range. GET /GridCell/by-ids?ids=<id>
+From then on, we send the events and grid cell data to the Flexibility Emission Microservice. GET /FlexibilityEmission/evaluate
+Which will either
+ - Send an event marking the asset as unavailable
+ - Send an event telling the prosumer to sell
+Depending on SOC percentage and on the grid cell peak hour range.
+'/
+
 participant Camunda
 participant Kong
 participant "Prosumer Microservice" as Pros
 participant "Asset Microservice" as Asset
 participant "Telemetry Microservice" as Tel
-participant "Grid Cell" as GC
+participant "Grid Cell Microservice" as GC
 participant "Flexibility Emission Microservice" as Flex
 participant Kafka
 
 Camunda -> Kong : Read Request
-Kong -> Pros : Forward Read Request
+Kong -> Pros : Forward Request
 note right of Pros : Process request
 Pros -> Kong : Response
 Kong -> Camunda : Forward Response
 
 Camunda -> Kong : Read Prosumer Assets Request
-Kong -> Asset : Forward Read Request
+Kong -> Asset : Forward Request
 note right of Asset : Process request
 Asset -> Kong : Response
 Kong -> Camunda : Forward Response
 
 Camunda -> Kong : Read Assets' Latest Telemetry Event Request
-Kong -> Tel : Forward Read Request
+Kong -> Tel : Forward Request
 note right of Tel : Process request
 Tel -> Kong : Response
 Kong -> Camunda : Forward Response
 
-Camunda -> Kong : Read by Id Request
-Kong -> GC : Forward Read Request
+Camunda -> Kong : Read Grid Cells by Id Request
+Kong -> GC : Forward Request
 note right of GC : Process request
 GC -> Kong : Response
 Kong -> Camunda : Forward Response
 
 Camunda -> Kong : Evaluate Request
-Kong -> Flex : Forward Evaluate Request
+Kong -> Flex : Forward Request
 note right of Flex : Process request
 Flex -> Kafka : Produce to Topic: flexibility-offers
 Flex -> Kong : Response

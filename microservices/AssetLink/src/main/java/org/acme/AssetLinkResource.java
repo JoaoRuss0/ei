@@ -82,22 +82,18 @@ public class AssetLinkResource {
     }
 
     @POST
-    @Path("topic/{id}/{utilityOperator}")
+    @Path("topic/{assetId}/{gridCellId}")
     @Blocking
-    public Response createTopic(Long id, String utilityOperator) {
-        AssetLink link = AssetLink.findById(client, id).await().indefinitely();
-        if (link == null) return Response.status(Response.Status.NOT_FOUND).build();
-        topicService.createAssetLinkTopic(link, utilityOperator);
+    public Response createTopic(Long assetId, String gridCellId) {
+        topicService.createAssetLinkTopic(assetId, gridCellId);
         return Response.noContent().build();
     }
 
     @DELETE
-    @Path("topic/{id}/{utilityOperator}")
+    @Path("topic/{assetId}/{gridCellId}")
     @Blocking
-    public Response deleteTopic(Long id, String utilityOperator) {
-        AssetLink link = AssetLink.findById(client, id).await().indefinitely();
-        if (link == null) return Response.noContent().build();
-        topicService.deleteAssetLinkTopic(link, utilityOperator);
+    public Response deleteTopic(Long assetId, String gridCellId) {
+        topicService.deleteAssetLinkTopic(assetId, gridCellId);
         return Response.noContent().build();
     }
 }

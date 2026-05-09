@@ -6,7 +6,7 @@ participant "Kong" as K
 participant "Prosumer Microservice" as P
 
 C -> K : CRUD Request
-K -> P : Forward CRUD Request
+K -> P : Forward Request
 note right of P
   Process request
 end note

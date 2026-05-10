@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+cd ../event-producer/
+mvn clean package
+cd ../integration-tests
+
 cd ..
 source addresses.sh > /dev/null
 cd integration-tests
@@ -29,8 +33,8 @@ UO_ID=$(create_entity "$UTILITY_OPERATOR_URL/UtilityOperator" "$UO_PAYLOAD" "Uti
 PRO_PAYLOAD='{"name": "Joao Russo", "location": "Porto", "FiscalNumber": 123456789}'
 PRO_ID=$(create_entity "$PROSUMER_URL/Prosumer" "$PRO_PAYLOAD" "Prosumer")
 
-GC_ID_STRING="ZONE-PORTO-642"
-GC_PAYLOAD='{"id": "'$GC_ID_STRING'", "address": "Porto Center", "postalCode": "4000-000", "maxLoad": 5000, "operatorId": '$UO_ID', "xCoords": 54, "yCoords": -22, "peakHoursStartTime": "2026-05-10T18:00:00", "peakHoursEndTime": "2026-05-10T22:00:00"}'
+GC_ID_STRING="ZONE-PORTO-345"
+GC_PAYLOAD='{"id": "'$GC_ID_STRING'", "address": "Porto Center", "postalCode": "4000-000", "maxLoad": 5000, "operatorId": '$UO_ID', "xCoords": 23, "yCoords": -54, "peakHoursStartTime": "2026-05-10T18:00:00", "peakHoursEndTime": "2026-05-10T22:00:00"}'
 GC_ID=$(create_entity "$GRID_CELL_URL/GridCell" "$GC_PAYLOAD" "Grid Cell")
 
 ASSET_PAYLOAD='{"name": "Home Battery", "prosumerId": '$PRO_ID', "gridCellId": "'$GC_ID'", "type": "BATTERY"}'
@@ -53,7 +57,7 @@ java -jar ../event-producer/target/event-producer.jar \
     --throughput 20 \
     --topic "$TOPIC_NAME" \
     --asset-id "$ASSET_ID" \
-    --grid-cell-id "$GC_ID" 2&> /dev/null &
+    --grid-cell-id "$GC_ID" &
 
 PRODUCER_PID=$!
 echo "Java Event Producer started in background (PID: $PRODUCER_PID)"

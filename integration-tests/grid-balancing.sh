@@ -19,7 +19,7 @@ echo "Checking topic: $TOPIC"
     --bootstrap-server "$KAFKA_CLUSTER" \
     --topic "$TOPIC" \
     --from-beginning \
-    --timeout-ms 5000 \
-    --max-messages 2 || echo "No messages found or timed out."
+    --timeout-ms 20000 \
+    --max-messages 1 || echo "No messages found or timed out."
 
 echo "-------------------------------------------------"

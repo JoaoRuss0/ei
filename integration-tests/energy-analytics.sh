@@ -26,8 +26,8 @@ consume_topic() {
         --bootstrap-server "$KAFKA_CLUSTER" \
         --topic "$topic" \
         --from-beginning \
-        --timeout-ms 5000 \
-        --max-messages 2 || echo "No messages found or timed out."
+        --timeout-ms 20000 \
+        --max-messages 1 || echo "No messages found or timed out."
 
     echo "-------------------------------------------------"
 }

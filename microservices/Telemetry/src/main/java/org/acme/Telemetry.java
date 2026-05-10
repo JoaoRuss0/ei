@@ -113,7 +113,6 @@ public class Telemetry
                 .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : null); 
     }
 
-
     public static Multi<Telemetry> findLatestForAssetIdsGridCellPair(MySQLPool client, List<AssetIdAndGridCell> toSearch) {
         if (toSearch.isEmpty()) return Multi.createFrom().empty();
 
@@ -149,7 +148,6 @@ public class Telemetry
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
                 .onItem().transform(Telemetry::from);
     }
-
 
     public static Multi<Telemetry> findForAssetIdAroundTimestamp(MySQLPool client, Long assetId, LocalDateTime timestamp, int n) {
         return client.preparedQuery(

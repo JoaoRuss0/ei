@@ -36,7 +36,6 @@ class AssetResourceTest {
                 .body("name", hasItems("asset-1", "asset-2", "asset-3"));
     }
 
-
     @Test
     void testGetSingleAssetSuccess() {
         given()
@@ -58,7 +57,6 @@ class AssetResourceTest {
                 .statusCode(404);
     }
 
-
     @Test
     void testCreateAsset() {
         String newAssetJson = """
@@ -78,7 +76,6 @@ class AssetResourceTest {
                 .statusCode(201)
                 .header("Location", containsString("/Asset/"));
     }
-
 
     @Test
     void testUpdateAssetSuccess() {
@@ -126,7 +123,6 @@ class AssetResourceTest {
                 .statusCode(404);
     }
 
-
     @Test
     void testDeleteAssetSuccess() {
         given()
@@ -142,7 +138,6 @@ class AssetResourceTest {
                 .then()
                 .statusCode(404);
     }
-
 
     @Test
     void testGetByGridCellIds() {

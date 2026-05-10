@@ -7,31 +7,18 @@ import io.vertx.mutiny.mysqlclient.MySQLPool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class AssetLink {
 	
 	    public Long id;
 		public Long idProsumer;
 		public Long idUtilityOperator;
-
-	    public AssetLink() {
-	    }
-
-		public AssetLink(Long id, Long idProsumer_received, Long idUtilityOperator_received) {
-			this.id = id;
-			this.idProsumer = idProsumer_received;
-			this.idUtilityOperator = idUtilityOperator_received;
-		}
-
-
-		@Override
-		public String toString() {
-			return "{id:" + id + ", idProsumer:" + idProsumer + ", idUtilityOperator:" + idUtilityOperator + "}\n";
-		}
 
 		private static AssetLink from(Row row) {
 	        return new AssetLink(row.getLong("id"), row.getLong("idProsumer") , row.getLong("idUtilityOperator"));

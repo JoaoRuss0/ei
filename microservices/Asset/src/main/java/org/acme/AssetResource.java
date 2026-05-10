@@ -75,7 +75,6 @@ public class AssetResource {
                 .onItem().transform(status -> Response.status(status).build());
     }
 
-
     @GET
     @Path("active/by-grid-cell-ids")
     public Multi<Asset> getByCellIds(@QueryParam("cellIds") List<String> cellIds) {

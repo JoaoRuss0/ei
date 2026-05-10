@@ -15,9 +15,6 @@ import java.util.concurrent.ExecutionException;
 @ApplicationScoped
 public class KafkaTopicService {
 
-    private static final short REPLICATION_FACTOR = 1;
-    private static final int PARTITON_COUNT = 1;
-
     @ConfigProperty(name = "kafka.bootstrap.servers")
     String bootstrapServers;
 

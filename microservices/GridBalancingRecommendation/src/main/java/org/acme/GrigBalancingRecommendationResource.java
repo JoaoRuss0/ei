@@ -14,7 +14,7 @@ import io.smallrye.mutiny.Multi;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
-@Path("AssetLink")
+@Path("GridBalancing")
 public class GrigBalancingRecommendationResource {
 
     private static final long[][] NEIGHBOURS = {{0,1},{0,-1},{1,0},{-1,0}};

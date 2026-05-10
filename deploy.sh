@@ -93,6 +93,27 @@ deploy_microservice() {
     echo "http://$addressMS:8080/q/swagger-ui/"
 }
 
+create_kafka_topics() {
+    echo "[CREATING KAFKA TOPICS] ..."
+
+    local topics=(
+        "flexibility-offers"
+        "balancing-recommendation"
+        "energy-discharged-by-zone"
+        "generated-energy-by-prosumer"
+        "consumed-energy-by-prosumer"
+        "average-soc"
+    )
+
+    for topic in "${topics[@]}"; do
+        ./kafka-binary/bin/kafka-topics.sh --create \
+            --if-not-exists \
+            --bootstrap-server "$addressKafka" \
+            --topic "$topic"
+    done
+    echo "[KAFKA TOPICS CREATED]"
+}
+
 mkdir -p logs
 
 echo "[DEPLOYING RDS, OLLAMA AND THE KAFKA CLUSTER] ..."
@@ -136,3 +157,5 @@ echo "- GridBalancingRecommendation: http://""$(cd terraform/microservices/grid_
 echo "- Telemetry: http://""$(cd terraform/microservices/telemetry && get_terraform_dns)"":8080/q/swagger-ui"
 
 echo "[DONE]"
+
+create_kafka_topics

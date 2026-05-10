@@ -46,4 +46,3 @@ terraform.rc
 .idea/
 access.sh
 logs
-kafka-binary

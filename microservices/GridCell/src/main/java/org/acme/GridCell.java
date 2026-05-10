@@ -54,16 +54,17 @@ public class GridCell {
                 .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
     }
 
-    public Uni<Boolean> save(MySQLPool client) {
-        Tuple params = Tuple.tuple(List.of(address, postalCode, peakHoursStartTime, peakHoursEndTime, maxLoad, operatorId, xCoords, yCoords));
-        return client.preparedQuery("INSERT INTO GridCell(address, postal_code, peak_hours_start, peak_hours_end, max_load, operator_id, x_coords, y_coords) VALUES (?,?,?,?,?,?,?,?)").execute(params)
-                .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
+    public Uni<String> save(MySQLPool client) {
+        List<Object> params = List.of( id, address, postalCode, peakHoursStartTime, peakHoursEndTime, maxLoad, operatorId, xCoords, yCoords);
+        return client.preparedQuery("INSERT INTO GridCell(id, address, postal_code, peak_hours_start, peak_hours_end, max_load, operator_id, x_coords, y_coords) VALUES (?,?,?,?,?,?,?,?,?)")
+                .execute(Tuple.from(params))
+                .onItem().transform(pgRowSet -> this.id);
     }
 
     public static Uni<Boolean> update(MySQLPool client, String id, GridUpdateRequest request) {
-        Tuple params = Tuple.tuple(List.of(request.address(), request.postalCode(), request.peakHoursStartTime(), request.peakHoursEndTime(), request.maxLoad(), request.operatorId(), request.xCoords(), request.yCoords(), id));
+        List<Object> list = java.util.Arrays.asList(request.address(), request.postalCode(), request.peakHoursStartTime(), request.peakHoursEndTime(), request.maxLoad(), request.operatorId(), request.xCoords(), request.yCoords(), id);
         return client.preparedQuery("UPDATE GridCell SET address = ?, postal_code = ? , peak_hours_start = ?, peak_hours_end = ?, max_load = ?, operator_id = ?, x_coords = ?, y_coords = ? WHERE id = ?")
-                .execute(params)
+                .execute(Tuple.from(list))
                 .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
     }
 

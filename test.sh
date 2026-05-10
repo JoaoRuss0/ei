@@ -37,11 +37,11 @@ echo "Running integration tests to check if events are sent/consumed"
 echo "====================================================================="
 
 cd integration-tests
-./ollama.sh
-./topic-creation-workflow.sh
 ./grid-balancing.sh
 ./flexibility-emission.sh
 ./energy-analytics.sh
+./topic-creation-workflow.sh
+./ollama.sh
 
 echo ""
 echo "----- DONE -----"

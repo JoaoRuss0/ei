@@ -84,7 +84,7 @@ public class AssetResource {
 
     @GET
     @Path("active/by-prosumer/{id}")
-    public Multi<Asset> findActiveBatteriesByProsumerId(Long prosumerId) {
+    public Multi<Asset> findActiveBatteriesByProsumerId(@PathParam("id") Long prosumerId) {
         return Asset.findActiveBatteriesByProsumerId(client, prosumerId);
     }
 }

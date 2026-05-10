@@ -2,6 +2,7 @@ package org.acme;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.vertx.mutiny.mysqlclient.MySQLClient;
 import io.vertx.mutiny.mysqlclient.MySQLPool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
@@ -46,9 +47,10 @@ public class Asset {
                 .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
     }
 
-    public Uni<Boolean> save(MySQLPool client) {
-        return client.preparedQuery("INSERT INTO Asset(name, prosumer_id, grid_cell_id, asset_type) VALUES (?,?,?,?)").execute(Tuple.of(this.name, this.prosumerId, this.gridCellId, this.type.name()))
-                .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
+    public Uni<Long> save(MySQLPool client) {
+        return client.preparedQuery("INSERT INTO Asset(name, prosumer_id, grid_cell_id, asset_type) VALUES (?,?,?,?)")
+                .execute(Tuple.of(this.name, this.prosumerId, this.gridCellId, this.type.name()))
+                .onItem().transform(pgRowSet -> pgRowSet.property(MySQLClient.LAST_INSERTED_ID));
     }
 
     public Uni<Boolean> update(MySQLPool client, Long id) {

@@ -7,6 +7,6 @@ sudo service docker start
 
 
 echo "Finished."
-sudo docker login -u "joaoruss0" -p "kybkoh-namko7-kAdhep"
-sudo docker pull joaoruss0/gridbalancingrecommendation:1.0.0-SNAPSHOT
-sudo docker run -d --name gridbalancingrecommendation -p 8080:8080 -e QUARKUS_DATASOURCE_REACTIVE_URL="mysql://ieproject202620260510034721990000000001.chvkqwfiehtt.us-east-1.rds.amazonaws.com:3306/VPPaaS" -e KAFKA_BOOTSTRAP_SERVERS="ec2-34-201-110-182.compute-1.amazonaws.com:9092,ec2-13-222-149-104.compute-1.amazonaws.com:9092,ec2-18-207-202-206.compute-1.amazonaws.com:9092" joaoruss0/gridbalancingrecommendation:1.0.0-SNAPSHOT
+sudo docker login -u "antoniomiguelpalma9999" -p "B@nanas.."
+sudo docker pull antoniomiguelpalma9999/gridbalancingrecommendation:1.0.0-SNAPSHOT
+sudo docker run -d --name gridbalancingrecommendation -p 8080:8080 -e QUARKUS_DATASOURCE_REACTIVE_URL="mysql://ieproject202620260510145722655600000001.ccxcs7cjlufc.us-east-1.rds.amazonaws.com:3306/VPPaaS" -e KAFKA_BOOTSTRAP_SERVERS="ec2-18-212-26-42.compute-1.amazonaws.com:9092,ec2-3-84-35-99.compute-1.amazonaws.com:9092,ec2-98-93-174-175.compute-1.amazonaws.com:9092" antoniomiguelpalma9999/gridbalancingrecommendation:1.0.0-SNAPSHOT

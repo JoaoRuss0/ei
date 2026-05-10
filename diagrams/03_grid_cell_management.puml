@@ -1,0 +1,16 @@
+@startuml GridCell Management Business Process
+title GridCell Management Business Process
+
+participant "Camunda" as C
+participant "Kong" as K
+participant "GridCell Microservice" as GC
+
+C -> K : CRUD Request
+K -> GC : Forward Request
+note right of GC
+  Process request
+end note
+GC -> K : Response
+K -> C : Forward Response
+
+@enduml

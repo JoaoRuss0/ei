@@ -34,7 +34,7 @@ public class GridCell {
         return new GridCell(row.getString("id"), row.getString("address"),
                 row.getString("postal_code"), row.getLocalDateTime("peak_hours_start"),
                 row.getLocalDateTime("peak_hours_end"), row.getLong("max_load"),
-                row.getLong("operator_id"), row.getLong("xCoords"), row.getLong("yCoords"));
+                row.getLong("operator_id"), row.getLong("x_coords"), row.getLong("y_coords"));
     }
 
     public static Multi<GridCell> findAll(MySQLPool client) {
@@ -56,7 +56,7 @@ public class GridCell {
 
     public Uni<Boolean> save(MySQLPool client) {
         Tuple params = Tuple.tuple(List.of(address, postalCode, peakHoursStartTime, peakHoursEndTime, maxLoad, operatorId, xCoords, yCoords));
-        return client.preparedQuery("INSERT INTO GridCell(address, postal_code,peak_hours_start,peak_hours_end, max_load, operator_id, x_cords, y_coords) VALUES (?,?,?,?,?,?,?,?)").execute(params)
+        return client.preparedQuery("INSERT INTO GridCell(address, postal_code, peak_hours_start, peak_hours_end, max_load, operator_id, x_coords, y_coords) VALUES (?,?,?,?,?,?,?,?)").execute(params)
                 .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
     }
 
@@ -67,7 +67,7 @@ public class GridCell {
                 .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
     }
 
-    public static Multi<GridCell> findByIds(MySQLPool client, Collection<Long> ids) {
+    public static Multi<GridCell> findByIds(MySQLPool client, List<Long> ids) {
         if (ids.isEmpty()) return Multi.createFrom().empty();
 
         String placeholders = ids.stream().map(i -> "?").collect(Collectors.joining(","));
@@ -81,7 +81,7 @@ public class GridCell {
                 .onItem().transform(GridCell::from);
     }
 
-    public static Multi<GridCell> findByOperatorIds(MySQLPool client, Collection<Long> operatorIds) {
+    public static Multi<GridCell> findByOperatorIds(MySQLPool client, List<Long> operatorIds) {
         if (operatorIds.isEmpty()) return Multi.createFrom().empty();
 
         String placeholders = operatorIds.stream().map(i -> "?").collect(Collectors.joining(","));

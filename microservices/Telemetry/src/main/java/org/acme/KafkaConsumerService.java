@@ -37,7 +37,7 @@ public class KafkaConsumerService {
         TopicSubscription topicSubscription = TopicSubscription.findById(client, topic.getTopicName()).await().indefinitely();
         if (topicSubscription == null || !topicSubscription.getOwnerService().equals(ServiceId.SERVICE_ID)) return;
 
-        TopicSubscription.delete(client, topic.getTopicName());
+        TopicSubscription.delete(client, topic.getTopicName()).await().indefinitely();
         DynamicTopicConsumer worker = tracker.untrack(topic);
         if (worker != null) worker.getConsumer().wakeup();
     }

@@ -9,6 +9,7 @@ import io.vertx.mutiny.sqlclient.Tuple;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Telemetry 
@@ -113,7 +114,7 @@ public class Telemetry
     }
 
 
-    public static Multi<Telemetry> findLatestForAssetIdsGridCellPair(MySQLPool client, Collection<AssetIdAndGridCell> toSearch) {
+    public static Multi<Telemetry> findLatestForAssetIdsGridCellPair(MySQLPool client, List<AssetIdAndGridCell> toSearch) {
         if (toSearch.isEmpty()) return Multi.createFrom().empty();
 
         String pairPlaceholders = toSearch.stream()

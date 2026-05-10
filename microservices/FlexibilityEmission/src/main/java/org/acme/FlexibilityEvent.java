@@ -58,7 +58,7 @@ public class FlexibilityEvent {
     }
 
     public Uni<Boolean> save(MySQLPool client) {
-        return client.preparedQuery("INSERT INTO FlexibilityEvent(id, asset_id, prosumer_id, event_type, event_time) VALUES (?,?,?,?,?)").execute(Tuple.of(this.id, this.assetId, this.prosumerId, this.eventType.name()))
+        return client.preparedQuery("INSERT INTO FlexibilityEvent(asset_id, prosumer_id, event_type, event_time) VALUES (?,?,?,?)").execute(Tuple.of(this.assetId, this.prosumerId, this.eventType.name(), this.eventTime.toString()))
                 .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
     }
 }

@@ -4,17 +4,15 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.smallrye.reactive.messaging.MutinyEmitter;
-import io.smallrye.reactive.messaging.annotations.Blocking;
-import io.smallrye.reactive.messaging.annotations.Channel;
+import io.smallrye.common.annotation.Blocking;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
-import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 @Path("EnergyAnalytics")
@@ -24,19 +22,19 @@ public class EnergyAnalyticsResource {
     io.vertx.mutiny.mysqlclient.MySQLPool client;
 
     @Channel("energy-discharged-by-zone")
-    MutinyEmitter<String> discargedEmitter;
+    Emitter<String> discargedEmitter;
 
     @Channel("generated-energy-by-prosumer")
-    MutinyEmitter<String> generatedEmitter;
+    Emitter<String> generatedEmitter;
 
     @Channel("consumed-energy-by-prosumer")
-    MutinyEmitter<String> consumedEmitter;
+    Emitter<String> consumedEmitter;
 
     @Channel("average-soc")
-    MutinyEmitter<String> averageSocEmitter;
+    Emitter<String> averageSocEmitter;
 
     @Inject
-    @ConfigProperty(name = "myapp.schema.create", defaultValue = "true") 
+    @ConfigProperty(name = "myapp.schema.create", defaultValue = "true")
     boolean schemaCreate ;
 
     void config(@Observes StartupEvent ev) {
@@ -49,8 +47,8 @@ public class EnergyAnalyticsResource {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS EnergyAnalytics").execute()
         .flatMap(r -> client.query("CREATE TABLE EnergyAnalytics (type ENUM('ENERGY_DISCHARGED_BY_ZONE', 'ENERGY_GENERATED_BY_PROSUMER', 'ENERGY_CONSUMED_BY_PROSUMER', 'AVERAGE_SOC') NOT NULL, entity_id VARCHAR(255) NOT NULL , value DOUBLE NOT NULL, timestamp DATETIME NOT NULL )").execute())
-        .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, entityId, value, timestamp) VALUES ('ENERGY_DISCHARGED_BY_ZONE', 'LISBON_SOUTH', 34.2, '2020-10-10 20:00')").execute())
-        .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, entityId, value, timestamp) VALUES ('ENERGY_GENERATED_BY_PROSUMER', '2', 50, '2020-10-10 20:00')").execute())
+        .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, entity_id, value, timestamp) VALUES ('ENERGY_DISCHARGED_BY_ZONE', 'LISBON_SOUTH', 34.2, '2020-10-10 20:00')").execute())
+        .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, entity_id, value, timestamp) VALUES ('ENERGY_GENERATED_BY_PROSUMER', '2', 50, '2020-10-10 20:00')").execute())
         .await().indefinitely();
     }
     
@@ -92,7 +90,7 @@ public class EnergyAnalyticsResource {
         return Response.ok().build();
     }
 
-    private <K> void publishAndSave(EnergyAnalyticsType type, Map<K, Double> data, MutinyEmitter<String> emitter, LocalDateTime ts) {
+    private <K> void publishAndSave(EnergyAnalyticsType type, Map<K, Double> data, Emitter<String> emitter, LocalDateTime ts) {
         data.forEach((k, v) -> {
             EnergyAnalytics event = new EnergyAnalytics(type, String.valueOf(k), v, ts);
             event.save(client).subscribe().with(ok -> {}, err -> System.err.println("Save failed: " + err));

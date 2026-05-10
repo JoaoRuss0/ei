@@ -3,8 +3,6 @@ package org.acme;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
-import io.smallrye.mutiny.Uni;
-import io.smallrye.reactive.messaging.MutinyEmitter;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -25,10 +23,10 @@ public class FlexibilityEmissionResource {
     io.vertx.mutiny.mysqlclient.MySQLPool client;
 
     @Channel("flexibility-offers")
-    MutinyEmitter<String> offerEmitter;
+    Emitter<String> offerEmitter;
 
     @Inject
-    @ConfigProperty(name = "myapp.schema.create", defaultValue = "true") 
+    @ConfigProperty(name = "myapp.schema.create", defaultValue = "true")
     boolean schemaCreate;
 
     void config(@Observes StartupEvent ev) {
@@ -40,9 +38,9 @@ public class FlexibilityEmissionResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS FlexibilityEvent").execute()
-        .flatMap(r -> client.query("CREATE TABLE FlexibilityEvent (id SERIAL PRIMARY KEY, asset_id BIGINT UNSIGNED NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, event_type VARCHAR(255) NOT NULL, event_time DATETIME NOT NULL , FOREIGN KEY (prosumer_id) REFERENCES Prosumer(id), FOREIGN KEY (asset_id) REFERENCES Asset(id))").execute())
-        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type, event_time) VALUES ('asset-1', 1, 'UNAVAILABLE', '2020-10-10 20:00')").execute())
-        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type, event_time) VALUES ('asset-2', 1, 'SELL', '2020-10-10 21:00')").execute())
+        .flatMap(r -> client.query("CREATE TABLE FlexibilityEvent (id SERIAL PRIMARY KEY, asset_id BIGINT UNSIGNED NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, event_type VARCHAR(255) NOT NULL, event_time DATETIME NOT NULL)").execute())
+        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type, event_time) VALUES (1, 1, 'UNAVAILABLE_FOR_BALANCING', '2020-10-10 20:00')").execute())
+        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type, event_time) VALUES (1, 1, 'SELL', '2020-10-10 21:00')").execute())
         .await().indefinitely();
     }
 

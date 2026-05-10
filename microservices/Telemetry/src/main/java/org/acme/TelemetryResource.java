@@ -12,6 +12,7 @@ import io.smallrye.mutiny.Multi;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 @Path("Telemetry")
 public class TelemetryResource {
@@ -35,8 +36,8 @@ public class TelemetryResource {
     private void initdb() {
         client.query("DROP TABLE IF EXISTS Telemetry").execute()
                 .flatMap(r -> client.query("CREATE TABLE Telemetry (id SERIAL PRIMARY KEY,   "
-                        + " timeStamp DATETIME, "
-                        + " asset_id BIGINT UNSIGNED, "
+                        + " timeStamp DATETIME NOT NULL, "
+                        + " asset_id BIGINT UNSIGNED NOT NULL, "
                         + " grid_cell_id VARCHAR(255) NOT NULL, "
                         + " asset_type VARCHAR(255) NOT NULL,  "
                         + " State_of_Charge	FLOAT, "
@@ -44,17 +45,15 @@ public class TelemetryResource {
                         + " Current_Output	FLOAT, "
                         + " Max_Capacity	FLOAT, "
                         + " State_of_Health	FLOAT, "
-                        + " Status VARCHAR(255) NOT NULL, "
+                        + " Status VARCHAR(255), "
                         + " Current_Generation FLOAT, "
                         + " Daily_Total FLOAT, "
                         + " Grid_Voltage FLOAT, "
                         + " Frequency FLOAT, "
-                        + " Plug_Status VARCHAR(255) NOT NULL, "
+                        + " Plug_Status VARCHAR(255), "
                         + " Charging_Rate FLOAT, "
                         + " Session_Energy FLOAT, "
-                        + " EV_SoC FLOAT, "
-                        + " FOREIGN KEY (asset_id) REFERENCES Asset(id),"
-                        + " FOREIGN KEY (grid_cell_id) REFERENCES GridCell(id))").execute())
+                        + " EV_SoC FLOAT)").execute())
                 .flatMap(r -> client.query("DROP TABLE IF EXISTS TopicSubscription").execute())
                 .flatMap(r -> client.query("CREATE TABLE TopicSubscription (topic_name VARCHAR(255) PRIMARY KEY, owner_service VARCHAR(255) NOT NULL)").execute())
                 .await().indefinitely();
@@ -80,9 +79,9 @@ public class TelemetryResource {
         return Telemetry.findAll(client);
     }
 
-    @GET
+    @POST
     @Path("latest")
-    public Multi<Telemetry> getLatest(Collection<AssetIdAndGridCell> toSearch) {
+    public Multi<Telemetry> getLatest(List<AssetIdAndGridCell> toSearch) {
         return Telemetry.findLatestForAssetIdsGridCellPair(client, toSearch);
     }
 
@@ -94,7 +93,7 @@ public class TelemetryResource {
 
     @GET
     @Path("asset/{assetId}/around/{timestamp}/")
-    public Multi<Telemetry> getAssetEventAroundTimestmap(@QueryParam("assetId") Long assetId, @PathParam("timestamp") LocalDateTime timestamp) {
+    public Multi<Telemetry> getAssetEventAroundTimestmap(@PathParam("assetId") Long assetId, @PathParam("timestamp") LocalDateTime timestamp) {
         return Telemetry.findForAssetIdAroundTimestamp(client, assetId, timestamp, 10);
     }
 }

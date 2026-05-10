@@ -9,6 +9,7 @@ import jakarta.inject.Inject;
 import org.acme.model.Topic;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,10 @@ public class TopicSubscriptionRecoveryService {
     KafkaDynamicConsumerTracker tracker;
 
     void onStartup(@Observes StartupEvent ev) {
+        recoverFailedServices(failedUuidsConfig);
+    }
+
+    public void recoverFailedServices(Optional<String> failedUuidsConfig) {
         if (failedUuidsConfig.isEmpty() || failedUuidsConfig.get().isBlank()) return;
 
         String failedUuids = failedUuidsConfig.get();
@@ -46,20 +51,16 @@ public class TopicSubscriptionRecoveryService {
         Tuple params = Tuple.tuple();
         failedIds.forEach(params::addString);
 
-        client.preparedQuery(query)
-                .execute(params)
-                .onItem()
-                .invoke(rows -> {
-                    for (Row row : rows) {
-                        String topic = row.getString("topic_name");
-                        takeOver(topic);
-                    }
-                })
+        List<String> topics = new ArrayList<>();
+        client.preparedQuery(query).execute(params)
+                .onItem().invoke(rows -> rows.forEach(r -> topics.add(r.getString("topic_name"))))
                 .await().indefinitely();
+
+        for (String topic : topics) takeOver(topic);
     }
 
     private void takeOver(String topicName) {
-        TopicSubscription.updateOwnerService(client, topicName, ServiceId.SERVICE_ID);
+        TopicSubscription.updateOwnerService(client, topicName, ServiceId.SERVICE_ID).await().indefinitely();
         DynamicTopicConsumer worker = new DynamicTopicConsumer(topicName, kafkaServers, client);
         worker.start();
         tracker.track(new Topic(topicName), worker);

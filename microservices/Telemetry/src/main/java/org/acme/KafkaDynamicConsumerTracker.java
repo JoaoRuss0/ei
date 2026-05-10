@@ -15,6 +15,6 @@ public class KafkaDynamicConsumerTracker {
     }
 
     public DynamicTopicConsumer untrack(Topic topic) {
-        return trackedConsumers.getOrDefault(topic, null);
+        return trackedConsumers.remove(topic);
     }
 }

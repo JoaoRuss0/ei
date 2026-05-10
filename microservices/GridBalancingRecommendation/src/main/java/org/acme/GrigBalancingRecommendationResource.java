@@ -4,8 +4,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.smallrye.common.annotation.Blocking;
-import io.smallrye.reactive.messaging.MutinyEmitter;
-import io.smallrye.reactive.messaging.annotations.Channel;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -13,6 +11,8 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 @Path("AssetLink")
 public class GrigBalancingRecommendationResource {
@@ -21,20 +21,20 @@ public class GrigBalancingRecommendationResource {
 
     @Inject
     io.vertx.mutiny.mysqlclient.MySQLPool client;
-    
+
     @Inject
-    @ConfigProperty(name = "myapp.schema.create", defaultValue = "true") 
+    @ConfigProperty(name = "myapp.schema.create", defaultValue = "true")
     boolean schemaCreate ;
 
     @Channel("balancing-recommendation")
-    MutinyEmitter<String> recommendationEmitter;
+    Emitter<String> recommendationEmitter;
 
     void config(@Observes StartupEvent ev) {
         if (schemaCreate) {
             initdb();
         }
     }
-    
+
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS GridBalancingRecommendation").execute()

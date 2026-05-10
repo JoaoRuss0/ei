@@ -9,6 +9,7 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import lombok.*;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
@@ -61,7 +62,7 @@ public class Asset {
                 .onItem().transform(Asset::from);
     }
 
-    public static Multi<Asset> findActiveByGridCellIds(MySQLPool client, Collection<String> cellIds) {
+    public static Multi<Asset> findActiveByGridCellIds(MySQLPool client, List<String> cellIds) {
         if (cellIds == null || cellIds.isEmpty()) return Multi.createFrom().empty();
 
         String placeholders = cellIds.stream().map(s -> "?").collect(Collectors.joining(","));

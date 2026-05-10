@@ -24,12 +24,12 @@ sudo bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c config/server.propertie
 echo "sudo bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c config/server.properties --initial-controllers $oldclusterlist"
 
 # Replication
-sudo sed -i "s/broker.id=0/broker.id=${idBroker+1}/g" /usr/local/kafka/config/server.properties
-sudo sed -i "s/offsets.topic.replication.factor=1/offsets.topic.replication.factor=${totalBrokers}/g" /usr/local/kafka/config/server.properties
-sudo sed -i "s/transaction.state.log.replication.factor=1/transaction.state.log.replication.factor=${totalBrokers}/g" /usr/local/kafka/config/server.properties
-sudo sed -i "s/transaction.state.log.min.isr=1/transaction.state.log.min.isr=${totalBrokers}/g" /usr/local/kafka/config/server.properties
-sudo sed -i "s/^num.partitions=1/num.partitions=${totalBrokers}/g" /usr/local/kafka/config/server.properties
-echo "default.replication.factor=${totalBrokers}" >> /usr/local/kafka/config/server.properties
+sudo sed -i "s/broker.id=0/broker.id=${idBroker+1}/g" config/server.properties
+sudo sed -i "s/offsets.topic.replication.factor=1/offsets.topic.replication.factor=${totalBrokers}/g" config/server.properties
+sudo sed -i "s/transaction.state.log.replication.factor=1/transaction.state.log.replication.factor=${totalBrokers}/g" config/server.properties
+sudo sed -i "s/transaction.state.log.min.isr=1/transaction.state.log.min.isr=${totalBrokers}/g" config/server.properties
+sudo sed -i "s/^num.partitions=1/num.partitions=${totalBrokers}/g" config/server.properties
+echo "default.replication.factor=${totalBrokers}" >> config/server.properties
 
 # Startup
 sudo bin/kafka-server-start.sh config/server.properties &

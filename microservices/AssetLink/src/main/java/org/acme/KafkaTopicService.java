@@ -7,6 +7,7 @@ import org.apache.kafka.common.errors.TopicExistsException;
 import org.apache.kafka.common.errors.UnknownTopicOrPartitionException;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
@@ -27,7 +28,7 @@ public class KafkaTopicService {
         props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
         try (AdminClient admin = AdminClient.create(props)) {
-            NewTopic topic = new NewTopic(topicName, PARTITON_COUNT, REPLICATION_FACTOR);
+            NewTopic topic = new NewTopic(topicName, Optional.empty(), Optional.empty());
             admin.createTopics(Collections.singleton(topic)).all().get();
         } catch (InterruptedException | ExecutionException e) {
 

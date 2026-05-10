@@ -1,5 +1,6 @@
 #!/bin/bash
 
+esc=$'\e'
 source ./access.sh
 
 get_terraform_dns() {
@@ -41,7 +42,6 @@ build_and_terraform_init_service() {
 deploy_rds() {
   cd terraform/rds
   terraform init && terraform apply -auto-approve
-  esc=$'\e'
   addressDB="$(terraform state show aws_db_instance.example |grep address | sed "s/address//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
 
   echo "RDS IS AVAILABLE HERE:"
@@ -52,7 +52,6 @@ deploy_rds() {
 deploy_kafka() {
   cd terraform/kafka
   terraform init && terraform apply -auto-approve
-  esc=$'\e'
   addressKafka="$(terraform output -json publicdnslist | jq -r 'map("\(.):9092") | join(",")')"
 
   echo "KAFKA IS AVAILABLE HERE:"
@@ -62,7 +61,6 @@ deploy_kafka() {
 deploy_ollama() {
     cd "terraform/microservices/ollama" || exit 1
     terraform init
-    terraform taint aws_instance.ollama_instance
     terraform apply -auto-approve
 
     echo "MICROSERVICE ollama IS AVAILABLE HERE:"
@@ -106,13 +104,12 @@ wait $RDS_PID $KAF_PID $OLL_PID
 
 echo "[DONE]"
 
-esc=$'\e'
 export addressDB="$(cd terraform/rds && terraform state show aws_db_instance.example | grep address | sed "s/address//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
 export addressKafka="$(cd terraform/kafka && terraform output -json publicdnslist | jq -r 'map("\(.):9092") | join(",")')"
 
 echo "- Database:" "$addressDB"
 echo "- Kafka Cluster:" "$addressKafka"
-echo "- Ollama:" "$(cd terraform/microservices/ollama && terraform state show -no-color aws_instance.ollama_instance | awk -F\" '/^    public_dns/ {print $2}' )"
+echo "- Ollama: http://""$(cd terraform/microservices/ollama && terraform state show -no-color aws_instance.ollama_instance | awk -F\" '/^    public_dns/ {print $2}' )"":11434/api/generate"
 
 echo "[DEPLOYING ALL MICROSERVICES] ..."
 

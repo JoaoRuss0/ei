@@ -68,6 +68,16 @@
       <version>1.18.46</version>
       <scope>provided</scope>
     </dependency>
+      <dependency>
+          <groupId>io.smallrye.reactive</groupId>
+          <artifactId>smallrye-reactive-messaging-in-memory</artifactId>
+          <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>org.awaitility</groupId>
+          <artifactId>awaitility</artifactId>
+          <scope>test</scope>
+      </dependency>
   </dependencies>
   <build>
     <plugins>

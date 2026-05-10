@@ -79,7 +79,7 @@ public class GrigBalancingRecommendationResource {
 
                 double transfer = Math.min(overload, headroom);
                 GridBalancingRecommendation recommendation = new GridBalancingRecommendation(cell.id(), neighbour.id(), transfer);
-                recommendation.save(client);
+                recommendation.save(client).await().indefinitely();
                 recommendationEmitter.send(recommendation.toJson());
 
                 loadByCell.merge(cell.id(), -transfer, Double::sum);

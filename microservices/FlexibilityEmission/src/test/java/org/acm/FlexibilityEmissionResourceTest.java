@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @QuarkusTest
-class ResourceTest {
+class FlexibilityEmissionResourceTest {
 
     @Inject @Any
     InMemoryConnector connector;

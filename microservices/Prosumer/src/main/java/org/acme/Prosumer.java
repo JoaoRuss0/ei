@@ -2,42 +2,24 @@ package org.acme;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.vertx.mutiny.mysqlclient.MySQLClient;
 import io.vertx.mutiny.mysqlclient.MySQLPool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
+import lombok.*;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class Prosumer {
 	
-	 	public Long FiscalNumber;
 	    public Long id;
-		public String location;
 		public String name;
-
-	    public Prosumer() {
-	    }
-
-	    public Prosumer(String name) {
-	        this.name = name;
-	    }
-
-	    public Prosumer(Long id, String name) {
-	        this.id = id;
-	        this.name = name;
-	    }
-		
-	    public Prosumer(Long iD, String name_R , String location_R , Long FiscalNumber_R ) {
-			FiscalNumber = FiscalNumber_R;
-			id = iD;
-			location = location_R;
-			name = name_R;
-		}
-
-		@Override
-		public String toString() {
-			return "{FiscalNumber:" + FiscalNumber + ", id:" + id + ", location:" + location + ", name:" + name
-					+ "}\n";
-		}
+		public String location;
+	 	public Long FiscalNumber;
 
 		private static Prosumer from(Row row) {
 	        return new Prosumer(row.getLong("id"), row.getString("name") , row.getString("location") , row.getLong("FiscalNumber") );
@@ -54,12 +36,12 @@ public class Prosumer {
 	                .onItem().transform(RowSet::iterator) 
 	                .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : null); 
 	    }
-	    
-	    public Uni<Boolean> save(MySQLPool client , String name_R, Long fnumber , String loc) 
-		{
-	        return client.preparedQuery("INSERT INTO Prosumer(name,FiscalNumber,location) VALUES (?,?,?)").execute(Tuple.of(name_R ,fnumber , loc))
-	        		.onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1 ); 
-	    }
+
+        public Uni<Long> save(MySQLPool client, String name_R, Long fnumber, String loc) {
+            return client.preparedQuery("INSERT INTO Prosumer(name,FiscalNumber,location) VALUES (?,?,?)")
+                    .execute(Tuple.of(name_R, fnumber, loc))
+                    .onItem().transform(pgRowSet -> pgRowSet.property(MySQLClient.LAST_INSERTED_ID));
+        }
 	    
 	    public static Uni<Boolean> delete(MySQLPool client, Long id_R) {
 	        return client.preparedQuery("DELETE FROM Prosumer WHERE id = ?").execute(Tuple.of(id_R))

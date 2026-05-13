@@ -6,7 +6,7 @@ terraform {
 }
 
 provider "aws" {
-  shared_credentials_files = ["../.aws/credentials"]
+  shared_credentials_files = ["${path.module}/../../config/credentials"]
   profile                  = "account_1"
   region                   = "us-east-1"
 }
@@ -22,7 +22,7 @@ resource "aws_instance" "kafkaCluster" {
 
   user_data = base64encode(
     templatefile("creation.sh", {
-      idBroker     = "${count.index}"
+      idBroker     = count.index
       totalBrokers = var.nBroker
     })
   )
@@ -77,7 +77,7 @@ resource "null_resource" "update_dns" {
   connection {
     type        = "ssh"
     user        = "ec2-user"
-    private_key = file("../.aws/key.pem")
+    private_key = file("${path.module}/../../config/key.pem")
     host        = aws_instance.kafkaCluster[count.index].public_ip
   }
   provisioner "remote-exec" {

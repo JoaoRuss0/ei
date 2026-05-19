@@ -31,6 +31,8 @@ sudo sed -i "s/transaction.state.log.min.isr=1/transaction.state.log.min.isr=${t
 sudo sed -i "s/^num.partitions=1/num.partitions=${totalBrokers}/g" config/server.properties
 echo "default.replication.factor=${totalBrokers}" >> config/server.properties
 
+echo "auto.create.topics.enable=false" >> config/server.properties
+
 # Startup
 sudo bin/kafka-server-start.sh config/server.properties &
 

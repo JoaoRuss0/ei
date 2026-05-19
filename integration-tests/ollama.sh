@@ -1,0 +1,12 @@
+#!/bin/bash
+
+cd ..
+source addresses.sh > /dev/null
+cd integration-tests
+
+API_URL="http://$OLLAMA_URL/api/generate"
+
+echo "Sending forecasting request to Ollama..."
+curl -X POST "$API_URL" -H "Content-Type: application/json" -d @payload.json
+
+echo "-------------------------------------------------"

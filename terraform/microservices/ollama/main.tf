@@ -9,9 +9,9 @@ terraform {
 }
 
 provider "aws" {
-  shared_credentials_files = ["../../.aws/credentials"]
-  profile                  = "account_1"
-  region                   = "us-east-1"
+	shared_credentials_files = ["${path.module}/../../../config/credentials"]
+	profile                  = "account_1"
+	region                   = "us-east-1"
 }
 
 resource "aws_instance" "ollama_instance" {
@@ -22,7 +22,7 @@ resource "aws_instance" "ollama_instance" {
 		volume_size = 50
 	}
 	key_name = "vockey"
-	user_data = "${file("ollama.sh")}"
+	user_data = file("ollama.sh")
 	user_data_replace_on_change = true
 	tags = {
 		Name = "terraform-ollama"

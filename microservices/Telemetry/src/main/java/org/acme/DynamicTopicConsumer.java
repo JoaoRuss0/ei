@@ -29,7 +29,7 @@ public class DynamicTopicConsumer extends Thread {
         properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put("auto.offset.reset", "earliest");
-        properties.put("group.id", "your-group-id");
+        properties.put("group.id", topic_received);
 
         consumer = new KafkaConsumer<>(properties);
     }

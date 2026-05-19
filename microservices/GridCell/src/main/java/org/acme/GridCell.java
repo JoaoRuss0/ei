@@ -1,5 +1,6 @@
 package org.acme;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.mysqlclient.MySQLPool;
@@ -9,6 +10,7 @@ import io.vertx.mutiny.sqlclient.Tuple;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +25,9 @@ public class GridCell {
     public String id;
     public String address;
     public String postalCode;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     public LocalDateTime peakHoursStartTime;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     public LocalDateTime peakHoursEndTime;
     public Long maxLoad;
     public Long operatorId;
@@ -55,7 +59,7 @@ public class GridCell {
     }
 
     public Uni<String> save(MySQLPool client) {
-        List<Object> params = List.of( id, address, postalCode, peakHoursStartTime, peakHoursEndTime, maxLoad, operatorId, xCoords, yCoords);
+        List<Object> params = Arrays.asList(id, address, postalCode, peakHoursStartTime, peakHoursEndTime, maxLoad, operatorId, xCoords, yCoords);
         return client.preparedQuery("INSERT INTO GridCell(id, address, postal_code, peak_hours_start, peak_hours_end, max_load, operator_id, x_coords, y_coords) VALUES (?,?,?,?,?,?,?,?,?)")
                 .execute(Tuple.from(params))
                 .onItem().transform(pgRowSet -> this.id);

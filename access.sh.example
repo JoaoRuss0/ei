@@ -1,8 +1,0 @@
-#!/bin/bash
-
-# JAVA path
-#export JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
-#export PATH=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/bin:"$PATH"
-
-export DockerUsername=
-export DockerPassword=

@@ -1,10 +1,10 @@
 #!/bin/bash
 
 esc=$'\e'
-source ./access.sh
+source ./config/docker_variables.sh
 
 get_terraform_dns() {
-    terraform state show aws_instance.quarkus_instance \
+    terraform state show "module.$1.aws_instance.quarkus_instance" \
         | grep public_dns \
         | sed 's/public_dns//g' \
         | sed 's/=//g' \
@@ -13,40 +13,14 @@ get_terraform_dns() {
         | sed "s/$esc\[[0-9;]*m//g"
 }
 
-update_container_image_group() {
-    sed -i '' "/quarkus.container-image.group/d" application.properties
-    echo "quarkus.container-image.group=$DockerUsername" >> application.properties
-}
-
-package() {
-    DockerImage="$(grep -m 1 "<artifactId>" pom.xml|sed "s/<artifactId>//g"|sed "s/<\/artifactId>//g" |sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g")"
-    DockerImageVersion="$(grep -m 1 "<version>" pom.xml|sed "s/<version>//g"|sed "s/<\/version>//g" |sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g")"
-
-    ./mvnw clean package -DskipTests
-}
-
-build_and_terraform_init_service() {
-    sed -i '' "/sudo docker login/d" quarkus.sh
-    sed -i '' "/sudo docker pull/d" quarkus.sh
-    sed -i '' "/sudo docker run/d" quarkus.sh
-
-    echo "sudo docker login -u \"$DockerUsername\" -p \"$DockerPassword\"" >> quarkus.sh
-    echo "sudo docker pull $DockerUsername/$DockerImage:$DockerImageVersion" >> quarkus.sh
-    echo "sudo docker run -d --name $DockerImage -p 8080:8080 -e QUARKUS_DATASOURCE_REACTIVE_URL=\"mysql://$addressDB:3306/VPPaaS\" -e KAFKA_BOOTSTRAP_SERVERS=\"$addressKafka\" $DockerUsername/$DockerImage:$DockerImageVersion" >> quarkus.sh
-
-    terraform init
-    terraform taint aws_instance.quarkus_instance
-    terraform apply -auto-approve
-}
-
 deploy_rds() {
   cd terraform/rds
   terraform init && terraform apply -auto-approve
   addressDB="$(terraform state show aws_db_instance.example |grep address | sed "s/address//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
 
   echo "RDS IS AVAILABLE HERE:"
-  terraform state show aws_db_instance.example |grep address
-  terraform state show aws_db_instance.example |grep port
+  terraform state show aws_db_instance.example | grep address
+  terraform state show aws_db_instance.example | grep port
 }
 
 deploy_kafka() {
@@ -79,28 +53,58 @@ deploy_microservice() {
     local service_name="$1"
     local terraform_service_name="$2"
 
-    cd "microservices/$service_name/src/main/resources" || exit 1
-    update_container_image_group
-    cd ../../.. || exit 1
-    package
-    cd ../.. || exit 1
+    cd "microservices/$service_name/" || exit 1
+    ./mvnw clean package -DskipTests -Dquarkus.container-image.group="${DOCKER_USERNAME}"
+    cd "../../terraform/microservices/$terraform_service_name/" || exit 1
 
-    cd "terraform/microservices/$terraform_service_name" || exit 1
-    build_and_terraform_init_service
+    terraform init
+    terraform taint "module.$service_name.aws_instance.quarkus_instance"
+    terraform apply -auto-approve -var="DATA_SOURCE=mysql://${addressDB}:3306/VPPaaS" -var="KAFKA_CLUSTER=${addresskafka}" -var="DOCKER_USERNAME=${DOCKER_USERNAME}" -var="DOCKER_PASSWORD=${DOCKER_PASSWORD}"
 
     echo "MICROSERVICE $service_name IS AVAILABLE HERE:"
-    addressMS="$(get_terraform_dns)"
+    addressMS="$(get_terraform_dns "$service_name")"
     echo "http://$addressMS:8080/q/swagger-ui/"
 }
+
+create_kafka_topics() {
+    echo "[CREATING KAFKA TOPICS] ..."
+
+    [[ ! -d "kafka-binary" ]] && curl -f -L -O https://dlcdn.apache.org/kafka/4.1.1/kafka_2.13-4.1.1.tgz && tar -xzf kafka_2.13-4.1.1.tgz && mv kafka_2.13-4.1.1 kafka-binary && rm kafka_2.13-4.1.1.tgz
+
+    local topics=(
+        "flexibility-offers"
+        "balancing-recommendation"
+        "energy-discharged-by-zone"
+        "generated-energy-by-prosumer"
+        "consumed-energy-by-prosumer"
+        "average-soc"
+    )
+
+    for topic in "${topics[@]}"; do
+        ./kafka-binary/bin/kafka-topics.sh --create \
+            --if-not-exists \
+            --bootstrap-server "$addressKafka" \
+            --topic "$topic"
+    done
+    echo "[KAFKA TOPICS CREATED]"
+}
+
+cleanup() {
+    echo -e "\n${esc}[31m[INTERRUPTING] Killing all background deployments...${esc}[0m"
+    kill 0
+}
+
+trap cleanup SIGINT
 
 mkdir -p logs
 
 echo "[DEPLOYING RDS, OLLAMA AND THE KAFKA CLUSTER] ..."
+
 deploy_kafka    > logs/kafka.log 2>&1       & KAF_PID=$!
 deploy_rds      > logs/rds.log 2>&1         & RDS_PID=$!
 deploy_ollama   > logs/ollama.log 2>&1      & OLL_PID=$!
 
-wait $RDS_PID $KAF_PID $OLL_PID
+wait $KAF_PID $OLL_PID $RDS_PID
 
 echo "[DONE]"
 
@@ -113,26 +117,28 @@ echo "- Ollama: http://""$(cd terraform/microservices/ollama && terraform state 
 
 echo "[DEPLOYING ALL MICROSERVICES] ..."
 
-(deploy_microservice "Asset"                        "asset"                         ) > logs/asset.log                 2>&1 & ASS_PID=$!
-(deploy_microservice "GridCell"                     "grid_cell"                     ) > logs/grid_cell.log             2>&1 & GDC_PID=$!
-(deploy_microservice "Prosumer"                     "prosumer"                      ) > logs/prosumer.log              2>&1 & PRO_PID=$!
-(deploy_microservice "UtilityOperator"              "utility_operator"              ) > logs/utility_operator.log      2>&1 & UTO_PID=$!
-(deploy_microservice "AssetLink"                    "asset_link"                    ) > logs/asset_link.log            2>&1 & ASL_PID=$!
-(deploy_microservice "EnergyAnalytics"              "energy_analytics"              ) > logs/energy_analytics.log      2>&1 & ENA_PID=$!
-(deploy_microservice "FlexibilityEmission"          "flexibility_emission"          ) > logs/flexibility_emission.log  2>&1 & FLX_PID=$!
-(deploy_microservice "GridBalancingRecommendation"  "grid_balancing"                ) > logs/grid_balancing.log        2>&1 & GDB_PID=$!
-(deploy_microservice "Telemetry"                    "telemetry"                     ) > logs/telemetry.log             2>&1 & TEL_PID=$!
+(deploy_microservice "Asset"                        "asset"                ) > logs/asset.log                 2>&1 & ASS_PID=$!
+(deploy_microservice "GridCell"                     "grid_cell"            ) > logs/grid_cell.log             2>&1 & GDC_PID=$!
+(deploy_microservice "Prosumer"                     "prosumer"             ) > logs/prosumer.log              2>&1 & PRO_PID=$!
+(deploy_microservice "UtilityOperator"              "utility_operator"     ) > logs/utility_operator.log      2>&1 & UTO_PID=$!
+(deploy_microservice "AssetLink"                    "asset_link"           ) > logs/asset_link.log            2>&1 & ASL_PID=$!
+(deploy_microservice "EnergyAnalytics"              "energy_analytics"     ) > logs/energy_analytics.log      2>&1 & ENA_PID=$!
+(deploy_microservice "FlexibilityEmission"          "flexibility_emission" ) > logs/flexibility_emission.log  2>&1 & FLX_PID=$!
+(deploy_microservice "GridBalancingRecommendation"  "grid_balancing"       ) > logs/grid_balancing.log        2>&1 & GDB_PID=$!
+(deploy_microservice "Telemetry"                    "telemetry"            ) > logs/telemetry.log             2>&1 & TEL_PID=$!
 
 wait $ASS_PID $GDC_PID $PRO_PID $UTO_PID $ASL_PID $ENA_PID $FLX_PID $GDB_PID $TEL_PID
 
-echo "- Asset: http://""$(cd terraform/microservices/asset && get_terraform_dns)"":8080/q/swagger-ui"
-echo "- GridCell: http://""$(cd terraform/microservices/grid_cell && get_terraform_dns)"":8080/q/swagger-ui"
-echo "- Prosumer: http://""$(cd terraform/microservices/prosumer && get_terraform_dns)"":8080/q/swagger-ui"
-echo "- UtilityOperator: http://""$(cd terraform/microservices/utility_operator && get_terraform_dns)"":8080/q/swagger-ui"
-echo "- AssetLink: http://""$(cd terraform/microservices/asset_link && get_terraform_dns)"":8080/q/swagger-ui"
-echo "- EnergyAnalytics: http://""$(cd terraform/microservices/energy_analytics && get_terraform_dns)"":8080/q/swagger-ui"
-echo "- FlexibilityEmission: http://""$(cd terraform/microservices/flexibility_emission && get_terraform_dns)"":8080/q/swagger-ui"
-echo "- GridBalancingRecommendation: http://""$(cd terraform/microservices/grid_balancing && get_terraform_dns)"":8080/q/swagger-ui"
-echo "- Telemetry: http://""$(cd terraform/microservices/telemetry && get_terraform_dns)"":8080/q/swagger-ui"
+echo "- Asset: http://""$(cd terraform/microservices/asset                                && get_terraform_dns asset)"":8080/q/swagger-ui"
+echo "- GridCell: http://""$(cd terraform/microservices/grid_cell                         && get_terraform_dns gridcell)"":8080/q/swagger-ui"
+echo "- Prosumer: http://""$(cd terraform/microservices/prosumer                          && get_terraform_dns prosumer)"":8080/q/swagger-ui"
+echo "- UtilityOperator: http://""$(cd terraform/microservices/utility_operator           && get_terraform_dns utilityoperator)"":8080/q/swagger-ui"
+echo "- AssetLink: http://""$(cd terraform/microservices/asset_link                       && get_terraform_dns assetlink)"":8080/q/swagger-ui"
+echo "- EnergyAnalytics: http://""$(cd terraform/microservices/energy_analytics           && get_terraform_dns energyanalytics)"":8080/q/swagger-ui"
+echo "- FlexibilityEmission: http://""$(cd terraform/microservices/flexibility_emission   && get_terraform_dns flexibilityemission)"":8080/q/swagger-ui"
+echo "- GridBalancingRecommendation: http://""$(cd terraform/microservices/grid_balancing && get_terraform_dns gridbalancing)"":8080/q/swagger-ui"
+echo "- Telemetry: http://""$(cd terraform/microservices/telemetry                        && get_terraform_dns telemetry)"":8080/q/swagger-ui"
 
 echo "[DONE]"
+
+create_kafka_topics

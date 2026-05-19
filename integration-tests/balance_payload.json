@@ -1,0 +1,32 @@
+{
+  "cells": [
+    {
+      "id": "ZONE-OVERLOAD",
+      "maxLoad": 100,
+      "xCoords": 0,
+      "yCoords": 0
+    },
+    {
+      "id": "ZONE-HEADROOM",
+      "maxLoad": 100,
+      "xCoords": 0,
+      "yCoords": 1
+    }
+  ],
+  "events": [
+    {
+      "asset_id": 1,
+      "asset_type": "EV_CHARGER",
+      "grid_cell_id": "ZONE-OVERLOAD",
+      "Plug_Status": "CHARGING",
+      "Charging_Rate": 150.0
+    },
+    {
+      "asset_id": 2,
+      "asset_type": "BATTERY",
+      "grid_cell_id": "ZONE-HEADROOM",
+      "Status": "ONLINE",
+      "Current_Output": 20.0
+    }
+  ]
+}

@@ -6,14 +6,12 @@ import io.smallrye.common.annotation.Blocking;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
-import jakarta.ws.rs.core.MediaType;
 
 @Path("AssetLink")
 public class AssetLinkResource {
@@ -44,7 +42,7 @@ public class AssetLinkResource {
         .flatMap(r -> client.query(" INSERT INTO AssetLink (idProsumer,idUtilityOperator) VALUES (4,2)").execute())
         .await().indefinitely();
     }
-    
+
     @GET
     public Multi<AssetLink> get() {
         return AssetLink.findAll(client);

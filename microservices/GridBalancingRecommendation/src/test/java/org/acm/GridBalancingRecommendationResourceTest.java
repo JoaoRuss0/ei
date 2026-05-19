@@ -38,7 +38,7 @@ class GridBalancingRecommendationResourceTest {
                 .execute().await().indefinitely();
 
         given()
-                .when().get("/AssetLink")
+                .when().get("/GridBalancing")
                 .then()
                 .statusCode(200)
                 .body("size()", greaterThanOrEqualTo(1));
@@ -74,7 +74,7 @@ class GridBalancingRecommendationResourceTest {
         given()
                 .contentType(ContentType.JSON)
                 .body(jsonPayload)
-                .when().post("/AssetLink/balance")
+                .when().post("/GridBalancing/balance")
                 .then()
                 .statusCode(200);
 

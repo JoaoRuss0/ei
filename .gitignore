@@ -47,3 +47,4 @@ terraform.rc
 access.sh
 logs
 kafka-binary
+.claude

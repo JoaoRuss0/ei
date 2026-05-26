@@ -5,7 +5,7 @@ variable "DOCKER_PASSWORD" {}
 
 module "gridbalancing" {
   source = "../"
-  SERVICE_NAME = "gridbalancing"
+  SERVICE_NAME = "gridbalancingrecommendation"
   ACCOUNT_NAME = "account_1"
   DATA_SOURCE = var.DATA_SOURCE
   KAFKA_CLUSTER = var.KAFKA_CLUSTER

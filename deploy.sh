@@ -49,6 +49,81 @@ deploy_ollama() {
     echo "http://$addressMS:11434/api/generate"
 }
 
+deploy_camunda() {
+    cd "terraform/camunda" || exit 1
+    terraform init && terraform apply -auto-approve
+
+    echo "CAMUNDA IS AVAILABLE HERE:"
+    addressCamunda="$(terraform state show aws_instance.camunda_engine_instance \
+                        | grep public_dns \
+                        | sed 's/public_dns//g' \
+                        | sed 's/=//g' \
+                        | sed 's/"//g' \
+                        | sed 's/ //g' \
+                        | sed "s/$esc\[[0-9;]*m//g")"
+
+    echo "http://$addressCamunda:8080/operate"
+    echo "http://$addressCamunda:8080/swagger-ui/index.html?urls.primaryName=Orchestration+Cluster+API"
+}
+
+deploy_kong() {
+    local asset_dns=$(cd terraform/microservices/asset                && get_terraform_dns asset)
+    local assetlink_dns=$(cd terraform/microservices/asset_link        && get_terraform_dns assetlink)
+    local energyanalytics_dns=$(cd terraform/microservices/energy_analytics    && get_terraform_dns energyanalytics)
+    local flexibilityemission_dns=$(cd terraform/microservices/flexibility_emission && get_terraform_dns flexibilityemission)
+    local gridbalancing_dns=$(cd terraform/microservices/grid_balancing && get_terraform_dns gridbalancing)
+    local gridcell_dns=$(cd terraform/microservices/grid_cell           && get_terraform_dns gridcell)
+    local prosumer_dns=$(cd terraform/microservices/prosumer            && get_terraform_dns prosumer)
+    local telemetry_dns=$(cd terraform/microservices/telemetry          && get_terraform_dns telemetry)
+    local utilityoperator_dns=$(cd terraform/microservices/utility_operator && get_terraform_dns utilityoperator)
+
+    cat > terraform/kong/microservices.auto.tfvars.json <<EOF
+{
+  "MICROSERVICES": {
+    "asset":               "http://${asset_dns}:8080",
+    "assetlink":           "http://${assetlink_dns}:8080",
+    "energyanalytics":     "http://${energyanalytics_dns}:8080",
+    "flexibilityemission": "http://${flexibilityemission_dns}:8080",
+    "gridbalancing":       "http://${gridbalancing_dns}:8080",
+    "gridcell":            "http://${gridcell_dns}:8080",
+    "prosumer":            "http://${prosumer_dns}:8080",
+    "telemetry":           "http://${telemetry_dns}:8080",
+    "utilityoperator":     "http://${utilityoperator_dns}:8080"
+  }
+}
+EOF
+
+    cd "terraform/kong" || exit 1
+    terraform init && terraform apply -auto-approve
+
+    echo "KONG IS AVAILABLE HERE:"
+    addressKong="$(terraform state show aws_instance.kong_instance \
+                    | grep public_dns \
+                    | sed 's/public_dns//g' \
+                    | sed 's/=//g' \
+                    | sed 's/"//g' \
+                    | sed 's/ //g' \
+                    | sed "s/$esc\[[0-9;]*m//g")"
+
+    echo "http://$addressKong:8000/"
+}
+
+deploy_konga() {
+    cd "terraform/konga" || exit 1
+    terraform init && terraform apply -auto-approve -var="KONG_ADMIN_URL=http://${addressKong}:8001"
+
+    echo "KONGA IS AVAILABLE HERE:"
+    addressKonga="$(terraform state show aws_instance.konga_instance \
+                    | grep public_dns \
+                    | sed 's/public_dns//g' \
+                    | sed 's/=//g' \
+                    | sed 's/"//g' \
+                    | sed 's/ //g' \
+                    | sed "s/$esc\[[0-9;]*m//g")"
+
+    echo "http://$addressKonga:1337/"
+}
+
 deploy_microservice() {
     local service_name="$1"
     local terraform_service_name="$2"
@@ -59,11 +134,40 @@ deploy_microservice() {
 
     terraform init
     terraform taint "module.$service_name.aws_instance.quarkus_instance"
-    terraform apply -auto-approve -var="DATA_SOURCE=mysql://${addressDB}:3306/VPPaaS" -var="KAFKA_CLUSTER=${addresskafka}" -var="DOCKER_USERNAME=${DOCKER_USERNAME}" -var="DOCKER_PASSWORD=${DOCKER_PASSWORD}"
+    terraform apply -auto-approve -var="DATA_SOURCE=mysql://${addressDB}:3306/VPPaaS" -var="KAFKA_CLUSTER=${addressKafka}" -var="DOCKER_USERNAME=${DOCKER_USERNAME}" -var="DOCKER_PASSWORD=${DOCKER_PASSWORD}"
 
     echo "MICROSERVICE $service_name IS AVAILABLE HERE:"
     addressMS="$(get_terraform_dns "$service_name")"
     echo "http://$addressMS:8080/q/swagger-ui/"
+}
+
+deploy_camunda_resources() {
+    echo "[WAITING FOR CAMUNDA TO BE READY] ..."
+    for i in $(seq 1 60); do
+        if curl -s -f -o /dev/null -m 5 "http://${addressCamunda}:8080/v2/topology"; then
+            echo "Camunda is ready."
+            break
+        fi
+        sleep 5
+    done
+
+    echo "[DEPLOYING CAMUNDA FORMS] ..."
+    for entry in ./bpmn/forms/*.form; do
+        echo "  - $entry"
+        curl -s -L -X POST "http://${addressCamunda}:8080/v2/deployments" \
+            -H "Accept: application/json" \
+            -F "resources=@${entry}" > /dev/null
+    done
+
+    echo "[DEPLOYING CAMUNDA BPMN PROCESSES] ..."
+    for entry in ./bpmn/*.bpmn; do
+        echo "  - $entry"
+        curl -s -L -X POST "http://${addressCamunda}:8080/v2/deployments" \
+            -H "Accept: application/json" \
+            -F "resources=@${entry}" > /dev/null
+    done
+
+    echo "[CAMUNDA RESOURCES DEPLOYED]"
 }
 
 create_kafka_topics() {
@@ -98,22 +202,27 @@ trap cleanup SIGINT
 
 mkdir -p logs
 
-echo "[DEPLOYING RDS, OLLAMA AND THE KAFKA CLUSTER] ..."
+echo "[DEPLOYING RDS, OLLAMA, KAFKA AND CAMUNDA] ..."
 
 deploy_kafka    > logs/kafka.log 2>&1       & KAF_PID=$!
 deploy_rds      > logs/rds.log 2>&1         & RDS_PID=$!
 deploy_ollama   > logs/ollama.log 2>&1      & OLL_PID=$!
+deploy_camunda  > logs/camunda.log 2>&1     & CAM_PID=$!
 
-wait $KAF_PID $OLL_PID $RDS_PID
+wait $KAF_PID $OLL_PID $RDS_PID $CAM_PID
 
 echo "[DONE]"
 
 export addressDB="$(cd terraform/rds && terraform state show aws_db_instance.example | grep address | sed "s/address//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
 export addressKafka="$(cd terraform/kafka && terraform output -json publicdnslist | jq -r 'map("\(.):9092") | join(",")')"
+export addressCamunda="$(cd terraform/camunda && terraform state show aws_instance.camunda_engine_instance | grep public_dns | sed "s/public_dns//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
 
 echo "- Database:" "$addressDB"
 echo "- Kafka Cluster:" "$addressKafka"
 echo "- Ollama: http://""$(cd terraform/microservices/ollama && terraform state show -no-color aws_instance.ollama_instance | awk -F\" '/^    public_dns/ {print $2}' )"":11434/api/generate"
+echo "- Camunda: http://$addressCamunda:8080/operate"
+
+deploy_camunda_resources > logs/camunda_resources.log 2>&1 & CAMRES_PID=$!
 
 echo "[DEPLOYING ALL MICROSERVICES] ..."
 
@@ -141,4 +250,22 @@ echo "- Telemetry: http://""$(cd terraform/microservices/telemetry              
 
 echo "[DONE]"
 
+echo "[DEPLOYING KONG WITH AUTO-REGISTERED MICROSERVICES] ..."
+
+(deploy_kong) > logs/kong.log 2>&1
+
+export addressKong="$(cd terraform/kong && terraform state show aws_instance.kong_instance | grep public_dns | sed "s/public_dns//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
+
+echo "- Kong: http://$addressKong:8000/"
+
+echo "[DEPLOYING KONGA WITH KONG NODE SEEDED] ..."
+
+(deploy_konga) > logs/konga.log 2>&1
+
+export addressKonga="$(cd terraform/konga && terraform state show aws_instance.konga_instance | grep public_dns | sed "s/public_dns//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
+
+echo "- Konga: http://$addressKonga:1337/"
+
 create_kafka_topics
+
+wait $CAMRES_PID

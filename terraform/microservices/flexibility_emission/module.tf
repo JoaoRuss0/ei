@@ -6,7 +6,7 @@ variable "DOCKER_PASSWORD" {}
 module "flexibilityemission" {
   source = "../"
   SERVICE_NAME = "flexibilityemission"
-  ACCOUNT_NAME = "account_1"
+  ACCOUNT_NAME = "account_2"
   DATA_SOURCE = var.DATA_SOURCE
   KAFKA_CLUSTER = var.KAFKA_CLUSTER
   DOCKER_USERNAME = var.DOCKER_USERNAME

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1apliyg" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
+  <bpmn:collaboration id="Collaboration_0ppdg7z">
+    <bpmn:participant id="Participant_1lkx1s7" name="LAAS" processRef="CrossSellingRecomendation" />
+  </bpmn:collaboration>
+  <bpmn:process id="CrossSellingRecomendation" name="CrossSellingRecomendation" isExecutable="true" camunda:historyTimeToLive="180">
+    <bpmn:laneSet id="LaneSet_0x2e29u">
+      <bpmn:lane id="Lane_0vw1god" name="Initiator">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0dw2xpt</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1lcokbc</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_03q04od</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_04oia4z" name="Executor">
+        <bpmn:flowNodeRef>Activity_0ae7711</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1m1an6i</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1kc8xs8</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1tznu53</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:sequenceFlow id="Flow_191qriu" sourceRef="StartEvent_1" targetRef="Activity_03q04od" />
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_191qriu</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0jv1c2g" sourceRef="Activity_0dw2xpt" targetRef="Event_1lcokbc" />
+    <bpmn:userTask id="Activity_0dw2xpt" name="Cross Selling Recomendations Created" camunda:assignee="demo">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="Confirm" label="Confirm" type="boolean" defaultValue="true">
+            <camunda:validation />
+          </camunda:formField>
+          <camunda:formField id="crossSellingRecommendations" label="crossSellingRecommendations" type="string" defaultValue="${crossSellingRecommendations}" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0ycim53</bpmn:incoming>
+      <bpmn:outgoing>Flow_0jv1c2g</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_1lcokbc">
+      <bpmn:incoming>Flow_0jv1c2g</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_12m3ahh" sourceRef="Activity_1tznu53" targetRef="Activity_0ae7711" />
+    <bpmn:serviceTask id="Activity_0ae7711" name="Create Cross Selling Recomendation">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="payload">{
+  "idLoyaltyCard": "${LoyaltyCardID}",
+  "idsShops": ${crossSellingRecommendations}
+}</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://${KONG_ADDRESS}:8000/CrossSellingRecommendation</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_12m3ahh</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ycim53</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0ycim53" sourceRef="Activity_0ae7711" targetRef="Activity_0dw2xpt" />
+    <bpmn:userTask id="Activity_03q04od" name="Get Loyalty Card ID, and emit possible Recomendations" camunda:assignee="demo">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="LoyaltyCardID" label="LoyaltyCardID" type="long">
+            <camunda:validation />
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_191qriu</bpmn:incoming>
+      <bpmn:outgoing>Flow_1hkbnh6</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1hkbnh6" sourceRef="Activity_03q04od" targetRef="Activity_1m1an6i" />
+    <bpmn:scriptTask id="Activity_1m1an6i" name="Obtain Kong Address" scriptFormat="JavaScript">
+      <bpmn:incoming>Flow_1hkbnh6</bpmn:incoming>
+      <bpmn:outgoing>Flow_19i8vtk</bpmn:outgoing>
+      <bpmn:script>execution.getProcessInstance().setVariable("KONG_ADDRESS", java.lang.System.getenv("KONG_ADDRESS"));</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_19i8vtk" sourceRef="Activity_1m1an6i" targetRef="Activity_1kc8xs8" />
+    <bpmn:sequenceFlow id="Flow_1jctxxz" sourceRef="Activity_1kc8xs8" targetRef="Activity_1tznu53" />
+    <bpmn:serviceTask id="Activity_1kc8xs8" name="Obtain All Client Purchases From Last Month">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://${KONG_ADDRESS}:8000/Purchase</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="ClientPurchases_ignored">
+              <camunda:script scriptFormat="JavaScript">var responseString = connector.getVariable("response");
+var response = S(responseString).elements();
+
+var targetId = connector.getVariable("LoyaltyCardID");
+
+var filtered = [];
+
+var now = new Date();
+var oneMonthAgo = new Date(now);
+oneMonthAgo.setMonth(now.getMonth() - 1);
+
+for (var i = 0; i &lt; response.size(); i++) {
+  var item = response.get(i);
+  var timestampStr = item.prop("timestamp").value();
+
+  var purchaseDate = new Date(timestampStr);
+
+  if (item.prop("loyaltyCard_id").value() == targetId &amp;&amp; purchaseDate &gt;= oneMonthAgo ) {
+filtered.push({
+      id: item.prop("id").value(),
+      timestamp: item.prop("timestamp").value(),
+      price: item.prop("price").value(),
+      product: item.prop("product").value(),
+      supplier: item.prop("supplier").value(),
+      shop_id: item.prop("shop_id").value(),
+      loyaltyCard_id: targetId,
+      discountCoupon_id: item.prop("discountCoupon_id").value()
+    });
+ }
+}
+
+connector.setVariable("ClientPurchases", S(JSON.stringify(filtered)));
+</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_19i8vtk</bpmn:incoming>
+      <bpmn:outgoing>Flow_1jctxxz</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_1tznu53" name="Calculate Cross Selling Recommendation" scriptFormat="JavaScript">
+      <bpmn:incoming>Flow_1jctxxz</bpmn:incoming>
+      <bpmn:outgoing>Flow_12m3ahh</bpmn:outgoing>
+      <bpmn:script>var purchases = JSON.parse(execution.getVariable("ClientPurchases"));
+
+var count = {};
+
+for (var i = 0; i &lt; purchases.length; i++) {
+  var shopId = purchases[i].shop_id;
+  count[shopId] = (count[shopId] || 0) + 1;
+}
+
+var entries = Object.keys(count).map(function(id) {
+  return { id: id, count: count[id] };
+});
+
+entries.sort(function(a, b) {
+  return b.count - a.count;
+});
+
+function getTied(arr, index) {
+  var base = arr[index].count;
+  var tied = arr.filter(function(el) {
+    return el.count == base;
+  });
+  return tied;
+}
+
+function getRandomSubset(arr, maxSize) {
+  var arrCopy = arr.slice(0);
+  for (var i = arrCopy.length - 1; i &gt; 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1)); 
+    var temp = arrCopy[i];
+    arrCopy[i] = arrCopy[j];
+    arrCopy[j] = temp;
+  }
+  return arrCopy.slice(0, maxSize);
+}
+
+var maxCount = entries.length &gt; 0 ? entries[0].count : 0;
+var maxEntries = getTied(entries, 0);
+if (maxEntries.length &gt; 3) {
+  maxEntries = getRandomSubset(maxEntries, 3);
+}
+
+var minCount = entries.length &gt; 0 ? entries[entries.length - 1].count : 0;
+var minEntries = getTied(entries, entries.length - 1);
+if (minEntries.length &gt; 3) {
+  minEntries = getRandomSubset(minEntries, 3);
+}
+
+if (minCount == maxCount)
+execution.setVariable("crossSellingRecommendations", null);
+else{
+var crossSelling = maxEntries.map(function(el) { return parseInt(el.id); })
+  .concat(minEntries.map(function(el) { return parseInt(el.id); }));
+
+execution.setVariable("crossSellingRecommendations", JSON.stringify(crossSelling));
+}</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0ppdg7z">
+      <bpmndi:BPMNShape id="Participant_1lkx1s7_di" bpmnElement="Participant_1lkx1s7" isHorizontal="true">
+        <dc:Bounds x="132" y="55" width="968" height="365" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_04oia4z_di" bpmnElement="Lane_04oia4z" isHorizontal="true">
+        <dc:Bounds x="162" y="238" width="938" height="182" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_0vw1god_di" bpmnElement="Lane_0vw1god" isHorizontal="true">
+        <dc:Bounds x="162" y="55" width="938" height="183" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="202" y="122" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0b4sie7" bpmnElement="Activity_0dw2xpt">
+        <dc:Bounds x="880" y="100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1lcokbc_di" bpmnElement="Event_1lcokbc">
+        <dc:Bounds x="1032" y="122" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_07ih1o6" bpmnElement="Activity_0ae7711" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="730" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_03ybyx0" bpmnElement="Activity_03q04od">
+        <dc:Bounds x="290" y="100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0pskatf" bpmnElement="Activity_1m1an6i">
+        <dc:Bounds x="290" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_13cam5b" bpmnElement="Activity_1kc8xs8" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="430" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_10qc1q9_di" bpmnElement="Activity_1tznu53">
+        <dc:Bounds x="580" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_191qriu_di" bpmnElement="Flow_191qriu">
+        <di:waypoint x="238" y="140" />
+        <di:waypoint x="290" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jv1c2g_di" bpmnElement="Flow_0jv1c2g">
+        <di:waypoint x="980" y="140" />
+        <di:waypoint x="1032" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12m3ahh_di" bpmnElement="Flow_12m3ahh">
+        <di:waypoint x="680" y="320" />
+        <di:waypoint x="730" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ycim53_di" bpmnElement="Flow_0ycim53">
+        <di:waypoint x="830" y="320" />
+        <di:waypoint x="860" y="320" />
+        <di:waypoint x="860" y="140" />
+        <di:waypoint x="880" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hkbnh6_di" bpmnElement="Flow_1hkbnh6">
+        <di:waypoint x="340" y="180" />
+        <di:waypoint x="340" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19i8vtk_di" bpmnElement="Flow_19i8vtk">
+        <di:waypoint x="390" y="320" />
+        <di:waypoint x="430" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1jctxxz_di" bpmnElement="Flow_1jctxxz">
+        <di:waypoint x="530" y="320" />
+        <di:waypoint x="580" y="320" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1apliyg" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.35.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
+  <bpmn:collaboration id="Collaboration_0ppdg7z">
+    <bpmn:participant id="Participant_1lkx1s7" name="LAAS" processRef="DiscountCouponEmission" />
+  </bpmn:collaboration>
+  <bpmn:process id="DiscountCouponEmission" name="DiscountCouponEmission" isExecutable="true" camunda:historyTimeToLive="180">
+    <bpmn:laneSet id="LaneSet_0x2e29u">
+      <bpmn:lane id="Lane_0vw1god" name="Initiator">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1lcokbc</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0dw2xpt</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_03q04od</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_04oia4z" name="Executor">
+        <bpmn:flowNodeRef>Gateway_1uhxa0h</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1rjij5x</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1p2mpn1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1tznu53</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1kc8xs8</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1m1an6i</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:sequenceFlow id="Flow_191qriu" sourceRef="StartEvent_1" targetRef="Activity_03q04od" />
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_191qriu</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1bm9kmj" sourceRef="Activity_03q04od" targetRef="Activity_1m1an6i" />
+    <bpmn:sequenceFlow id="Flow_06usou0" sourceRef="Activity_1m1an6i" targetRef="Activity_1kc8xs8" />
+    <bpmn:sequenceFlow id="Flow_1qxs27z" sourceRef="Activity_1kc8xs8" targetRef="Activity_1tznu53" />
+    <bpmn:sequenceFlow id="Flow_0jv1c2g" sourceRef="Activity_0dw2xpt" targetRef="Event_1lcokbc" />
+    <bpmn:sequenceFlow id="Flow_1wnmeex" sourceRef="Activity_1tznu53" targetRef="Gateway_1uhxa0h" />
+    <bpmn:exclusiveGateway id="Gateway_1uhxa0h">
+      <bpmn:incoming>Flow_1onez3j</bpmn:incoming>
+      <bpmn:incoming>Flow_1wnmeex</bpmn:incoming>
+      <bpmn:outgoing>Flow_1v8yw3y</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0ugeyam</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1v8yw3y" name="Iterated through the entire list" sourceRef="Gateway_1uhxa0h" targetRef="Activity_0dw2xpt">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${requestsIndex == DiscountCouponRequestsSize}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0ugeyam" name="Still has requests" sourceRef="Gateway_1uhxa0h" targetRef="Activity_1p2mpn1">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${requestsIndex &lt; DiscountCouponRequestsSize}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="Event_1lcokbc">
+      <bpmn:incoming>Flow_0jv1c2g</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="Activity_0dw2xpt" name="Possible&#10;Discount Coupons were emitted" camunda:assignee="demo">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="Confirm" label="Confirm" type="boolean" defaultValue="true">
+            <camunda:validation />
+          </camunda:formField>
+          <camunda:formField id="DiscountCoupons" label="DiscountCoupons" type="string" defaultValue="${DiscountCouponRequests}" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1v8yw3y</bpmn:incoming>
+      <bpmn:outgoing>Flow_0jv1c2g</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1onez3j" sourceRef="Activity_1rjij5x" targetRef="Gateway_1uhxa0h" />
+    <bpmn:serviceTask id="Activity_1rjij5x" name="Emit Discount Coupon">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://${KONG_ADDRESS}:8000/DiscountCoupon</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">${currentRequest}</camunda:inputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0504gk8</bpmn:incoming>
+      <bpmn:outgoing>Flow_1onez3j</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_1p2mpn1" name="Put current request in the process and increase index" scriptFormat="JavaScript">
+      <bpmn:incoming>Flow_0ugeyam</bpmn:incoming>
+      <bpmn:outgoing>Flow_0504gk8</bpmn:outgoing>
+      <bpmn:script>var requests = execution.getVariable("DiscountCouponRequests");
+var index = execution.getVariable("requestsIndex");
+
+var requestsList = JSON.parse(requests);
+
+execution.setVariable("currentRequest", JSON.stringify(requestsList[index]));
+
+index = index + 1;
+execution.setVariable("requestsIndex", index);
+
+
+</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0504gk8" sourceRef="Activity_1p2mpn1" targetRef="Activity_1rjij5x" />
+    <bpmn:scriptTask id="Activity_1tznu53" name="Create Discount Coupon Emission Requests" scriptFormat="JavaScript">
+      <bpmn:incoming>Flow_1qxs27z</bpmn:incoming>
+      <bpmn:outgoing>Flow_1wnmeex</bpmn:outgoing>
+      <bpmn:script>var purchasesJson = execution.getVariable("ClientPurchases");
+var loyaltyCardId = execution.getVariable("LoyaltyCardID");
+
+var purchases = JSON.parse(purchasesJson);
+
+var visitsPerShop = {};
+
+for (var i = 0; i &lt; purchases.length; i++) {
+  var shopId = purchases[i].shop_id;
+  visitsPerShop[shopId] = (visitsPerShop[shopId] || 0) + 1;
+}
+
+var discountGroups = {
+  5: [],
+  10: [],
+  15: []
+};
+
+for (var shopId in visitsPerShop) {
+  var visits = visitsPerShop[shopId];
+  if (visits &gt; 10) {
+    discountGroups[5].push(Number(shopId));
+  } else if (visits &gt; 5) {
+    discountGroups[10].push(Number(shopId));
+  } else if (visits &gt;= 3) {
+    discountGroups[15].push(Number(shopId));
+  }
+}
+
+var now = new Date();
+var expirationDate = new Date(now.getTime() + 30*24*60*60*1000).toISOString();
+
+var couponRequests = [];
+
+for (var discount in discountGroups) {
+  var shops = discountGroups[discount];
+  if (shops.length &gt; 0) {
+    couponRequests.push({
+      idLoyaltyCard: loyaltyCardId,
+      idsShops: shops,
+      discount: Number(discount),
+      expirationDate: expirationDate
+    });
+  }
+}
+
+execution.setVariable("DiscountCouponRequests", JSON.stringify(couponRequests));
+execution.setVariable("DiscountCouponRequestsSize", couponRequests.length);
+execution.setVariable("requestsIndex", 0);</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="Activity_1kc8xs8" name="Obtain All Client Purchases From Last Month">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://${KONG_ADDRESS}:8000/Purchase</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="ClientPurchases_ignored">
+              <camunda:script scriptFormat="JavaScript">var responseString = connector.getVariable("response");
+var response = S(responseString).elements();
+
+var targetId = connector.getVariable("LoyaltyCardID");
+
+var filtered = [];
+
+var now = new Date();
+var oneMonthAgo = new Date(now);
+oneMonthAgo.setMonth(now.getMonth() - 1);
+
+for (var i = 0; i &lt; response.size(); i++) {
+  var item = response.get(i);
+  var timestampStr = item.prop("timestamp").value();
+
+  var purchaseDate = new Date(timestampStr);
+
+  if (item.prop("loyaltyCard_id").value() == targetId &amp;&amp; purchaseDate &gt;= oneMonthAgo ) {
+filtered.push({
+      id: item.prop("id").value(),
+      timestamp: item.prop("timestamp").value(),
+      price: item.prop("price").value(),
+      product: item.prop("product").value(),
+      supplier: item.prop("supplier").value(),
+      shop_id: item.prop("shop_id").value(),
+      loyaltyCard_id: targetId,
+      discountCoupon_id: item.prop("discountCoupon_id").value()
+    });
+ }
+}
+
+connector.setVariable("ClientPurchases", S(JSON.stringify(filtered)));
+</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_06usou0</bpmn:incoming>
+      <bpmn:outgoing>Flow_1qxs27z</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_1m1an6i" name="Obtain Kong Address" scriptFormat="JavaScript">
+      <bpmn:incoming>Flow_1bm9kmj</bpmn:incoming>
+      <bpmn:outgoing>Flow_06usou0</bpmn:outgoing>
+      <bpmn:script>execution.getProcessInstance().setVariable("KONG_ADDRESS", java.lang.System.getenv("KONG_ADDRESS"));</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="Activity_03q04od" name="Decide customer, through Loyalty Card ID to emit coupons" camunda:assignee="demo">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="LoyaltyCardID" label="LoyaltyCardID" type="long">
+            <camunda:validation />
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_191qriu</bpmn:incoming>
+      <bpmn:outgoing>Flow_1bm9kmj</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0ppdg7z">
+      <bpmndi:BPMNShape id="Participant_1lkx1s7_di" bpmnElement="Participant_1lkx1s7" isHorizontal="true">
+        <dc:Bounds x="132" y="55" width="1208" height="365" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_04oia4z_di" bpmnElement="Lane_04oia4z" isHorizontal="true">
+        <dc:Bounds x="162" y="238" width="1178" height="182" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_0vw1god_di" bpmnElement="Lane_0vw1god" isHorizontal="true">
+        <dc:Bounds x="162" y="55" width="1178" height="183" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="202" y="122" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1uhxa0h_di" bpmnElement="Gateway_1uhxa0h" isMarkerVisible="true">
+        <dc:Bounds x="755" y="295" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1lcokbc_di" bpmnElement="Event_1lcokbc">
+        <dc:Bounds x="1232" y="122" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0b4sie7" bpmnElement="Activity_0dw2xpt">
+        <dc:Bounds x="1030" y="100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_108hskn" bpmnElement="Activity_1rjij5x" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="1050" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1v532yi" bpmnElement="Activity_1p2mpn1">
+        <dc:Bounds x="900" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1oek5yw_di" bpmnElement="Activity_1tznu53">
+        <dc:Bounds x="620" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0fmc5ea" bpmnElement="Activity_1kc8xs8" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="470" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_12fuy9l" bpmnElement="Activity_1m1an6i">
+        <dc:Bounds x="320" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0565rz3_di" bpmnElement="Activity_03q04od">
+        <dc:Bounds x="320" y="100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_191qriu_di" bpmnElement="Flow_191qriu">
+        <di:waypoint x="238" y="140" />
+        <di:waypoint x="320" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bm9kmj_di" bpmnElement="Flow_1bm9kmj">
+        <di:waypoint x="370" y="180" />
+        <di:waypoint x="370" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06usou0_di" bpmnElement="Flow_06usou0">
+        <di:waypoint x="420" y="320" />
+        <di:waypoint x="470" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1qxs27z_di" bpmnElement="Flow_1qxs27z">
+        <di:waypoint x="570" y="320" />
+        <di:waypoint x="620" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jv1c2g_di" bpmnElement="Flow_0jv1c2g">
+        <di:waypoint x="1130" y="140" />
+        <di:waypoint x="1232" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wnmeex_di" bpmnElement="Flow_1wnmeex">
+        <di:waypoint x="720" y="320" />
+        <di:waypoint x="755" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1v8yw3y_di" bpmnElement="Flow_1v8yw3y">
+        <di:waypoint x="780" y="295" />
+        <di:waypoint x="780" y="140" />
+        <di:waypoint x="1030" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="791" y="196" width="78" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ugeyam_di" bpmnElement="Flow_0ugeyam">
+        <di:waypoint x="805" y="320" />
+        <di:waypoint x="900" y="320" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="808" y="293" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1onez3j_di" bpmnElement="Flow_1onez3j">
+        <di:waypoint x="1100" y="360" />
+        <di:waypoint x="1100" y="390" />
+        <di:waypoint x="780" y="390" />
+        <di:waypoint x="780" y="345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0504gk8_di" bpmnElement="Flow_0504gk8">
+        <di:waypoint x="1000" y="320" />
+        <di:waypoint x="1050" y="320" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

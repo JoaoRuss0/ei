@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1apliyg" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.34.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
+  <bpmn:collaboration id="Collaboration_0ppdg7z">
+    <bpmn:participant id="Participant_1lkx1s7" name="LAAS" processRef="SelledProductAnalytics" />
+  </bpmn:collaboration>
+  <bpmn:process id="SelledProductAnalytics" name="SelledProductAnalytics" isExecutable="true" camunda:historyTimeToLive="180">
+    <bpmn:laneSet id="LaneSet_0x2e29u">
+      <bpmn:lane id="Lane_0vw1god" name="Initiator">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1lcokbc</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0dw2xpt</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_03q04od</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_04oia4z" name="Executor">
+        <bpmn:flowNodeRef>Activity_0ae7711</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1kc8xs8</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0q2vrps</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0kb354l</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1m1an6i</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0jukkoz</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0p85vqc</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_14jb1oe</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_149zogz</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0yxi482</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:sequenceFlow id="Flow_191qriu" sourceRef="StartEvent_1" targetRef="Activity_03q04od" />
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_191qriu</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1bm9kmj" sourceRef="Activity_03q04od" targetRef="Activity_1m1an6i" />
+    <bpmn:sequenceFlow id="Flow_0jv1c2g" sourceRef="Activity_0dw2xpt" targetRef="Event_1lcokbc" />
+    <bpmn:endEvent id="Event_1lcokbc">
+      <bpmn:incoming>Flow_0jv1c2g</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1hk1ho6" sourceRef="Activity_1m1an6i" targetRef="Gateway_0jukkoz" />
+    <bpmn:sequenceFlow id="Flow_08lin06" sourceRef="Gateway_0jukkoz" targetRef="Activity_1kc8xs8">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${typeOfAnalysis == "SHOP"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0xi1yuy" sourceRef="Activity_1kc8xs8" targetRef="Gateway_0yxi482" />
+    <bpmn:sequenceFlow id="Flow_0fee4b3" sourceRef="Gateway_0yxi482" targetRef="Activity_149zogz" />
+    <bpmn:sequenceFlow id="Flow_12i49nb" sourceRef="Activity_149zogz" targetRef="Activity_0ae7711" />
+    <bpmn:serviceTask id="Activity_0ae7711" name="Create Selled Product Analises">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="payload">{
+  "typeOfAnalysis": "${typeOfAnalysis}",
+  "typeValue": "${identifierOfAnalysisType}",
+  "timestamp": "${timestamp}",
+ "data": ${purchasesAnalytics}
+}</camunda:inputParameter>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://${KONG_ADDRESS}:8000/SelledProduct</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_12i49nb</bpmn:incoming>
+      <bpmn:outgoing>Flow_0g3rn05</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0g3rn05" sourceRef="Activity_0ae7711" targetRef="Activity_0dw2xpt" />
+    <bpmn:userTask id="Activity_0dw2xpt" name="Selled Product Analises was emitted" camunda:assignee="demo">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="Confirm" label="Confirm" type="boolean" defaultValue="true">
+            <camunda:validation />
+          </camunda:formField>
+          <camunda:formField id="purchasesAnalytics" label="purchasesAnalytics" type="string" defaultValue="${purchasesAnalytics}" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0g3rn05</bpmn:incoming>
+      <bpmn:outgoing>Flow_0jv1c2g</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1rgkxf7" sourceRef="Gateway_0jukkoz" targetRef="Activity_0kb354l">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${typeOfAnalysis == "DISCOUNT_COUPON"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0ugqdp9" sourceRef="Activity_0kb354l" targetRef="Gateway_0yxi482" />
+    <bpmn:sequenceFlow id="Flow_1mua4nc" sourceRef="Gateway_0jukkoz" targetRef="Activity_0p85vqc">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${typeOfAnalysis == "POSTAL_CODE"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1ah121a" sourceRef="Activity_14jb1oe" targetRef="Gateway_0yxi482" />
+    <bpmn:sequenceFlow id="Flow_0tgkcls" sourceRef="Activity_0p85vqc" targetRef="Activity_14jb1oe" />
+    <bpmn:sequenceFlow id="Flow_1erx7rj" sourceRef="Gateway_0jukkoz" targetRef="Activity_0q2vrps">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${typeOfAnalysis == "LOYALTY_CARD"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_07870eo" sourceRef="Activity_0q2vrps" targetRef="Gateway_0yxi482" />
+    <bpmn:serviceTask id="Activity_1kc8xs8" name="Obtain All Shop Purchases">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://${KONG_ADDRESS}:8000/Purchase</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Purchases_ignored">
+              <camunda:script scriptFormat="JavaScript">var responseString = connector.getVariable("response");
+var response = S(responseString).elements();
+
+var targetId = connector.getVariable("identifierOfAnalysisType");
+
+var filtered = [];
+
+for (var i = 0; i &lt; response.size(); i++) {
+  var item = response.get(i);
+
+  if (item.prop("shop_id").value() == targetId) {
+filtered.push({
+      id: item.prop("id").value(),
+      timestamp: item.prop("timestamp").value(),
+      price: item.prop("price").value(),
+      product: item.prop("product").value(),
+      supplier: item.prop("supplier").value(),
+      shop_id: item.prop("shop_id").value(),
+      loyaltyCard_id: item.prop("loyaltyCard_id").value(),
+      discountCoupon_id: item.prop("discountCoupon_id").value()
+    });
+ }
+}
+
+connector.setVariable("Purchases", S(JSON.stringify(filtered)));
+</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_08lin06</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xi1yuy</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_0q2vrps" name="Obtain All Loyalty Card Purchases">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://${KONG_ADDRESS}:8000/Purchase</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Purchases_ignored">
+              <camunda:script scriptFormat="JavaScript">var responseString = connector.getVariable("response");
+var response = S(responseString).elements();
+
+var targetId = connector.getVariable("identifierOfAnalysisType");
+
+var filtered = [];
+
+for (var i = 0; i &lt; response.size(); i++) {
+  var item = response.get(i);
+
+  if (item.prop("loyaltyCard_id").value() == targetId) {
+filtered.push({
+      id: item.prop("id").value(),
+      timestamp: item.prop("timestamp").value(),
+      price: item.prop("price").value(),
+      product: item.prop("product").value(),
+      supplier: item.prop("supplier").value(),
+      shop_id: item.prop("shop_id").value(),
+      loyaltyCard_id: item.prop("loyaltyCard_id").value(),
+      discountCoupon_id: item.prop("discountCoupon_id").value()
+    });
+ }
+}
+
+connector.setVariable("Purchases", S(JSON.stringify(filtered)));
+</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1erx7rj</bpmn:incoming>
+      <bpmn:outgoing>Flow_07870eo</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_0kb354l" name="Obtain All Discount Coupon Purchases">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://${KONG_ADDRESS}:8000/Purchase</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Purchases_ignored">
+              <camunda:script scriptFormat="JavaScript">var responseString = connector.getVariable("response");
+var response = S(responseString).elements();
+
+var targetId = connector.getVariable("identifierOfAnalysisType");
+
+var filtered = [];
+
+for (var i = 0; i &lt; response.size(); i++) {
+  var item = response.get(i);
+
+  if (item.prop("discountCoupon_id").value() == targetId) {
+filtered.push({
+      id: item.prop("id").value(),
+      timestamp: item.prop("timestamp").value(),
+      price: item.prop("price").value(),
+      product: item.prop("product").value(),
+      supplier: item.prop("supplier").value(),
+      shop_id: item.prop("shop_id").value(),
+      loyaltyCard_id: item.prop("loyaltyCard_id").value(),
+      discountCoupon_id: item.prop("discountCoupon_id").value()
+    });
+ }
+}
+
+connector.setVariable("Purchases", S(JSON.stringify(filtered)));
+</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1rgkxf7</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ugqdp9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="Activity_03q04od" name="Decide Analysis" camunda:assignee="demo">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="typeOfAnalysis" label="typeOfAnalysis" type="enum">
+            <camunda:value id="DISCOUNT_COUPON" name="DISCOUNT_COUPON" />
+            <camunda:value id="POSTAL_CODE" name="POSTAL_CODE" />
+            <camunda:value id="SHOP" name="SHOP" />
+            <camunda:value id="LOYALTY_CARD" name="LOYALTY_CARD" />
+          </camunda:formField>
+          <camunda:formField id="identifierOfAnalysisType" label="identifierOfAnalysisType" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_191qriu</bpmn:incoming>
+      <bpmn:outgoing>Flow_1bm9kmj</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:scriptTask id="Activity_1m1an6i" name="Obtain Kong Address" scriptFormat="JavaScript">
+      <bpmn:incoming>Flow_1bm9kmj</bpmn:incoming>
+      <bpmn:outgoing>Flow_1hk1ho6</bpmn:outgoing>
+      <bpmn:script>execution.getProcessInstance().setVariable("KONG_ADDRESS", java.lang.System.getenv("KONG_ADDRESS"));</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:exclusiveGateway id="Gateway_0jukkoz">
+      <bpmn:incoming>Flow_1hk1ho6</bpmn:incoming>
+      <bpmn:outgoing>Flow_08lin06</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1rgkxf7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1mua4nc</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1erx7rj</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Activity_0p85vqc" name="Obtain All Shops From Postal Code ">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://${KONG_ADDRESS}:8000/Shop</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Shops_ignored">
+              <camunda:script scriptFormat="JavaScript">var responseString = connector.getVariable("response");
+var response = S(responseString).elements();
+
+var target = connector.getVariable("identifierOfAnalysisType");
+
+var filtered = [];
+
+for (var i = 0; i &lt; response.size(); i++) {
+  var item = response.get(i);
+
+  if (item.prop("postalCode").value() == target) {
+filtered.push(item.prop("id").value());
+ }
+}
+
+connector.setVariable("Shops", filtered.join(", "));
+</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1mua4nc</bpmn:incoming>
+      <bpmn:outgoing>Flow_0tgkcls</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_14jb1oe" name="Obtain All Postal Code Purchases">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://${KONG_ADDRESS}:8000/Purchase</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Purchases_ignored">
+              <camunda:script scriptFormat="JavaScript">var responseString = connector.getVariable("response");
+var response = S(responseString).elements();
+
+var shops = connector.getVariable("Shops").split(", ").map(s =&gt; parseInt(s));
+
+
+var filtered = [];
+
+for (var i = 0; i &lt; response.size(); i++) {
+  var item = response.get(i);
+
+  if (shops.includes(item.prop("shop_id").value())) {
+filtered.push({
+      id: item.prop("id").value(),
+      timestamp: item.prop("timestamp").value(),
+      price: item.prop("price").value(),
+      product: item.prop("product").value(),
+      supplier: item.prop("supplier").value(),
+      shop_id: item.prop("shop_id").value(),
+      loyaltyCard_id: item.prop("loyaltyCard_id").value(),
+      discountCoupon_id: item.prop("discountCoupon_id").value()
+    });
+ }
+}
+
+connector.setVariable("Purchases", S(JSON.stringify(filtered)));
+</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0tgkcls</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ah121a</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Activity_149zogz" name="Aggregation" scriptFormat="JavaScript">
+      <bpmn:incoming>Flow_0fee4b3</bpmn:incoming>
+      <bpmn:outgoing>Flow_12i49nb</bpmn:outgoing>
+      <bpmn:script>var purchases = JSON.parse(execution.getVariable("Purchases"));
+
+var purchasesAnalytics = Object.values(
+    purchases.reduce((acc, item) =&gt; {
+        if (!acc[item.product]) {
+            acc[item.product] = {
+                product: item.product,
+                count: 0,
+                sumPrice: 0
+            };
+        }
+
+        acc[item.product].count += 1;
+        acc[item.product].sumPrice += item.price;
+
+        return acc;
+    }, {})
+);
+
+execution.setVariable("purchasesAnalytics", JSON.stringify(purchasesAnalytics));
+
+
+var now = new Date()
+execution.setVariable("timestamp",  now.toISOString());</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:exclusiveGateway id="Gateway_0yxi482">
+      <bpmn:incoming>Flow_0xi1yuy</bpmn:incoming>
+      <bpmn:incoming>Flow_0ugqdp9</bpmn:incoming>
+      <bpmn:incoming>Flow_1ah121a</bpmn:incoming>
+      <bpmn:incoming>Flow_07870eo</bpmn:incoming>
+      <bpmn:outgoing>Flow_0fee4b3</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0ppdg7z">
+      <bpmndi:BPMNShape id="Participant_1lkx1s7_di" bpmnElement="Participant_1lkx1s7" isHorizontal="true">
+        <dc:Bounds x="132" y="55" width="1208" height="645" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_04oia4z_di" bpmnElement="Lane_04oia4z" isHorizontal="true">
+        <dc:Bounds x="162" y="238" width="1178" height="462" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_0vw1god_di" bpmnElement="Lane_0vw1god" isHorizontal="true">
+        <dc:Bounds x="162" y="55" width="1178" height="183" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="202" y="122" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1lcokbc_di" bpmnElement="Event_1lcokbc">
+        <dc:Bounds x="1232" y="122" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_07ih1o6" bpmnElement="Activity_0ae7711" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="1050" y="390" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0b4sie7" bpmnElement="Activity_0dw2xpt">
+        <dc:Bounds x="1050" y="100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0yxi482_di" bpmnElement="Gateway_0yxi482" isMarkerVisible="true">
+        <dc:Bounds x="715" y="405" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0jukkoz_di" bpmnElement="Gateway_0jukkoz" isMarkerVisible="true">
+        <dc:Bounds x="435" y="405" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_13cam5b" bpmnElement="Activity_1kc8xs8" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="550" y="250" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0xxs26e" bpmnElement="Activity_0q2vrps" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="554" y="460" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0aurr4r" bpmnElement="Activity_0kb354l" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="554" y="340" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0565rz3_di" bpmnElement="Activity_03q04od">
+        <dc:Bounds x="280" y="100" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_12fuy9l" bpmnElement="Activity_1m1an6i">
+        <dc:Bounds x="280" y="390" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_07fd1e0" bpmnElement="Activity_0p85vqc" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="500" y="560" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0q6kwxb" bpmnElement="Activity_14jb1oe" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="620" y="560" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ge2dm7_di" bpmnElement="Activity_149zogz">
+        <dc:Bounds x="880" y="390" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_191qriu_di" bpmnElement="Flow_191qriu">
+        <di:waypoint x="238" y="140" />
+        <di:waypoint x="280" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bm9kmj_di" bpmnElement="Flow_1bm9kmj">
+        <di:waypoint x="330" y="180" />
+        <di:waypoint x="330" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jv1c2g_di" bpmnElement="Flow_0jv1c2g">
+        <di:waypoint x="1150" y="140" />
+        <di:waypoint x="1232" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hk1ho6_di" bpmnElement="Flow_1hk1ho6">
+        <di:waypoint x="380" y="430" />
+        <di:waypoint x="435" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08lin06_di" bpmnElement="Flow_08lin06">
+        <di:waypoint x="460" y="405" />
+        <di:waypoint x="460" y="290" />
+        <di:waypoint x="550" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xi1yuy_di" bpmnElement="Flow_0xi1yuy">
+        <di:waypoint x="650" y="290" />
+        <di:waypoint x="740" y="290" />
+        <di:waypoint x="740" y="405" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fee4b3_di" bpmnElement="Flow_0fee4b3">
+        <di:waypoint x="765" y="430" />
+        <di:waypoint x="880" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12i49nb_di" bpmnElement="Flow_12i49nb">
+        <di:waypoint x="980" y="430" />
+        <di:waypoint x="1050" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0g3rn05_di" bpmnElement="Flow_0g3rn05">
+        <di:waypoint x="1100" y="390" />
+        <di:waypoint x="1100" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1rgkxf7_di" bpmnElement="Flow_1rgkxf7">
+        <di:waypoint x="460" y="405" />
+        <di:waypoint x="460" y="380" />
+        <di:waypoint x="554" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ugqdp9_di" bpmnElement="Flow_0ugqdp9">
+        <di:waypoint x="654" y="380" />
+        <di:waypoint x="740" y="380" />
+        <di:waypoint x="740" y="405" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1mua4nc_di" bpmnElement="Flow_1mua4nc">
+        <di:waypoint x="460" y="455" />
+        <di:waypoint x="460" y="600" />
+        <di:waypoint x="500" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ah121a_di" bpmnElement="Flow_1ah121a">
+        <di:waypoint x="720" y="600" />
+        <di:waypoint x="740" y="600" />
+        <di:waypoint x="740" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tgkcls_di" bpmnElement="Flow_0tgkcls">
+        <di:waypoint x="600" y="600" />
+        <di:waypoint x="620" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1erx7rj_di" bpmnElement="Flow_1erx7rj">
+        <di:waypoint x="460" y="455" />
+        <di:waypoint x="460" y="500" />
+        <di:waypoint x="554" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07870eo_di" bpmnElement="Flow_07870eo">
+        <di:waypoint x="654" y="500" />
+        <di:waypoint x="740" y="500" />
+        <di:waypoint x="740" y="455" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

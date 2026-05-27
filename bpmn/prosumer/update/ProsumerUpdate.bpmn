@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_130kq99" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.47.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
   <bpmn:collaboration id="Collaboration_1twr9we">
-    <bpmn:participant id="Participant_54ffadd1-59f2-4226-b2a8-6c9a775dc604" name="PROSSUMER" processRef="Prosumer_Update_Initiator" />
+    <bpmn:participant id="Participant_54ffadd1-59f2-4226-b2a8-6c9a775dc604" name="PROSUMER" processRef="Prosumer_Update_Initiator" />
     <bpmn:participant id="Participant_69114438-a6e4-41ab-a99a-78848c155372" name="PROSUMER MANAGER" processRef="Prosumer_Update_Executor" />
     <bpmn:messageFlow id="MessageFlow_533b9548-749d-44dc-9ff0-f4d8236ec74a" sourceRef="Activity_0yrey7y" targetRef="Event_442f9699-cfa2-4319-ad7a-3a2ee3dfb9da" />
     <bpmn:messageFlow id="Flow_16qrrkn" sourceRef="Activity_04wyitf" targetRef="Event_80deba5e-7f3a-4ef8-a47e-3845129fcae3" />
@@ -332,11 +332,12 @@
         <zeebe:ioMapping>
           <zeebe:input source="noAuth" target="authentication.type" />
           <zeebe:input source="PUT" target="method" />
-          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/prosumer/Prosumer/&#34; + string(prosumerId)+ &#34;/&#34; + string(name)+ &#34;/&#34; + string(fiscalnumber) + &#34;/&#34; + string(location)" target="url" />
+          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/prosumer/Prosumer/&#34; + string(prosumerId)" target="url" />
           <zeebe:input source="={&#10;  &#34;Content-Type&#34;: &#34;Application/json&#34;,&#10;  &#34;accept&#34;: &#34;Application/json&#34;&#10;}" target="headers" />
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
+          <zeebe:input source="={&#10;  &#34;name&#34;: name,&#10;  &#34;FiscalNumber&#34;: fiscalnumber,&#10;  &#34;location&#34;: location&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
@@ -507,11 +508,12 @@
         <zeebe:ioMapping>
           <zeebe:input source="noAuth" target="authentication.type" />
           <zeebe:input source="PUT" target="method" />
-          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/prosumer/Prosumer/&#34; + string(currentProsumer.prosumerId)+ &#34;/&#34; + string(currentProsumer.name)+ &#34;/&#34; + string(currentProsumer.fiscalNumber) + &#34;/&#34; + string(currentProsumer.location)" target="url" />
+          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/prosumer/Prosumer/&#34; + string(currentProsumer.id)" target="url" />
           <zeebe:input source="={&#10;  &#34;Content-Type&#34;: &#34;Application/json&#34;,&#10;  &#34;accept&#34;: &#34;Application/json&#34;&#10;}" target="headers" />
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
+          <zeebe:input source="={&#10;  &#34;name&#34;: currentProsumer.name,&#10;  &#34;FiscalNumber&#34;: currentProsumer.FiscalNumber,&#10;  &#34;location&#34;: currentProsumer.location&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>

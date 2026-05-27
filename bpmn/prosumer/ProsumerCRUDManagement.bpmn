@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1o384rh" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.47.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.9.0">
   <bpmn:collaboration id="Collaboration_1yez1uy">
-    <bpmn:participant id="Participant_0tc28xi" name="PROSSUMER" processRef="Prossumer_CRUD_Management" />
+    <bpmn:participant id="Participant_0tc28xi" name="PROSUMER" processRef="Prosumer_CRUD_Management" />
   </bpmn:collaboration>
-  <bpmn:process id="Prossumer_CRUD_Management" isExecutable="true">
+  <bpmn:process id="Prosumer_CRUD_Management" isExecutable="true">
     <bpmn:laneSet id="LaneSet_15m6zoe">
       <bpmn:lane id="Lane_0if8gbh" name="Initiator">
         <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
@@ -47,28 +47,28 @@
       <bpmn:incoming>Flow_1c7bno4</bpmn:incoming>
       <bpmn:outgoing>Flow_0bw3uco</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:callActivity id="Activity_164uvmn" name="Update Prossumer">
+    <bpmn:callActivity id="Activity_164uvmn" name="Update Prosumer">
       <bpmn:extensionElements>
         <zeebe:calledElement processId="Prosumer_Update_Initiator" propagateAllChildVariables="false" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1x13l9k</bpmn:incoming>
       <bpmn:outgoing>Flow_13mr6o1</bpmn:outgoing>
     </bpmn:callActivity>
-    <bpmn:callActivity id="Activity_1iz7a4f" name="Create Prossumer">
+    <bpmn:callActivity id="Activity_1iz7a4f" name="Create Prosumer">
       <bpmn:extensionElements>
         <zeebe:calledElement processId="Prosumer_Create_Initiator" propagateAllChildVariables="false" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0a70vll</bpmn:incoming>
       <bpmn:outgoing>Flow_0iid85c</bpmn:outgoing>
     </bpmn:callActivity>
-    <bpmn:callActivity id="Activity_1fc2sbw" name="Read Prossumer">
+    <bpmn:callActivity id="Activity_1fc2sbw" name="Read Prosumer">
       <bpmn:extensionElements>
         <zeebe:calledElement processId="Prosumer_Read_Initiator" propagateAllChildVariables="false" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0wjpxzm</bpmn:incoming>
       <bpmn:outgoing>Flow_19stnli</bpmn:outgoing>
     </bpmn:callActivity>
-    <bpmn:callActivity id="Activity_18c12bg" name="Delete Prossumer">
+    <bpmn:callActivity id="Activity_18c12bg" name="Delete Prosumer">
       <bpmn:extensionElements>
         <zeebe:ioMapping>
           <zeebe:input source="noAuth" target="authentication.type" />

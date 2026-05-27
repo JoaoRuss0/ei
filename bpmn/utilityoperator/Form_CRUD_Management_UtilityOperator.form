@@ -1,0 +1,42 @@
+{
+  "components": [
+    {
+      "label": "Select operation",
+      "values": [
+        {
+          "label": "READ",
+          "value": "READ"
+        },
+        {
+          "label": "CREATE",
+          "value": "CREATE"
+        },
+        {
+          "label": "UPDATE",
+          "value": "UPDATE"
+        },
+        {
+          "label": "DELETE",
+          "value": "DELETE"
+        }
+      ],
+      "type": "select",
+      "layout": {
+        "row": "Row_11iten5",
+        "columns": null
+      },
+      "id": "Field_0kcus5n",
+      "key": "operation",
+      "description": "Select operation to apply to utility operator"
+    }
+  ],
+  "type": "default",
+  "id": "Form_CRUD_Management_UtilityOperator",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.9.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

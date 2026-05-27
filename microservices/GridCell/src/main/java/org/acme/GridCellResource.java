@@ -78,7 +78,7 @@ public class GridCellResource {
 
     @GET
     @Path("by-ids")
-    public Multi<GridCell> getByCellIds(@QueryParam("ids") List<Long> ids) {
+    public Multi<GridCell> getByCellIds(@QueryParam("ids") List<String> ids) {
         return GridCell.findByIds(client, ids);
     }
 

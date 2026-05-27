@@ -1,0 +1,84 @@
+{
+  "components": [
+    {
+      "text": "# Update",
+      "type": "text",
+      "layout": {
+        "row": "Row_0h3ywbi",
+        "columns": null
+      },
+      "id": "Field_1cg4n5e"
+    },
+    {
+      "label": "ID",
+      "type": "number",
+      "layout": {
+        "row": "Row_0i7c7ph",
+        "columns": null
+      },
+      "id": "Field_0rf6wvp",
+      "key": "utilityoperatorId",
+      "description": "Utility Operator ID"
+    },
+    {
+      "label": "Name",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0rpzfk6",
+        "columns": null
+      },
+      "id": "Field_0sppgut",
+      "key": "name",
+      "description": "Utility Operator name"
+    },
+    {
+      "label": "IBAN",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_196yxvu",
+        "columns": null
+      },
+      "id": "Field_1wc2119",
+      "key": "iban",
+      "description": "Utility Operator IBAN"
+    },
+    {
+      "label": "Location",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0hds74y",
+        "columns": null
+      },
+      "id": "Field_1ykgxfy",
+      "key": "location",
+      "description": "Utility Operator Location"
+    },
+    {
+      "text": "# UtilityOperators",
+      "type": "text",
+      "layout": {
+        "row": "Row_0ic0w3f",
+        "columns": null
+      },
+      "id": "Field_08o72hl"
+    },
+    {
+      "text": "=string join(\n  for p in utilityoperatorList return\n    \"ID: \" + string(p.id) +\n    \"<br/>Name: \" + p.name +\n    \"<br/>IBAN: \" + string(p.iban) +\n    \"<br/>Location: \" + p.location,\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_0ic0w3f",
+        "columns": null
+      },
+      "id": "Field_0jwqjdq"
+    }
+  ],
+  "type": "default",
+  "id": "Form_Request_Update_UtilityOperator",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

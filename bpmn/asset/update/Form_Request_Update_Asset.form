@@ -1,0 +1,98 @@
+{
+  "components": [
+    {
+      "text": "# Update",
+      "type": "text",
+      "layout": {
+        "row": "Row_0h3ywbi",
+        "columns": null
+      },
+      "id": "Field_1cg4n5e"
+    },
+    {
+      "label": "Asset ID",
+      "type": "number",
+      "layout": {
+        "row": "Row_0i7c7ph",
+        "columns": null
+      },
+      "id": "Field_0rf6wvp",
+      "key": "assetId",
+      "description": "Asset ID to update"
+    },
+    {
+      "label": "Name",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0rpzfk6",
+        "columns": null
+      },
+      "id": "Field_0sppgut",
+      "key": "name",
+      "description": "Asset name"
+    },
+    {
+      "label": "Prosumer ID",
+      "type": "number",
+      "layout": {
+        "row": "Row_196yxvu",
+        "columns": null
+      },
+      "id": "Field_1wc2119",
+      "key": "prosumerId",
+      "description": "Owning Prosumer ID"
+    },
+    {
+      "label": "Type",
+      "values": [
+        {
+          "label": "BATTERY",
+          "value": "BATTERY"
+        },
+        {
+          "label": "SOLAR",
+          "value": "SOLAR"
+        },
+        {
+          "label": "EV_CHARGER",
+          "value": "EV_CHARGER"
+        }
+      ],
+      "type": "select",
+      "layout": {
+        "row": "Row_0hds74y",
+        "columns": null
+      },
+      "id": "Field_1ykgxfy",
+      "key": "type",
+      "description": "Asset Type"
+    },
+    {
+      "text": "# Assets",
+      "type": "text",
+      "layout": {
+        "row": "Row_0ic0w3f",
+        "columns": null
+      },
+      "id": "Field_08o72hl"
+    },
+    {
+      "text": "=string join(\n  for p in assetList return\n    \"ID: \" + string(p.id) +\n    \"<br/>Name: \" + p.name +\n    \"<br/>Prosumer ID: \" + string(p.prosumerId) +\n    \"<br/>Type: \" + p.type,\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_0ic0w3f",
+        "columns": null
+      },
+      "id": "Field_0jwqjdq"
+    }
+  ],
+  "type": "default",
+  "id": "Form_Request_Update_Asset",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

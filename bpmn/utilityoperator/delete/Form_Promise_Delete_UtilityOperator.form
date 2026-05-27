@@ -10,7 +10,7 @@
       "id": "Field_1thzyts"
     },
     {
-      "text": "=\"ID: \" + string(prosumerId) + \"<br/> name: \" + string(prosumer.name)  + \"<br/> Fiscal Number: \" + string(prosumer.fiscalNumber) +\n\"<br/> Location:\" +   string(prosumer.location)\n",
+      "text": "=\"ID: \" + string(utilityoperatorId) + \"<br/> name: \" + string(utilityoperator.name)  + \"<br/> IBAN: \" + string(utilityoperator.iban) +\n\"<br/> Location:\" +   string(utilityoperator.location)\n",
       "type": "text",
       "layout": {
         "row": "Row_179ar8t",
@@ -28,7 +28,7 @@
       "id": "Field_02ymir8"
     },
     {
-      "text": "=string join(\n  for r in assetLinks return\n    \"ID: \" + string(r.id) +\n    \"<br/>Prosumer ID: \" + string(r.idProsumer) +\n    \"<br/>Utility Operator ID: \" + string(r.idUtilityOperator),\n  \"<br/><br/>\"\n)",
+      "text": "=string join(\n  for r in assetLinks return\n    \"ID: \" + string(r.id) +\n    \"<br/>Utility Operator ID: \" + string(r.idUtilityOperator) +\n    \"<br/>Utility Operator ID: \" + string(r.idUtilityOperator),\n  \"<br/><br/>\"\n)",
       "type": "text",
       "layout": {
         "row": "Row_0rxdb0q",
@@ -37,42 +37,28 @@
       "id": "Field_0xi0vhm"
     },
     {
-      "text": "# Assets",
+      "text": "# Grid Cells",
       "type": "text",
       "layout": {
-        "row": "Row_1s8bav5",
+        "row": "Row_0fjmp8o",
         "columns": null
       },
-      "id": "Field_1ho3f72"
+      "id": "Field_1q1c03f"
     },
     {
-      "text": "=string join(\n  for r in assets return\n    \"ID: \" + string(r.id) +\n    \"<br/>Name: \" + r.name +\n    \"<br/>Prosumer ID: \" + string(r.prosumerId) +\n    \"<br/>Type: \" + r.type,\n  \"<br/><br/>\"\n)",
+      "text": "=string join(\n  for r in gridCellList return\n    \"ID: \" + r.id +\n    \"<br/>Address: \" + r.address +\n    \"<br/>Postal Code: \" + r.postalCode +\n    \"<br/>Peak Hours: \" + r.peakHoursStartTime + \" — \" + r.peakHoursEndTime +\n    \"<br/>Max Load: \" + string(r.maxLoad) +\n    \"<br/>Operator ID: \" + string(r.operatorId) +\n    \"<br/>Coordinates: (\" + string(r.xCoords) + \", \" + string(r.yCoords) + \")\",\n  \"<br/><br/>\"\n)",
       "type": "text",
       "layout": {
-        "row": "Row_1s8bav5",
+        "row": "Row_0fjmp8o",
         "columns": null
       },
-      "id": "Field_0hu66nf"
+      "id": "Field_10e3am5"
     },
     {
       "computeOn": "change",
       "type": "expression",
       "layout": {
-        "row": "Row_0d4pux0",
-        "columns": null
-      },
-      "id": "Field_0zthdda",
-      "key": "expression_ee3ffh",
-      "expression": "=has_no_assets",
-      "conditional": {
-        "hide": "=assets = null or count(assets) = 0 or assets = []"
-      }
-    },
-    {
-      "computeOn": "change",
-      "type": "expression",
-      "layout": {
-        "row": "Row_0y4061g",
+        "row": "Row_1s8bav5",
         "columns": null
       },
       "id": "Field_1rzn08g",
@@ -83,7 +69,21 @@
       }
     },
     {
-      "text": "There are active assets links or assets for this prosumer!",
+      "computeOn": "change",
+      "type": "expression",
+      "layout": {
+        "row": "Row_0e9df1c",
+        "columns": null
+      },
+      "id": "Field_0rxjdxd",
+      "key": "expression_03a7t",
+      "expression": "=has_no_grid_cells",
+      "conditional": {
+        "hide": "=gridCellList = null or count(gridCellList) = 0 or gridCellList = []"
+      }
+    },
+    {
+      "text": "There are active assets links or grid cells for this utility operator!",
       "type": "text",
       "layout": {
         "row": "Row_1v7hnck",
@@ -91,7 +91,7 @@
       },
       "id": "Field_1f5zgg6",
       "conditional": {
-        "hide": "=not(has_no_asset_links) or not(has_no_assets)"
+        "hide": "=not(has_no_asset_links) or not(has_no_grid_cells)"
       }
     },
     {
@@ -107,7 +107,7 @@
     }
   ],
   "type": "default",
-  "id": "Form_Promise_Delete_Prosumer",
+  "id": "Form_Promise_Delete_UtilityOperator",
   "executionPlatform": "Camunda Cloud",
   "executionPlatformVersion": "8.8.0",
   "exporter": {

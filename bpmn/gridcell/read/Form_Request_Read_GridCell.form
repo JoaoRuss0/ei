@@ -1,0 +1,24 @@
+{
+  "components": [
+    {
+      "label": "ID",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_196yxvu",
+        "columns": null
+      },
+      "id": "Field_1wc2119",
+      "key": "gridcell_id",
+      "description": "Grid Cell ID (e.g., PORTO_NORTH)"
+    }
+  ],
+  "type": "default",
+  "id": "Form_Request_Read_GridCell",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

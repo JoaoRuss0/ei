@@ -4,14 +4,12 @@ title Asset Link Deletion Business Process
 /'
 Stop the consumption of the topic(s) by the Telemetry Microservice POST /Telemetry/stop
 Delete the topic(s) from Kafka using the AssetLink microservice DELETE /AssetLink/topic/{assetId}/{gridCellId}
-Remove the grid cell to the asset(s) using the Asset MicroService PUT /Asset/{id}
-Delete the asset link we need to first make a contract between the prosumer and utility operator. POST /AssetLink
+Delete the asset link. DELETE /AssetLink/{id}
 '/
 
 participant Camunda
 participant Kong
 participant "AssetLink Microservice" as Link
-participant "Asset Microservice" as Asset
 participant "Telemetry Microservice" as Tel
 participant Kafka
 
@@ -25,12 +23,6 @@ Camunda -> Kong : Delete Topic Request
 Kong -> Kafka : Forward Request
 note right of Kafka : Delete Topic
 Kafka -> Kong : Response
-Kong -> Camunda : Forward Response
-
-Camunda -> Kong : Clear Asset's Grid Cell Id Request
-Kong -> Asset : Forward Request
-note right of Asset : Process request
-Asset -> Kong : Response
 Kong -> Camunda : Forward Response
 
 Camunda -> Kong : Delete Request

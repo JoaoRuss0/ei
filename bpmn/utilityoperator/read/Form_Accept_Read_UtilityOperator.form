@@ -1,0 +1,42 @@
+{
+  "components": [
+    {
+      "text": "# UtilityOperator",
+      "type": "text",
+      "layout": {
+        "row": "Row_1plwgff",
+        "columns": null
+      },
+      "id": "Field_0tnupbp"
+    },
+    {
+      "text": "=\"ID: \" + string(utilityoperator.id) + \"<br/> name: \" + string(utilityoperator.name)  + \"<br/> IBAN: \" + string(utilityoperator.iban) +\n\"<br/> Location:\" +   string(utilityoperator.location)\n",
+      "type": "text",
+      "layout": {
+        "row": "Row_1plwgff",
+        "columns": null
+      },
+      "id": "Field_0ehxlug"
+    },
+    {
+      "label": "Is the read of utilityoperator acceptable?",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_1fnevqu",
+        "columns": null
+      },
+      "id": "Field_1bn5agz",
+      "key": "accept",
+      "defaultValue": true
+    }
+  ],
+  "type": "default",
+  "id": "Form_Accept_Read_UtilityOperator",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

@@ -1,0 +1,149 @@
+{
+  "components": [
+    {
+      "text": "# Update",
+      "type": "text",
+      "layout": {
+        "row": "Row_0h3ywbi",
+        "columns": null
+      },
+      "id": "Field_1cg4n5e"
+    },
+    {
+      "label": "Grid Cell ID",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0i7c7ph",
+        "columns": null
+      },
+      "id": "Field_0rf6wvp",
+      "key": "gridCellId",
+      "description": "ID of the Grid Cell to update (e.g., PORTO_NORTH)"
+    },
+    {
+      "label": "Address",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0rpzfk6",
+        "columns": null
+      },
+      "id": "Field_0sppgut",
+      "key": "address",
+      "description": "Grid Cell address"
+    },
+    {
+      "label": "Postal Code",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0hds74y",
+        "columns": null
+      },
+      "id": "Field_1ykgxfy",
+      "key": "postalCode",
+      "description": "Grid Cell Postal Code"
+    },
+    {
+      "label": "Peak Hours Start",
+      "type": "datetime",
+      "subtype": "datetime",
+      "dateLabel": "Peak Hours Start Date",
+      "timeLabel": "Peak Hours Start Time",
+      "use24h": true,
+      "timeInterval": 15,
+      "layout": {
+        "row": "Row_phs",
+        "columns": null
+      },
+      "id": "Field_phs",
+      "key": "peakHoursStartTime",
+      "description": "Peak hours start (YYYY-MM-DDTHH:mm:ss)"
+    },
+    {
+      "label": "Peak Hours End",
+      "type": "datetime",
+      "subtype": "datetime",
+      "dateLabel": "Peak Hours End Date",
+      "timeLabel": "Peak Hours End Time",
+      "use24h": true,
+      "timeInterval": 15,
+      "layout": {
+        "row": "Row_phe",
+        "columns": null
+      },
+      "id": "Field_phe",
+      "key": "peakHoursEndTime",
+      "description": "Peak hours end (YYYY-MM-DDTHH:mm:ss)"
+    },
+    {
+      "label": "Max Load",
+      "type": "number",
+      "layout": {
+        "row": "Row_196yxvu",
+        "columns": null
+      },
+      "id": "Field_1wc2119",
+      "key": "maxLoad",
+      "description": "Grid Cell Max Load"
+    },
+    {
+      "label": "Operator ID",
+      "type": "number",
+      "layout": {
+        "row": "Row_opid",
+        "columns": null
+      },
+      "id": "Field_opid",
+      "key": "operatorId",
+      "description": "Owning Utility Operator ID"
+    },
+    {
+      "label": "X Coords",
+      "type": "number",
+      "layout": {
+        "row": "Row_xy",
+        "columns": 6
+      },
+      "id": "Field_xc",
+      "key": "xCoords",
+      "description": "X coordinate"
+    },
+    {
+      "label": "Y Coords",
+      "type": "number",
+      "layout": {
+        "row": "Row_xy",
+        "columns": 6
+      },
+      "id": "Field_yc",
+      "key": "yCoords",
+      "description": "Y coordinate"
+    },
+    {
+      "text": "# Grid Cells",
+      "type": "text",
+      "layout": {
+        "row": "Row_0ic0w3f",
+        "columns": null
+      },
+      "id": "Field_08o72hl"
+    },
+    {
+      "text": "=string join(\n  for p in gridCellList return\n    \"ID: \" + p.id +\n    \"<br/>Address: \" + p.address +\n    \"<br/>Postal Code: \" + p.postalCode +\n    \"<br/>Max Load: \" + string(p.maxLoad) +\n    \"<br/>Operator ID: \" + string(p.operatorId),\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_0ic0w3f",
+        "columns": null
+      },
+      "id": "Field_0jwqjdq"
+    }
+  ],
+  "type": "default",
+  "id": "Form_Request_Update_GridCell",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

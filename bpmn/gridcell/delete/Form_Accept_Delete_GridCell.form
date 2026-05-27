@@ -1,0 +1,33 @@
+{
+  "components": [
+    {
+      "text": "# GridCell",
+      "type": "text",
+      "layout": {
+        "row": "Row_1plwgff",
+        "columns": null
+      },
+      "id": "Field_0tnupbp"
+    },
+    {
+      "label": "=\"Is the delete of gridcell with id \" + string(gridcell_id) + \" acceptable?\"",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_1fnevqu",
+        "columns": null
+      },
+      "id": "Field_1bn5agz",
+      "key": "accept",
+      "defaultValue": true
+    }
+  ],
+  "type": "default",
+  "id": "Form_Accept_Delete_GridCell",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

@@ -1,0 +1,51 @@
+{
+  "components": [
+    {
+      "text": "# Delete",
+      "type": "text",
+      "layout": {
+        "row": "Row_196yxvu",
+        "columns": null
+      },
+      "id": "Field_1bgtal8"
+    },
+    {
+      "label": "ID",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0hbnlpb",
+        "columns": null
+      },
+      "id": "Field_1wc2119",
+      "key": "gridcell_id",
+      "description": "Grid Cell ID (e.g., PORTO_NORTH)"
+    },
+    {
+      "text": "# All",
+      "type": "text",
+      "layout": {
+        "row": "Row_1uzweco",
+        "columns": null
+      },
+      "id": "Field_1u585pg"
+    },
+    {
+      "text": "=string join(\n  for p in gridCellList return\n    \"ID: \" + string(p.id) +\n    \"<br/>Name: \" + p.address +\n    \"<br/>Max Load: \" + string(p.maxLoad) +\n    \"<br/>Postal Code: \" + p.postalCode,\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_1uzweco",
+        "columns": null
+      },
+      "id": "Field_0jw0c1v"
+    }
+  ],
+  "type": "default",
+  "id": "Form_Request_Delete_GridCell",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

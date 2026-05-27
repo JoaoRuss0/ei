@@ -1,0 +1,122 @@
+{
+  "components": [
+    {
+      "label": "ID",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_id",
+        "columns": null
+      },
+      "id": "Field_id",
+      "key": "id",
+      "description": "Grid Cell unique identifier (e.g., PORTO_NORTH)"
+    },
+    {
+      "label": "Address",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0h3ywbi",
+        "columns": null
+      },
+      "id": "Field_0sppgut",
+      "key": "address",
+      "description": "Grid Cell address"
+    },
+    {
+      "label": "Postal Code",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0hds74y",
+        "columns": null
+      },
+      "id": "Field_1ykgxfy",
+      "key": "postalCode",
+      "description": "Grid Cell Postal Code"
+    },
+    {
+      "label": "Peak Hours Start",
+      "type": "datetime",
+      "subtype": "datetime",
+      "dateLabel": "Peak Hours Start Date",
+      "timeLabel": "Peak Hours Start Time",
+      "use24h": true,
+      "timeInterval": 15,
+      "layout": {
+        "row": "Row_phs",
+        "columns": null
+      },
+      "id": "Field_phs",
+      "key": "peakHoursStartTime",
+      "description": "Peak hours start (YYYY-MM-DDTHH:mm:ss)"
+    },
+    {
+      "label": "Peak Hours End",
+      "type": "datetime",
+      "subtype": "datetime",
+      "dateLabel": "Peak Hours End Date",
+      "timeLabel": "Peak Hours End Time",
+      "use24h": true,
+      "timeInterval": 15,
+      "layout": {
+        "row": "Row_phe",
+        "columns": null
+      },
+      "id": "Field_phe",
+      "key": "peakHoursEndTime",
+      "description": "Peak hours end (YYYY-MM-DDTHH:mm:ss)"
+    },
+    {
+      "label": "Max Load",
+      "type": "number",
+      "layout": {
+        "row": "Row_196yxvu",
+        "columns": null
+      },
+      "id": "Field_1wc2119",
+      "key": "maxLoad",
+      "description": "Grid Cell Max Load"
+    },
+    {
+      "label": "Operator ID",
+      "type": "number",
+      "layout": {
+        "row": "Row_opid",
+        "columns": null
+      },
+      "id": "Field_opid",
+      "key": "operatorId",
+      "description": "Owning Utility Operator ID"
+    },
+    {
+      "label": "X Coords",
+      "type": "number",
+      "layout": {
+        "row": "Row_xy",
+        "columns": 6
+      },
+      "id": "Field_xc",
+      "key": "xCoords",
+      "description": "X coordinate"
+    },
+    {
+      "label": "Y Coords",
+      "type": "number",
+      "layout": {
+        "row": "Row_xy",
+        "columns": 6
+      },
+      "id": "Field_yc",
+      "key": "yCoords",
+      "description": "Y coordinate"
+    }
+  ],
+  "type": "default",
+  "id": "Form_Request_Create_GridCell",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

@@ -1,0 +1,42 @@
+{
+  "components": [
+    {
+      "text": "# Asset",
+      "type": "text",
+      "layout": {
+        "row": "Row_1plwgff",
+        "columns": null
+      },
+      "id": "Field_0tnupbp"
+    },
+    {
+      "text": "=\"ID: \" + string(assetId) + \"<br/> name: \" + string(name)  + \"<br/> Prosumer ID: \" + string(prosumerId) +\n\"<br/> Type:\" +   string(type)\n",
+      "type": "text",
+      "layout": {
+        "row": "Row_1plwgff",
+        "columns": null
+      },
+      "id": "Field_0ehxlug"
+    },
+    {
+      "label": "Is the update of asset acceptable?",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_1fnevqu",
+        "columns": null
+      },
+      "id": "Field_1bn5agz",
+      "key": "accept",
+      "defaultValue": true
+    }
+  ],
+  "type": "default",
+  "id": "Form_Accept_Update_Asset",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

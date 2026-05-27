@@ -3,8 +3,8 @@ title Grid Balancing Recommendation Business Process
 
 /'
 Get all grid cells using the Grid Cell Microservice. GET /GridCell
-Get active assets in those grid cells using the Asset Microservice. GET /Asset/active/by-grid-cell-ids?cellIds=<id>
-Get latest telemetry events for those assets in current grid cells using the Telemetry Microservice. GET /Telemetry/latest
+Get latest telemetry events for those grid cells using the Telemetry Microservice. GET /Telemetry/latest
+(Each telemetry event carries its own grid_cell_id, so we don't need to query Asset by grid cell.)
 Send to Grid Balancing Microservice for processing and produce balancing events. POST /balance
 
 The business process does not need to query the Prosumer, Utility Operator and Asset Link microservices - as it is in
@@ -14,7 +14,6 @@ the project statement - since all the information we need can be obtained from t
 participant Camunda
 participant Kong
 participant "Grid Cell Microservice" as GC
-participant "Asset Microservice" as Asset
 participant "Telemetry Microservice" as Tel
 participant "Grid Balancing Microservice" as GB
 participant Kafka
@@ -23,12 +22,6 @@ Camunda -> Kong : Read All Grid Cells Request
 Kong -> GC : Forward Request
 note right of GC : Process request
 GC -> Kong : Response
-Kong -> Camunda : Forward Response
-
-Camunda -> Kong : Read Active Assets by Grid Cell Ids Request
-Kong -> Asset : Forward Request
-note right of Asset : Process request
-Asset -> Kong : Response
 Kong -> Camunda : Forward Response
 
 Camunda -> Kong : Read Latest Telemetry Events Request

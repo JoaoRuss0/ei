@@ -72,14 +72,14 @@ public class GridCell {
                 .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
     }
 
-    public static Multi<GridCell> findByIds(MySQLPool client, List<Long> ids) {
+    public static Multi<GridCell> findByIds(MySQLPool client, List<String> ids) {
         if (ids.isEmpty()) return Multi.createFrom().empty();
 
         String placeholders = ids.stream().map(i -> "?").collect(Collectors.joining(","));
         String query = "SELECT * FROM GridCell WHERE id IN (" + placeholders + ")";
 
         Tuple params = Tuple.tuple();
-        ids.forEach(params::addLong);
+        ids.forEach(params::addString);
 
         return client.preparedQuery(query).execute(params)
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))

@@ -1,0 +1,101 @@
+{
+  "components": [
+    {
+      "text": "# New",
+      "type": "text",
+      "layout": {
+        "row": "Row_03b91bd",
+        "columns": 3
+      },
+      "id": "Field_0ie3wmp"
+    },
+    {
+      "text": "=\"ID: \" + string(utilityoperatorId) + \"<br/> name: \" + string(name)  + \"<br/> IBAN: \" + string(iban) +\n\"<br/> Location:\" +   string(location)\n",
+      "type": "text",
+      "layout": {
+        "row": "Row_03b91bd",
+        "columns": null
+      },
+      "id": "Field_06uqaw3"
+    },
+    {
+      "text": "# Current",
+      "type": "text",
+      "layout": {
+        "row": "Row_03b91bd",
+        "columns": 3
+      },
+      "id": "Field_0aubpi4"
+    },
+    {
+      "text": "=\"ID: \" + string(currentUtilityOperator.id) + \"<br/> Name: \" + currentUtilityOperator.name + \"<br/> IBAN: \" + string(currentUtilityOperator.iban) + \"<br/> Location: \" + currentUtilityOperator.location",
+      "type": "text",
+      "layout": {
+        "row": "Row_03b91bd",
+        "columns": null
+      },
+      "id": "Field_16u6m2p"
+    },
+    {
+      "computeOn": "change",
+      "type": "expression",
+      "layout": {
+        "row": "Row_09zgnue",
+        "columns": null
+      },
+      "id": "Field_1es9jx2",
+      "key": "repeatingIban",
+      "expression": "=some p in utilityoperatorList satisfies p.iban = iban and p.id != utilityoperatorId"
+    },
+    {
+      "text": "# All",
+      "type": "text",
+      "layout": {
+        "row": "Row_0vt8ozh",
+        "columns": 3
+      },
+      "id": "Field_1w3q4lm"
+    },
+    {
+      "text": "=string join(\n  for p in utilityoperatorList return\n    \"ID: \" + string(p.id) +\n    \"<br/>Name: \" + p.name +\n    \"<br/>IBAN: \" + string(p.iban) +\n    \"<br/>Location: \" + p.location,\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_0vt8ozh",
+        "columns": null
+      },
+      "id": "Field_1biabvq"
+    },
+    {
+      "text": "IBAN already exists!",
+      "type": "text",
+      "layout": {
+        "row": "Row_0ywdmar",
+        "columns": null
+      },
+      "id": "Field_1gmuiyj",
+      "conditional": {
+        "hide": "=not(repeatingIban)"
+      }
+    },
+    {
+      "label": "Checkbox",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_0ywdmar",
+        "columns": 3
+      },
+      "id": "Field_1bneafl",
+      "key": "promise",
+      "description": "Allow utilityoperator update"
+    }
+  ],
+  "type": "default",
+  "id": "Form_Current_List_And_Change_UtilityOperator",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

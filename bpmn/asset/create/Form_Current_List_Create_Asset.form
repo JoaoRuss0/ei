@@ -1,0 +1,83 @@
+{
+  "components": [
+    {
+      "text": "# New",
+      "type": "text",
+      "layout": {
+        "row": "Row_03b91bd",
+        "columns": 3
+      },
+      "id": "Field_0ie3wmp"
+    },
+    {
+      "text": "=\"Name: \" + string(name)  + \"<br/> Prosumer ID: \" + string(prosumerId) +\n\"<br/> Type:\" +   string(type)\n",
+      "type": "text",
+      "layout": {
+        "row": "Row_03b91bd",
+        "columns": null
+      },
+      "id": "Field_06uqaw3"
+    },
+    {
+      "computeOn": "change",
+      "type": "expression",
+      "layout": {
+        "row": "Row_09zgnue",
+        "columns": null
+      },
+      "id": "Field_1es9jx2",
+      "key": "repeatingDummy",
+      "expression": "=false"
+    },
+    {
+      "text": "# All",
+      "type": "text",
+      "layout": {
+        "row": "Row_0vt8ozh",
+        "columns": 3
+      },
+      "id": "Field_1w3q4lm"
+    },
+    {
+      "text": "=string join(\n  for p in assetList return\n    \"ID: \" + string(p.id) +\n    \"<br/>Name: \" + p.name +\n    \"<br/>Prosumer ID: \" + string(p.prosumerId) +\n    \"<br/>Type: \" + p.type,\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_0vt8ozh",
+        "columns": null
+      },
+      "id": "Field_1biabvq"
+    },
+    {
+      "text": "(no uniqueness check)",
+      "type": "text",
+      "layout": {
+        "row": "Row_0ywdmar",
+        "columns": null
+      },
+      "id": "Field_1gmuiyj",
+      "conditional": {
+        "hide": "=not(repeatingDummy)"
+      }
+    },
+    {
+      "label": "Checkbox",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_0ywdmar",
+        "columns": 3
+      },
+      "id": "Field_1bneafl",
+      "key": "promise",
+      "description": "Allow asset creation"
+    }
+  ],
+  "type": "default",
+  "id": "Form_Current_List_Create_Asset",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

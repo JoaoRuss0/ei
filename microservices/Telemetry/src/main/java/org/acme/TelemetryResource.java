@@ -96,5 +96,17 @@ public class TelemetryResource {
     public Multi<Telemetry> getAssetEventAroundTimestmap(@PathParam("assetId") Long assetId, @PathParam("timestamp") LocalDateTime timestamp) {
         return Telemetry.findForAssetIdAroundTimestamp(client, assetId, timestamp, 10);
     }
+
+    @GET
+    @Path("by-asset/{assetId}")
+    public Multi<Telemetry> getByAssetId(@PathParam("assetId") Long assetId) {
+        return Telemetry.findByAssetId(client, assetId);
+    }
+
+    @GET
+    @Path("by-grid-cell/{gridCellId}")
+    public Multi<Telemetry> getByGridCellId(@PathParam("gridCellId") String gridCellId) {
+        return Telemetry.findByGridCellId(client, gridCellId);
+    }
 }
 

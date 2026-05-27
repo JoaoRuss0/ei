@@ -11,8 +11,6 @@ import jakarta.ws.rs.core.Response.ResponseBuilder;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.List;
 
 @Path("Asset")
 public class AssetResource {
@@ -33,9 +31,9 @@ public class AssetResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS Asset").execute()
-        .flatMap(r -> client.query("CREATE TABLE Asset (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, grid_cell_id VARCHAR(255), asset_type ENUM('BATTERY','SOLAR','EV_CHARGER') NOT NULL)").execute())
-        .flatMap(r -> client.query("INSERT INTO Asset(name, prosumer_id, grid_cell_id, asset_type) VALUES ('asset-1', 1, 'PORTO_NORTH', 'BATTERY')").execute())
-        .flatMap(r -> client.query("INSERT INTO Asset(name, prosumer_id, grid_cell_id, asset_type) VALUES ('asset-2', 1, 'PORTO_NORTH', 'BATTERY')").execute())
+        .flatMap(r -> client.query("CREATE TABLE Asset (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, asset_type ENUM('BATTERY','SOLAR','EV_CHARGER') NOT NULL)").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset(name, prosumer_id, asset_type) VALUES ('asset-1', 1, 'BATTERY')").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset(name, prosumer_id, asset_type) VALUES ('asset-2', 1, 'BATTERY')").execute())
         .await().indefinitely();
     }
 
@@ -59,7 +57,7 @@ public class AssetResource {
                 .onItem().transform(uri -> Response.created(uri).build());
     }
 
-    @POST
+    @PUT
     @Path("{id}")
     public Uni<Response> update(Long id, Asset asset) {
         return asset.update(client, id)
@@ -76,14 +74,8 @@ public class AssetResource {
     }
 
     @GET
-    @Path("active/by-grid-cell-ids")
-    public Multi<Asset> getByCellIds(@QueryParam("cellIds") List<String> cellIds) {
-        return Asset.findActiveByGridCellIds(client, cellIds);
-    }
-
-    @GET
-    @Path("active/by-prosumer/{id}")
-    public Multi<Asset> findActiveBatteriesByProsumerId(@PathParam("id") Long prosumerId) {
-        return Asset.findActiveBatteriesByProsumerId(client, prosumerId);
+    @Path("by-prosumer/{id}")
+    public Multi<Asset> findByProsumerId(@PathParam("id") Long prosumerId, @QueryParam("type") String type) {
+        return Asset.findByProsumerId(client, prosumerId, type);
     }
 }

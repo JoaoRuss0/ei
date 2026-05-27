@@ -159,4 +159,16 @@ public class Telemetry
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
                 .onItem().transform(Telemetry::from);
     }
+
+    public static Multi<Telemetry> findByAssetId(MySQLPool client, Long assetId) {
+        return client.preparedQuery("SELECT * FROM Telemetry WHERE asset_id = ?").execute(Tuple.of(assetId))
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(Telemetry::from);
+    }
+
+    public static Multi<Telemetry> findByGridCellId(MySQLPool client, String gridCellId) {
+        return client.preparedQuery("SELECT * FROM Telemetry WHERE grid_cell_id = ?").execute(Tuple.of(gridCellId))
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(Telemetry::from);
+    }
 }

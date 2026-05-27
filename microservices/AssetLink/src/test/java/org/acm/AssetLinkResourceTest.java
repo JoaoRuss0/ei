@@ -144,4 +144,74 @@ class AssetLinkResourceTest {
 
         Mockito.verify(topicService).deleteAssetLinkTopic(100L, "ZONE_A");
     }
+
+    @Test
+    void testFindByProsumerIdMultiple() {
+        // Seed: (1,1,1) and (3,1,3) both have idProsumer=1
+        given()
+                .pathParam("idProsumer", 1)
+                .when().get("/AssetLink/by-prosumer-id/{idProsumer}")
+                .then()
+                .statusCode(200)
+                .body("size()", is(2))
+                .body("id", hasItems(1, 3))
+                .body("idUtilityOperator", hasItems(1, 3));
+    }
+
+    @Test
+    void testFindByProsumerIdSingle() {
+        // Seed: only (2,2,1) has idProsumer=2
+        given()
+                .pathParam("idProsumer", 2)
+                .when().get("/AssetLink/by-prosumer-id/{idProsumer}")
+                .then()
+                .statusCode(200)
+                .body("size()", is(1))
+                .body("[0].id", is(2));
+    }
+
+    @Test
+    void testFindByProsumerIdEmpty() {
+        given()
+                .pathParam("idProsumer", 999)
+                .when().get("/AssetLink/by-prosumer-id/{idProsumer}")
+                .then()
+                .statusCode(200)
+                .body("size()", is(0));
+    }
+
+    @Test
+    void testFindByUtilityOperatorIdMultiple() {
+        // Seed: (1,1,1) and (2,2,1) both have idUtilityOperator=1
+        given()
+                .pathParam("idUtilityOperator", 1)
+                .when().get("/AssetLink/by-utilityoperator-id/{idUtilityOperator}")
+                .then()
+                .statusCode(200)
+                .body("size()", is(2))
+                .body("id", hasItems(1, 2))
+                .body("idProsumer", hasItems(1, 2));
+    }
+
+    @Test
+    void testFindByUtilityOperatorIdSingle() {
+        // Seed: only (3,1,3) has idUtilityOperator=3
+        given()
+                .pathParam("idUtilityOperator", 3)
+                .when().get("/AssetLink/by-utilityoperator-id/{idUtilityOperator}")
+                .then()
+                .statusCode(200)
+                .body("size()", is(1))
+                .body("[0].id", is(3));
+    }
+
+    @Test
+    void testFindByUtilityOperatorIdEmpty() {
+        given()
+                .pathParam("idUtilityOperator", 999)
+                .when().get("/AssetLink/by-utilityoperator-id/{idUtilityOperator}")
+                .then()
+                .statusCode(200)
+                .body("size()", is(0));
+    }
 }

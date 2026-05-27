@@ -20,9 +20,9 @@ class AssetResourceTest {
     void setup() {
         client.query("DELETE FROM Asset").execute()
                 .flatMap(r -> client.query("ALTER TABLE Asset AUTO_INCREMENT = 1").execute())
-                .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, grid_cell_id, asset_type) VALUES (1, 'asset-1', 1, 'PORTO_NORTH', 'BATTERY')").execute())
-                .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, grid_cell_id, asset_type) VALUES (2, 'asset-2', 1, 'PORTO_NORTH', 'BATTERY')").execute())
-                .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, grid_cell_id, asset_type) VALUES (3, 'asset-3', 2, 'LISBON_SOUTH', 'SOLAR')").execute())
+                .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, asset_type) VALUES (1, 'asset-1', 1, 'BATTERY')").execute())
+                .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, asset_type) VALUES (2, 'asset-2', 1, 'BATTERY')").execute())
+                .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, asset_type) VALUES (3, 'asset-3', 2, 'SOLAR')").execute())
                 .await().indefinitely();
     }
 
@@ -63,7 +63,6 @@ class AssetResourceTest {
                 {
                     "name": "new-ev-charger",
                     "prosumerId": 5,
-                    "gridCellId": "COIMBRA_CENTER",
                     "type": "EV_CHARGER"
                 }
                 """;
@@ -83,7 +82,6 @@ class AssetResourceTest {
                 {
                     "name": "updated-solar-panel",
                     "prosumerId": 2,
-                    "gridCellId": "LISBON_SOUTH",
                     "type": "SOLAR"
                 }
                 """;
@@ -92,7 +90,7 @@ class AssetResourceTest {
                 .contentType(ContentType.JSON)
                 .body(updateJson)
                 .pathParam("id", 3)
-                .when().post("/Asset/{id}") // Note: Using POST as defined in your code
+                .when().put("/Asset/{id}")
                 .then()
                 .statusCode(204);
 
@@ -109,7 +107,6 @@ class AssetResourceTest {
                 {
                     "name": "ghost-asset",
                     "prosumerId": 1,
-                    "gridCellId": "NONE",
                     "type": "BATTERY"
                 }
                 """;
@@ -118,7 +115,7 @@ class AssetResourceTest {
                 .contentType(ContentType.JSON)
                 .body(updateJson)
                 .pathParam("id", 999)
-                .when().post("/Asset/{id}")
+                .when().put("/Asset/{id}")
                 .then()
                 .statusCode(404);
     }
@@ -131,7 +128,6 @@ class AssetResourceTest {
                 .then()
                 .statusCode(204);
 
-        // Verify it is gone
         given()
                 .pathParam("id", 1)
                 .when().get("/Asset/{id}")
@@ -140,26 +136,25 @@ class AssetResourceTest {
     }
 
     @Test
-    void testGetByGridCellIds() {
-        given()
-                .queryParam("cellIds", "PORTO_NORTH")
-                .queryParam("cellIds", "LISBON_SOUTH")
-                .when().get("/Asset/active/by-grid-cell-ids")
-                .then()
-                .statusCode(200)
-                .body("size()", is(3))
-                .body("gridCellId", hasItems("PORTO_NORTH", "LISBON_SOUTH"));
-    }
-
-    @Test
-    void testFindActiveBatteriesByProsumerId() {
+    void testFindByProsumerId() {
         given()
                 .pathParam("id", 1)
-                .when().get("/Asset/active/by-prosumer/{id}")
+                .when().get("/Asset/by-prosumer/{id}")
                 .then()
                 .statusCode(200)
                 .body("size()", is(2))
-                .body("[0].type", is("BATTERY"))
-                .body("[1].type", is("BATTERY"));
+                .body("name", hasItems("asset-1", "asset-2"));
+    }
+
+    @Test
+    void testFindByProsumerIdWithTypeFilter() {
+        given()
+                .pathParam("id", 2)
+                .queryParam("type", "SOLAR")
+                .when().get("/Asset/by-prosumer/{id}")
+                .then()
+                .statusCode(200)
+                .body("size()", is(1))
+                .body("[0].type", is("SOLAR"));
     }
 }

@@ -68,9 +68,9 @@ public class ProsumerResource {
     }
 
     @PUT
-    @Path("/{id}/{name}/{FiscalNumber}/{location}")
-    public Uni<Response> update(Long id , String name , Long FiscalNumber , String location) {
-        return Prosumer.update(client, id , name , FiscalNumber , location)
+    @Path("/{id}")
+    public Uni<Response> update(Long id, ProsumerUpdateRequest request) {
+        return Prosumer.update(client, id, request.name(), request.FiscalNumber(), request.location())
                 .onItem().transform(updated -> updated ? Response.Status.NO_CONTENT : Response.Status.NOT_FOUND)
                 .onItem().transform(status -> Response.status(status).build());
     }

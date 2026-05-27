@@ -80,12 +80,19 @@ class ProsumerResourceTest {
 
     @Test
     void testUpdateProsumerSuccess() {
+        String updateJson = """
+                {
+                    "name": "client2_updated",
+                    "FiscalNumber": 111222,
+                    "location": "Braga"
+                }
+                """;
+
         given()
+                .contentType(io.restassured.http.ContentType.JSON)
+                .body(updateJson)
                 .pathParam("id", 2)
-                .pathParam("name", "client2_updated")
-                .pathParam("FiscalNumber", 111222)
-                .pathParam("location", "Braga")
-                .when().put("/Prosumer/{id}/{name}/{FiscalNumber}/{location}")
+                .when().put("/Prosumer/{id}")
                 .then()
                 .statusCode(204);
 
@@ -102,12 +109,19 @@ class ProsumerResourceTest {
 
     @Test
     void testUpdateProsumerNotFound() {
+        String updateJson = """
+                {
+                    "name": "ghost_client",
+                    "FiscalNumber": 0,
+                    "location": "Nowhere"
+                }
+                """;
+
         given()
+                .contentType(io.restassured.http.ContentType.JSON)
+                .body(updateJson)
                 .pathParam("id", 999)
-                .pathParam("name", "ghost_client")
-                .pathParam("FiscalNumber", 0)
-                .pathParam("location", "Nowhere")
-                .when().put("/Prosumer/{id}/{name}/{FiscalNumber}/{location}")
+                .when().put("/Prosumer/{id}")
                 .then()
                 .statusCode(404);
     }

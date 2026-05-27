@@ -70,6 +70,12 @@ public class AssetLinkResource {
         return AssetLink.findByIdProsumerId(client, idProsumer);
     }
 
+    @GET
+    @Path("by-utilityoperator-id/{idUtilityOperator}")
+    public Multi<AssetLink> getByUtilityOperator(Long idUtilityOperator) {
+        return AssetLink.findByIdUtilityOperatorId(client, idUtilityOperator);
+    }
+
     @POST
     public Uni<Response> create(AssetLink assetlink) {
         return assetlink.save(client , assetlink.idProsumer , assetlink.idUtilityOperator)

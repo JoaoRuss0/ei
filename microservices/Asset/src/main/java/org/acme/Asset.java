@@ -9,10 +9,6 @@ import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 import lombok.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -23,11 +19,10 @@ public class Asset {
     public Long id;
     public String name;
     public Long prosumerId;
-    public String gridCellId;
     public AssetType type;
 
     private static Asset from(Row row) {
-        return new Asset(row.getLong("id"), row.getString("name"), row.getLong("prosumer_id"), row.getString("grid_cell_id"), AssetType.valueOf(row.getString("asset_type")));
+        return new Asset(row.getLong("id"), row.getString("name"), row.getLong("prosumer_id"), AssetType.valueOf(row.getString("asset_type")));
     }
 
     public static Multi<Asset> findAll(MySQLPool client) {
@@ -48,32 +43,23 @@ public class Asset {
     }
 
     public Uni<Long> save(MySQLPool client) {
-        return client.preparedQuery("INSERT INTO Asset(name, prosumer_id, grid_cell_id, asset_type) VALUES (?,?,?,?)")
-                .execute(Tuple.of(this.name, this.prosumerId, this.gridCellId, this.type.name()))
+        return client.preparedQuery("INSERT INTO Asset(name, prosumer_id, asset_type) VALUES (?,?,?)")
+                .execute(Tuple.of(this.name, this.prosumerId, this.type.name()))
                 .onItem().transform(pgRowSet -> pgRowSet.property(MySQLClient.LAST_INSERTED_ID));
     }
 
     public Uni<Boolean> update(MySQLPool client, Long id) {
-        return client.preparedQuery("UPDATE Asset SET name = ?, prosumer_id = ?, grid_cell_id = ?, asset_type = ? WHERE id = ?").execute(Tuple.of(this.name, this.prosumerId, this.gridCellId, this.type.name(), id))
+        return client.preparedQuery("UPDATE Asset SET name = ?, prosumer_id = ?, asset_type = ? WHERE id = ?").execute(Tuple.of(this.name, this.prosumerId, this.type.name(), id))
                 .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
     }
 
-    public static Multi<Asset> findActiveBatteriesByProsumerId(MySQLPool client, Long prosumerId) {
-        return client.preparedQuery("SELECT * FROM Asset WHERE prosumer_id = ? and asset_type = 'BATTERY' and grid_cell_id IS NOT NULL").execute(Tuple.of(prosumerId))
-                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
-                .onItem().transform(Asset::from);
-    }
-
-    public static Multi<Asset> findActiveByGridCellIds(MySQLPool client, List<String> cellIds) {
-        if (cellIds == null || cellIds.isEmpty()) return Multi.createFrom().empty();
-
-        String placeholders = cellIds.stream().map(s -> "?").collect(Collectors.joining(","));
-        String query = "SELECT * FROM Asset WHERE grid_cell_id IN (" + placeholders + ")";
-
-        Tuple params = Tuple.tuple();
-        cellIds.forEach(params::addString);
-
-        return client.preparedQuery(query).execute(params)
+    public static Multi<Asset> findByProsumerId(MySQLPool client, Long prosumerId, String typeFilter) {
+        if (typeFilter == null || typeFilter.isBlank()) {
+            return client.preparedQuery("SELECT * FROM Asset WHERE prosumer_id = ?").execute(Tuple.of(prosumerId))
+                    .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                    .onItem().transform(Asset::from);
+        }
+        return client.preparedQuery("SELECT * FROM Asset WHERE prosumer_id = ? AND asset_type = ?").execute(Tuple.of(prosumerId, typeFilter))
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
                 .onItem().transform(Asset::from);
     }

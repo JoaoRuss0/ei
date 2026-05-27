@@ -1,0 +1,86 @@
+{
+  "components": [
+    {
+      "text": "# Delete",
+      "type": "text",
+      "layout": {
+        "row": "Row_179ar8t",
+        "columns": null
+      },
+      "id": "Field_1thzyts"
+    },
+    {
+      "text": "=\"ID: \" + string(prosumerId) + \"<br/> name: \" + string(prosumer.name)  + \"<br/> Fiscal Number: \" + string(prosumer.fiscalNumber) +\n\"<br/> Location:\" +   string(prosumer.location)\n",
+      "type": "text",
+      "layout": {
+        "row": "Row_179ar8t",
+        "columns": null
+      },
+      "id": "Field_0kqc9tu"
+    },
+    {
+      "text": "# Asset Links:",
+      "type": "text",
+      "layout": {
+        "row": "Row_0rxdb0q",
+        "columns": null
+      },
+      "id": "Field_02ymir8"
+    },
+    {
+      "text": "=string join(\n  for r in assetLinks return\n    \"ID: \" + string(r.id) +\n    \"<br/>Prosumer ID: \" + string(r.idProsumer) +\n    \"<br/>Utility Operator ID: \" + string(r.idUtilityOperator),\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_0rxdb0q",
+        "columns": null
+      },
+      "id": "Field_0xi0vhm"
+    },
+    {
+      "computeOn": "change",
+      "type": "expression",
+      "layout": {
+        "row": "Row_1s8bav5",
+        "columns": null
+      },
+      "id": "Field_1rzn08g",
+      "key": "expression_8wu7p",
+      "expression": "=has_no_asset_links",
+      "conditional": {
+        "hide": "=assetLinks = null or count(assetLinks) = 0 or assetLinks = []"
+      }
+    },
+    {
+      "text": "There are active assets links for this prosumer!",
+      "type": "text",
+      "layout": {
+        "row": "Row_1v7hnck",
+        "columns": null
+      },
+      "id": "Field_1f5zgg6",
+      "conditional": {
+        "hide": "=not(has_no_asset_links)"
+      }
+    },
+    {
+      "label": "Is it possible to promise the request?",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_1v7hnck",
+        "columns": 5
+      },
+      "id": "Field_1u7vprv",
+      "key": "promise",
+      "defaultValue": true
+    }
+  ],
+  "type": "default",
+  "id": "Form_Promise_Delete_Prosumer",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

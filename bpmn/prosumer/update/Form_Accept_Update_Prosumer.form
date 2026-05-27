@@ -1,0 +1,42 @@
+{
+  "components": [
+    {
+      "text": "# Prosumer",
+      "type": "text",
+      "layout": {
+        "row": "Row_1plwgff",
+        "columns": null
+      },
+      "id": "Field_0tnupbp"
+    },
+    {
+      "text": "=\"ID: \" + string(prosumerId) + \"<br/> name: \" + string(name)  + \"<br/> Fiscal Number: \" + string(fiscalnumber) +\n\"<br/> Location:\" +   string(location)\n",
+      "type": "text",
+      "layout": {
+        "row": "Row_1plwgff",
+        "columns": null
+      },
+      "id": "Field_0ehxlug"
+    },
+    {
+      "label": "Is the update of prosumer acceptable?",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_1fnevqu",
+        "columns": null
+      },
+      "id": "Field_1bn5agz",
+      "key": "accept",
+      "defaultValue": true
+    }
+  ],
+  "type": "default",
+  "id": "Form_Accept_Update_Prosumer",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

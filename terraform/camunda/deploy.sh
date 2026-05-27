@@ -5,6 +5,10 @@ wget https://downloads.camunda.cloud/release/camunda/c8run/8.8.9/camunda8-run-8.
 sudo tar xvf camunda8-run-8.8.9-linux-x86_64.tar.gz
 sudo rm camunda8-run-8.8.9-linux-x86_64.tar.gz
 
+sudo mkdir /c8run
+echo KONG_ADDRESS
+sudo echo "KONG_ADDRESS=${KONG_ADDRESS}" >> /c8run/.env
+
 sudo chmod -R 777 c8run
-sudo runuser -l ec2-user -c 'cd /c8run && ./start.sh'
+sudo runuser -l ec2-user -c "cd /c8run && ./start.sh"
 echo "Finished."

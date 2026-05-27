@@ -1,0 +1,42 @@
+{
+  "components": [
+    {
+      "text": "# Read Prosumer",
+      "type": "text",
+      "layout": {
+        "row": "Row_1v881sd",
+        "columns": null
+      },
+      "id": "Field_1oe06kd"
+    },
+    {
+      "text": "=\"ID: \" + string(prosumerId) + \"<br/> name: \" + string(prosumer.name)  + \"<br/> Fiscal Number: \" + string(prosumer.fiscalNumber) +\n\"<br/> Location:\" +   string(prosumer.location)\n",
+      "type": "text",
+      "layout": {
+        "row": "Row_1v881sd",
+        "columns": null
+      },
+      "id": "Field_1r59fw7"
+    },
+    {
+      "label": "Is it possible to promise the request?",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_179ar8t",
+        "columns": null
+      },
+      "id": "Field_1u7vprv",
+      "key": "promise",
+      "defaultValue": true
+    }
+  ],
+  "type": "default",
+  "id": "Form_Promise_Read_Current_Prosumer",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

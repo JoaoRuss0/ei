@@ -32,15 +32,16 @@ svc_meta() {
 }
 
 mkdir -p logs
+for svc in "${SERVICES[@]}"; do
+    : > "logs/$svc.log"
+done
 
 build_one() {
     local svc="$1"
     echo "[BUILD] $svc"
-    (
-        cd "microservices/$svc" || exit 1
-        ./mvnw -B -q clean package -DskipTests \
-            -Dquarkus.container-image.group="$DOCKER_USERNAME"
-    )
+    cd "microservices/$svc" || exit 1
+    ./mvnw -B -q clean package -DskipTests \
+        -Dquarkus.container-image.group="$DOCKER_USERNAME"
     echo "[BUILT] $svc"
 }
 
@@ -53,7 +54,7 @@ if [ "$DO_BUILD" = "1" ]; then
 
     PIDS=()
     for svc in "${SERVICES[@]}"; do
-        build_one "$svc" > "logs/build_$svc.log" 2>&1 &
+        (build_one "$svc") >> "logs/$svc.log" 2>&1 &
         PIDS+=($!)
     done
     wait "${PIDS[@]}"
@@ -101,7 +102,13 @@ REMOTE
 }
 
 if [ "$DO_REFRESH" = "1" ]; then
-    source ./addresses.sh > /dev/null
+    echo "[FETCHING ADDRESSES]"
+    ADDR_TMP=$(mktemp)
+    source ./addresses.sh > "$ADDR_TMP" 2>&1
+    for svc in "${SERVICES[@]}"; do
+        cat "$ADDR_TMP" >> "logs/$svc.log"
+    done
+    rm -f "$ADDR_TMP"
     if [ -z "$DB_ADDRESS" ] || [ -z "$KAFKA_CLUSTER" ]; then
         echo "[ERROR] DB_ADDRESS or KAFKA_CLUSTER missing — is the infrastructure deployed?" >&2
         exit 1
@@ -114,7 +121,7 @@ if [ "$DO_REFRESH" = "1" ]; then
 
     PIDS=()
     for svc in "${SERVICES[@]}"; do
-        refresh_one "$svc" > "logs/refresh_$svc.log" 2>&1 &
+        refresh_one "$svc" >> "logs/$svc.log" 2>&1 &
         PIDS+=($!)
     done
     wait "${PIDS[@]}"

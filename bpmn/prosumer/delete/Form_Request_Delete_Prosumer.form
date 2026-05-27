@@ -1,0 +1,51 @@
+{
+  "components": [
+    {
+      "text": "# Delete",
+      "type": "text",
+      "layout": {
+        "row": "Row_196yxvu",
+        "columns": null
+      },
+      "id": "Field_1bgtal8"
+    },
+    {
+      "label": "ID",
+      "type": "number",
+      "layout": {
+        "row": "Row_0hbnlpb",
+        "columns": null
+      },
+      "id": "Field_1wc2119",
+      "key": "prosumer_id",
+      "description": "Prosumer ID"
+    },
+    {
+      "text": "# All",
+      "type": "text",
+      "layout": {
+        "row": "Row_1uzweco",
+        "columns": null
+      },
+      "id": "Field_1u585pg"
+    },
+    {
+      "text": "=string join(\n  for p in prosumerList return\n    \"ID: \" + string(p.id) +\n    \"<br/>Name: \" + p.name +\n    \"<br/>Fiscal Number: \" + string(p.fiscalNumber) +\n    \"<br/>Location: \" + p.location,\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_1uzweco",
+        "columns": null
+      },
+      "id": "Field_0jw0c1v"
+    }
+  ],
+  "type": "default",
+  "id": "Form_Request_Delete_Prosumer",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

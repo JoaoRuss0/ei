@@ -64,6 +64,12 @@ public class AssetLinkResource {
                 .onItem().transform(ResponseBuilder::build); 
     }
 
+    @GET
+    @Path("by-prosumer-id/{idProsumer}")
+    public Multi<AssetLink> getDual(Long idProsumer) {
+        return AssetLink.findByIdProsumerId(client, idProsumer);
+    }
+
     @POST
     public Uni<Response> create(AssetLink assetlink) {
         return assetlink.save(client , assetlink.idProsumer , assetlink.idUtilityOperator)

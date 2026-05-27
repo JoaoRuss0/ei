@@ -1,0 +1,101 @@
+{
+  "components": [
+    {
+      "text": "# New",
+      "type": "text",
+      "layout": {
+        "row": "Row_03b91bd",
+        "columns": 3
+      },
+      "id": "Field_0ie3wmp"
+    },
+    {
+      "text": "=\"ID: \" + string(prosumerId) + \"<br/> name: \" + string(name)  + \"<br/> Fiscal Number: \" + string(fiscalnumber) +\n\"<br/> Location:\" +   string(location)\n",
+      "type": "text",
+      "layout": {
+        "row": "Row_03b91bd",
+        "columns": null
+      },
+      "id": "Field_06uqaw3"
+    },
+    {
+      "text": "# Current",
+      "type": "text",
+      "layout": {
+        "row": "Row_03b91bd",
+        "columns": 3
+      },
+      "id": "Field_0aubpi4"
+    },
+    {
+      "text": "=\"ID: \" + string(currentProsumer.id) + \"<br/> Name: \" + currentProsumer.name + \"<br/> Fiscal Number: \" + string(currentProsumer.fiscalNumber) + \"<br/> Location: \" + currentProsumer.location",
+      "type": "text",
+      "layout": {
+        "row": "Row_03b91bd",
+        "columns": null
+      },
+      "id": "Field_16u6m2p"
+    },
+    {
+      "computeOn": "change",
+      "type": "expression",
+      "layout": {
+        "row": "Row_09zgnue",
+        "columns": null
+      },
+      "id": "Field_1es9jx2",
+      "key": "repeatingFiscalNumber",
+      "expression": "=some p in prosumerList satisfies p.fiscalNumber = fiscalnumber"
+    },
+    {
+      "text": "# All",
+      "type": "text",
+      "layout": {
+        "row": "Row_0vt8ozh",
+        "columns": 3
+      },
+      "id": "Field_1w3q4lm"
+    },
+    {
+      "text": "=string join(\n  for p in prosumerList return\n    \"ID: \" + string(p.id) +\n    \"<br/>Name: \" + p.name +\n    \"<br/>Fiscal Number: \" + string(p.fiscalNumber) +\n    \"<br/>Location: \" + p.location,\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_0vt8ozh",
+        "columns": null
+      },
+      "id": "Field_1biabvq"
+    },
+    {
+      "text": "Fiscal Number already exists!",
+      "type": "text",
+      "layout": {
+        "row": "Row_0ywdmar",
+        "columns": null
+      },
+      "id": "Field_1gmuiyj",
+      "conditional": {
+        "hide": "=not(repeatingFiscalNumber)"
+      }
+    },
+    {
+      "label": "Checkbox",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_0ywdmar",
+        "columns": 3
+      },
+      "id": "Field_1bneafl",
+      "key": "promise",
+      "description": "Allow prosumer update"
+    }
+  ],
+  "type": "default",
+  "id": "Form_Current_List_And_Change_Prosumer",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

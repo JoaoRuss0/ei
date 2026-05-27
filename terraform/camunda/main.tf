@@ -21,13 +21,21 @@ resource "aws_instance" "camunda_engine_instance" {
   vpc_security_group_ids  = [aws_security_group.instance.id]
   key_name                = "vockey"
 
-  user_data = file("${path.module}/deploy.sh")
+  user_data = templatefile("${path.module}/deploy.sh", {
+    KONG_ADDRESS = var.KONG_ADDRESS
+  })
 
   user_data_replace_on_change = true
-  
+
   tags = {
     Name = "terraform-camunda"
   }
+}
+
+variable "KONG_ADDRESS" {
+  description = "Kong proxy DNS:port for Camunda Connector secrets resolution (referenced as {{secrets.KONG_ADDRESS}} in BPMN connectors)"
+  type        = string
+  default     = ""
 }
 
 resource "aws_security_group" "instance" {

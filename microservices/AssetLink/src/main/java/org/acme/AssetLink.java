@@ -53,4 +53,10 @@ public class AssetLink {
         return client.preparedQuery("DELETE FROM AssetLink WHERE id = ?").execute(Tuple.of(id_R))
                 .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
     }
+
+    public static Multi<AssetLink> findByIdProsumerId(MySQLPool client, Long prosumer_id) {
+        return client.preparedQuery("SELECT id, idProsumer, idUtilityOperator FROM AssetLink WHERE idProsumer = ?").execute(Tuple.of(prosumer_id))
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(AssetLink::from);
+    }
 }

@@ -51,7 +51,7 @@ deploy_ollama() {
 
 deploy_camunda() {
     cd "terraform/camunda" || exit 1
-    terraform init && terraform apply -auto-approve
+    terraform init && terraform apply -auto-approve -var="KONG_ADDRESS=${addressKong}"
 
     echo "CAMUNDA IS AVAILABLE HERE:"
     addressCamunda="$(terraform state show aws_instance.camunda_engine_instance \
@@ -76,6 +76,7 @@ deploy_kong() {
     local prosumer_dns=$(cd terraform/microservices/prosumer            && get_terraform_dns prosumer)
     local telemetry_dns=$(cd terraform/microservices/telemetry          && get_terraform_dns telemetry)
     local utilityoperator_dns=$(cd terraform/microservices/utility_operator && get_terraform_dns utilityoperator)
+    local ollama_dns=$(cd terraform/microservices/ollama && terraform state show -no-color aws_instance.ollama_instance | awk -F\" '/^    public_dns/ {print $2}')
 
     cat > terraform/kong/microservices.auto.tfvars.json <<EOF
 {
@@ -88,7 +89,8 @@ deploy_kong() {
     "gridcell":            "http://${gridcell_dns}:8080",
     "prosumer":            "http://${prosumer_dns}:8080",
     "telemetry":           "http://${telemetry_dns}:8080",
-    "utilityoperator":     "http://${utilityoperator_dns}:8080"
+    "utilityoperator":     "http://${utilityoperator_dns}:8080",
+    "ollama":              "http://${ollama_dns}:11434"
   }
 }
 EOF
@@ -128,12 +130,9 @@ deploy_microservice() {
     local service_name="$1"
     local terraform_service_name="$2"
 
-    cd "microservices/$service_name/" || exit 1
-    ./mvnw clean package -DskipTests -Dquarkus.container-image.group="${DOCKER_USERNAME}"
-    cd "../../terraform/microservices/$terraform_service_name/" || exit 1
+    cd "terraform/microservices/$terraform_service_name/" || exit 1
 
     terraform init
-    terraform taint "module.$service_name.aws_instance.quarkus_instance"
     terraform apply -auto-approve -var="DATA_SOURCE=mysql://${addressDB}:3306/VPPaaS" -var="KAFKA_CLUSTER=${addressKafka}" -var="DOCKER_USERNAME=${DOCKER_USERNAME}" -var="DOCKER_PASSWORD=${DOCKER_PASSWORD}"
 
     echo "MICROSERVICE $service_name IS AVAILABLE HERE:"
@@ -152,20 +151,20 @@ deploy_camunda_resources() {
     done
 
     echo "[DEPLOYING CAMUNDA FORMS] ..."
-    for entry in ./bpmn/forms/*.form; do
+    while IFS= read -r entry; do
         echo "  - $entry"
         curl -s -L -X POST "http://${addressCamunda}:8080/v2/deployments" \
             -H "Accept: application/json" \
             -F "resources=@${entry}" > /dev/null
-    done
+    done < <(find ./bpmn -type f -name "*.form" ! -path "*/Generic-BPMN-Patterns-For-Your-Reuse/*" | sort)
 
     echo "[DEPLOYING CAMUNDA BPMN PROCESSES] ..."
-    for entry in ./bpmn/*.bpmn; do
+    while IFS= read -r entry; do
         echo "  - $entry"
         curl -s -L -X POST "http://${addressCamunda}:8080/v2/deployments" \
             -H "Accept: application/json" \
             -F "resources=@${entry}" > /dev/null
-    done
+    done < <(find ./bpmn -type f -name "*.bpmn" ! -path "*/Generic-BPMN-Patterns-For-Your-Reuse/*" | sort)
 
     echo "[CAMUNDA RESOURCES DEPLOYED]"
 }
@@ -202,27 +201,22 @@ trap cleanup SIGINT
 
 mkdir -p logs
 
-echo "[DEPLOYING RDS, OLLAMA, KAFKA AND CAMUNDA] ..."
+echo "[DEPLOYING RDS, OLLAMA AND KAFKA] ..."
 
 deploy_kafka    > logs/kafka.log 2>&1       & KAF_PID=$!
 deploy_rds      > logs/rds.log 2>&1         & RDS_PID=$!
 deploy_ollama   > logs/ollama.log 2>&1      & OLL_PID=$!
-deploy_camunda  > logs/camunda.log 2>&1     & CAM_PID=$!
 
-wait $KAF_PID $OLL_PID $RDS_PID $CAM_PID
+wait $KAF_PID $OLL_PID $RDS_PID
 
 echo "[DONE]"
 
 export addressDB="$(cd terraform/rds && terraform state show aws_db_instance.example | grep address | sed "s/address//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
 export addressKafka="$(cd terraform/kafka && terraform output -json publicdnslist | jq -r 'map("\(.):9092") | join(",")')"
-export addressCamunda="$(cd terraform/camunda && terraform state show aws_instance.camunda_engine_instance | grep public_dns | sed "s/public_dns//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
 
 echo "- Database:" "$addressDB"
 echo "- Kafka Cluster:" "$addressKafka"
 echo "- Ollama: http://""$(cd terraform/microservices/ollama && terraform state show -no-color aws_instance.ollama_instance | awk -F\" '/^    public_dns/ {print $2}' )"":11434/api/generate"
-echo "- Camunda: http://$addressCamunda:8080/operate"
-
-deploy_camunda_resources > logs/camunda_resources.log 2>&1 & CAMRES_PID=$!
 
 echo "[DEPLOYING ALL MICROSERVICES] ..."
 
@@ -248,23 +242,26 @@ echo "- FlexibilityEmission: http://""$(cd terraform/microservices/flexibility_e
 echo "- GridBalancingRecommendation: http://""$(cd terraform/microservices/grid_balancing && get_terraform_dns gridbalancing)"":8080/q/swagger-ui"
 echo "- Telemetry: http://""$(cd terraform/microservices/telemetry                        && get_terraform_dns telemetry)"":8080/q/swagger-ui"
 
-echo "[DONE]"
-
-echo "[DEPLOYING KONG WITH AUTO-REGISTERED MICROSERVICES] ..."
+echo "[DEPLOYING KONG] ..."
 
 (deploy_kong) > logs/kong.log 2>&1
-
 export addressKong="$(cd terraform/kong && terraform state show aws_instance.kong_instance | grep public_dns | sed "s/public_dns//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
-
 echo "- Kong: http://$addressKong:8000/"
 
-echo "[DEPLOYING KONGA WITH KONG NODE SEEDED] ..."
+echo "[DEPLOYING CAMUNDA AND KONGA] ..."
 
-(deploy_konga) > logs/konga.log 2>&1
+(deploy_camunda) > logs/camunda.log 2>&1 & CAM_PID=$!
+(deploy_konga)   > logs/konga.log 2>&1   & KGA_PID=$!
 
+wait $CAM_PID $KGA_PID
+
+export addressCamunda="$(cd terraform/camunda && terraform state show aws_instance.camunda_engine_instance | grep public_dns | sed "s/public_dns//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
 export addressKonga="$(cd terraform/konga && terraform state show aws_instance.konga_instance | grep public_dns | sed "s/public_dns//g" | sed "s/=//g" | sed "s/\"//g" |sed "s/ //g" | sed "s/$esc\[[0-9;]*m//g" )"
 
+echo "- Camunda: http://$addressCamunda:8080/operate"
 echo "- Konga: http://$addressKonga:1337/"
+
+deploy_camunda_resources > logs/camunda_resources.log 2>&1 & CAMRES_PID=$!
 
 create_kafka_topics
 

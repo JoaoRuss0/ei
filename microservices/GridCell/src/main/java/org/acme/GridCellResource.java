@@ -56,8 +56,10 @@ public class GridCellResource {
     @POST
     public Uni<Response> create(GridCell gridCell) {
         return gridCell.save(client)
-                .onItem().transform(id -> URI.create("/GridCell/" + id))
-                .onItem().transform(uri -> Response.created(uri).build());
+                .onItem().transform(id -> Response.created(URI.create("/GridCell/" + id))
+                        .entity(java.util.Map.of("id", id))
+                        .type(jakarta.ws.rs.core.MediaType.APPLICATION_JSON)
+                        .build());
     }
     
     @DELETE

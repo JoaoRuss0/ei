@@ -10,24 +10,13 @@
       "id": "Field_0ie3wmp"
     },
     {
-      "text": "=\"Name: \" + string(name)  + \"<br/> Max Load: \" + string(maxLoad) +\n\"<br/> Postal Code:\" +   string(postalCode)\n",
+      "text": "=\"Address: \" + string(address)  + \"<br/> Max Load: \" + string(maxLoad) +\n\"<br/> Postal Code:\" +   string(postalCode)\n",
       "type": "text",
       "layout": {
         "row": "Row_03b91bd",
         "columns": null
       },
       "id": "Field_06uqaw3"
-    },
-    {
-      "computeOn": "change",
-      "type": "expression",
-      "layout": {
-        "row": "Row_09zgnue",
-        "columns": null
-      },
-      "id": "Field_1es9jx2",
-      "key": "repeatingId",
-      "expression": "=some p in gridCellList satisfies p.id = id"
     },
     {
       "text": "# All",
@@ -48,27 +37,14 @@
       "id": "Field_1biabvq"
     },
     {
-      "text": "Max Load already exists!",
-      "type": "text",
-      "layout": {
-        "row": "Row_0ywdmar",
-        "columns": null
-      },
-      "id": "Field_1gmuiyj",
-      "conditional": {
-        "hide": "=not(repeatingId)"
-      }
-    },
-    {
-      "label": "Checkbox",
+      "label": "Allow gridcell creation?",
       "type": "checkbox",
       "layout": {
         "row": "Row_0ywdmar",
-        "columns": 3
+        "columns": 16
       },
       "id": "Field_1bneafl",
-      "key": "promise",
-      "description": "Allow gridcell creation"
+      "key": "promise"
     }
   ],
   "type": "default",

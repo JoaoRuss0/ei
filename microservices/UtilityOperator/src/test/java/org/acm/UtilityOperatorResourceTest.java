@@ -74,7 +74,9 @@ class UtilityOperatorResourceTest {
                 .when().post("/UtilityOperator")
                 .then()
                 .statusCode(201)
-                .header("Location", containsString("/UtilityOperator/"));
+                .header("Location", containsString("/UtilityOperator/"))
+                .body("id", notNullValue())
+                .body("id", greaterThan(0));
     }
 
     @Test

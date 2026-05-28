@@ -46,53 +46,13 @@
       "id": "Field_1q1c03f"
     },
     {
-      "text": "=string join(\n  for r in gridCellList return\n    \"ID: \" + r.id +\n    \"<br/>Address: \" + r.address +\n    \"<br/>Postal Code: \" + r.postalCode +\n    \"<br/>Peak Hours: \" + r.peakHoursStartTime + \" — \" + r.peakHoursEndTime +\n    \"<br/>Max Load: \" + string(r.maxLoad) +\n    \"<br/>Operator ID: \" + string(r.operatorId) +\n    \"<br/>Coordinates: (\" + string(r.xCoords) + \", \" + string(r.yCoords) + \")\",\n  \"<br/><br/>\"\n)",
+      "text": "=string join(\n  for r in gridCellList return\n    \"ID: \" + r.id +\n    \"<br/>Address: \" + r.address +\n    \"<br/>Postal Code: \" + r.postalCode +\n    \"<br/>Peak Hours: \" + r.peakHoursStartTime + \" \u2014 \" + r.peakHoursEndTime +\n    \"<br/>Max Load: \" + string(r.maxLoad) +\n    \"<br/>Operator ID: \" + string(r.operatorId) +\n    \"<br/>Coordinates: (\" + string(r.xCoords) + \", \" + string(r.yCoords) + \")\",\n  \"<br/><br/>\"\n)",
       "type": "text",
       "layout": {
         "row": "Row_0fjmp8o",
         "columns": null
       },
       "id": "Field_10e3am5"
-    },
-    {
-      "computeOn": "change",
-      "type": "expression",
-      "layout": {
-        "row": "Row_1s8bav5",
-        "columns": null
-      },
-      "id": "Field_1rzn08g",
-      "key": "expression_8wu7p",
-      "expression": "=has_no_asset_links",
-      "conditional": {
-        "hide": "=assetLinks = null or count(assetLinks) = 0 or assetLinks = []"
-      }
-    },
-    {
-      "computeOn": "change",
-      "type": "expression",
-      "layout": {
-        "row": "Row_0e9df1c",
-        "columns": null
-      },
-      "id": "Field_0rxjdxd",
-      "key": "expression_03a7t",
-      "expression": "=has_no_grid_cells",
-      "conditional": {
-        "hide": "=gridCellList = null or count(gridCellList) = 0 or gridCellList = []"
-      }
-    },
-    {
-      "text": "There are active assets links or grid cells for this utility operator!",
-      "type": "text",
-      "layout": {
-        "row": "Row_1v7hnck",
-        "columns": null
-      },
-      "id": "Field_1f5zgg6",
-      "conditional": {
-        "hide": "=not(has_no_asset_links) or not(has_no_grid_cells)"
-      }
     },
     {
       "label": "Is it possible to promise the request?",

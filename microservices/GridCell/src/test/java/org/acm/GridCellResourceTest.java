@@ -70,7 +70,8 @@ class GridCellResourceTest {
                 .when().post("/GridCell")
                 .then()
                 .statusCode(201)
-                .header("Location", containsString("/GridCell/COIMBRA_01"));
+                .header("Location", containsString("/GridCell/COIMBRA_01"))
+                .body("id", equalTo("COIMBRA_01"));
     }
 
     @Test

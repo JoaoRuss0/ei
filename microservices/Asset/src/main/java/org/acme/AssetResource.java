@@ -53,8 +53,10 @@ public class AssetResource {
     @POST
     public Uni<Response> create(Asset asset) {
         return asset.save(client)
-                .onItem().transform(id -> URI.create("/Asset/" + id))
-                .onItem().transform(uri -> Response.created(uri).build());
+                .onItem().transform(id -> Response.created(URI.create("/Asset/" + id))
+                        .entity(java.util.Map.of("id", id))
+                        .type(jakarta.ws.rs.core.MediaType.APPLICATION_JSON)
+                        .build());
     }
 
     @PUT

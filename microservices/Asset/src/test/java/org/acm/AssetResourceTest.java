@@ -73,7 +73,9 @@ class AssetResourceTest {
                 .when().post("/Asset")
                 .then()
                 .statusCode(201)
-                .header("Location", containsString("/Asset/"));
+                .header("Location", containsString("/Asset/"))
+                .body("id", notNullValue())
+                .body("id", greaterThan(0));
     }
 
     @Test

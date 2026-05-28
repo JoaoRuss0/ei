@@ -3,9 +3,7 @@ title Asset Link Creation/Reading Business Process
 
 /'
 In order to create an asset link we need to first make a contract between the prosumer and utility operator. POST /AssetLink
-Fetch all potential grid cells from the contracted Utility Operator. GET /GridCells/by-operator-ids?operatorIds=<id>
-Pick one of the operator's grid cells (Camunda form) — the chosen cell is used only for topic creation.
-Create a new topic(s) in Kafka using the AssetLink microservice POST /AssetLink/topic/{assetId}/{gridCellId}
+Create a new topic(s) in Kafka using the AssetLink microservice POST /AssetLink/topic/{prosumerId}/{utilityOperatorId}
 Activate the consumption of said topic(s) by the Telemetry Microservice POST /Telemetry/consume
 '/
 
@@ -24,16 +22,10 @@ Kong -> Camunda : Forward Response
 
 note left of Camunda : If the Request is Create, continue
 
-Camunda -> Kong : Read related Utility Operator's Grid Cells Request
-Kong -> GC : Forward Request
-note right of GC : Process request
-GC -> Kong : Response
-Kong -> Camunda : Forward Response
-
 Camunda -> Kong : Create Topic Request
 Kong -> Link : Forward Request
-Link -> Kafka : Create Topic (AssetID-GridCellId)
-note right of Kafka : Create Topic 'AssetID-GridCellId'
+Link -> Kafka : Create Topic (ProsumerID-UtilityOperatorID)
+note right of Kafka : Create Topic 'ProsumerID-UtilityOperatorID'
 Kafka -> Link : Response
 Link -> Kong : Response
 Kong -> Camunda : Forward Response

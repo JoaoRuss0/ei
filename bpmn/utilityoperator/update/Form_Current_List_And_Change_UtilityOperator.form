@@ -37,17 +37,6 @@
       "id": "Field_16u6m2p"
     },
     {
-      "computeOn": "change",
-      "type": "expression",
-      "layout": {
-        "row": "Row_09zgnue",
-        "columns": null
-      },
-      "id": "Field_1es9jx2",
-      "key": "repeatingIban",
-      "expression": "=some p in utilityoperatorList satisfies p.iban = iban and p.id != utilityoperatorId"
-    },
-    {
       "text": "# All",
       "type": "text",
       "layout": {
@@ -66,27 +55,14 @@
       "id": "Field_1biabvq"
     },
     {
-      "text": "IBAN already exists!",
-      "type": "text",
-      "layout": {
-        "row": "Row_0ywdmar",
-        "columns": null
-      },
-      "id": "Field_1gmuiyj",
-      "conditional": {
-        "hide": "=not(repeatingIban)"
-      }
-    },
-    {
-      "label": "Checkbox",
+      "label": "Allow utilityoperator update?",
       "type": "checkbox",
       "layout": {
         "row": "Row_0ywdmar",
-        "columns": 3
+        "columns": 16
       },
       "id": "Field_1bneafl",
-      "key": "promise",
-      "description": "Allow utilityoperator update"
+      "key": "promise"
     }
   ],
   "type": "default",

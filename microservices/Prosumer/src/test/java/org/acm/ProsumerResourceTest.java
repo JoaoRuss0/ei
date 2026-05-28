@@ -75,7 +75,9 @@ class ProsumerResourceTest {
                 .when().post("/Prosumer")
                 .then()
                 .statusCode(201)
-                .header("Location", containsString("/Prosumer/"));
+                .header("Location", containsString("/Prosumer/"))
+                .body("id", notNullValue())
+                .body("id", greaterThan(0));
     }
 
     @Test

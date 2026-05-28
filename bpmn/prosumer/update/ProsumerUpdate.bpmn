@@ -99,7 +99,7 @@
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;processDefinitionId&#34;: &#34;Prosumer_Update_Executor&#34;,&#10;  &#34;variables&#34;: &#10;  { &#10;    &#34;prosumerId&#34;: prosumerId,&#10;    &#34;name&#34;: name,&#10;    &#34;fiscalnumber&#34;: fiscalnumber,&#10;    &#34;location&#34; : location,&#10;    &#34;businessKey&#34;: businessKey,&#10;    &#34;prosumerList&#34;: prosumerList,&#10;    &#34;currentProsumer&#34;: prosumerId[item.id = prosumerId]&#10;  }&#10;}" target="body" />
+          <zeebe:input source="={&#10;  &#34;processDefinitionId&#34;: &#34;Prosumer_Update_Executor&#34;,&#10;  &#34;variables&#34;: &#10;  { &#10;    &#34;prosumerId&#34;: prosumerId,&#10;    &#34;name&#34;: name,&#10;    &#34;fiscalnumber&#34;: fiscalnumber,&#10;    &#34;location&#34; : location,&#10;    &#34;businessKey&#34;: businessKey,&#10;    &#34;prosumerList&#34;: prosumerList,&#10;    &#34;currentProsumer&#34;: prosumerList[item.id = prosumerId][1]&#10;  }&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>

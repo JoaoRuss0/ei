@@ -31,7 +31,7 @@ public class UtilityOperatorResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS UtilityOperator").execute()
-        .flatMap(r -> client.query("CREATE TABLE UtilityOperator (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL, iban VARCHAR(255) NOT NULL)").execute())
+        .flatMap(r -> client.query("CREATE TABLE UtilityOperator (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL, iban VARCHAR(255) NOT NULL UNIQUE)").execute())
         .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('ArcoCegoLisbon','Lisboa', '123123123')").execute())
         .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('PracadeBocage','Setubal', '123123123')").execute())
         .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('PracadaBoavista','Porto', '123123123')").execute())
@@ -55,8 +55,10 @@ public class UtilityOperatorResource {
     @POST
     public Uni<Response> create(UtilityOperator operator) {
         return operator.save(client , operator.name , operator.location, operator.iban)
-                .onItem().transform(id -> URI.create("/UtilityOperator/" + id))
-                .onItem().transform(uri -> Response.created(uri).build());
+                .onItem().transform(id -> Response.created(URI.create("/UtilityOperator/" + id))
+                        .entity(java.util.Map.of("id", id))
+                        .type(MediaType.APPLICATION_JSON)
+                        .build());
     }
     
     @DELETE

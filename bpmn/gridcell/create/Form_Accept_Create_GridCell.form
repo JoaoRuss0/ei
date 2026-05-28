@@ -10,7 +10,7 @@
       "id": "Field_0tnupbp"
     },
     {
-      "text": "=\"Name: \" + string(name)  + \"<br/> Max Load: \" + string(maxLoad) +\n\"<br/> Postal Code:\" +   string(postalCode)\n",
+      "text": "=\"Address: \" + string(address)  + \"<br/> Max Load: \" + string(maxLoad) +\n\"<br/> Postal Code:\" +   string(postalCode)\n",
       "type": "text",
       "layout": {
         "row": "Row_1plwgff",

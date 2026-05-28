@@ -3,7 +3,7 @@ title Asset Link Deletion Business Process
 
 /'
 Stop the consumption of the topic(s) by the Telemetry Microservice POST /Telemetry/stop
-Delete the topic(s) from Kafka using the AssetLink microservice DELETE /AssetLink/topic/{assetId}/{gridCellId}
+Delete the topic(s) from Kafka using the AssetLink microservice DELETE /AssetLink/topic/{prosumerId}/{utilityOperatorId}
 Delete the asset link. DELETE /AssetLink/{id}
 '/
 

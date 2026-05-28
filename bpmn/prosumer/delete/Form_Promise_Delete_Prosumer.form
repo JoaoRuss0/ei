@@ -55,46 +55,6 @@
       "id": "Field_0hu66nf"
     },
     {
-      "computeOn": "change",
-      "type": "expression",
-      "layout": {
-        "row": "Row_0d4pux0",
-        "columns": null
-      },
-      "id": "Field_0zthdda",
-      "key": "expression_ee3ffh",
-      "expression": "=has_no_assets",
-      "conditional": {
-        "hide": "=assets = null or count(assets) = 0 or assets = []"
-      }
-    },
-    {
-      "computeOn": "change",
-      "type": "expression",
-      "layout": {
-        "row": "Row_0y4061g",
-        "columns": null
-      },
-      "id": "Field_1rzn08g",
-      "key": "expression_8wu7p",
-      "expression": "=has_no_asset_links",
-      "conditional": {
-        "hide": "=assetLinks = null or count(assetLinks) = 0 or assetLinks = []"
-      }
-    },
-    {
-      "text": "There are active assets links or assets for this prosumer!",
-      "type": "text",
-      "layout": {
-        "row": "Row_1v7hnck",
-        "columns": null
-      },
-      "id": "Field_1f5zgg6",
-      "conditional": {
-        "hide": "=not(has_no_asset_links) or not(has_no_assets)"
-      }
-    },
-    {
       "label": "Is it possible to promise the request?",
       "type": "checkbox",
       "layout": {

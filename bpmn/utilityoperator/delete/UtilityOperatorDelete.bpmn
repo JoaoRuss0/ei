@@ -310,7 +310,7 @@
     <bpmn:sequenceFlow id="Flow_0hp3f4y" sourceRef="Gateway_0a829wr" targetRef="Activity_1op81if" />
     <bpmn:sequenceFlow id="Flow_06q52bc" sourceRef="Gateway_0robt1u" targetRef="Gateway_1kq34ax" />
     <bpmn:sequenceFlow id="Flow_167xvul" sourceRef="Gateway_1kq34ax" targetRef="Activity_e67ad815-e9da-4c51-868d-951fdcd37132">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=assetLinks = null or assetLinks = [] or count(assetLinks) = 0 or gridCellList = null or gridCellList = [] or count(gridCellList) = 0</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=(assetLinks = null or assetLinks = [] or count(assetLinks) = 0) and (gridCellList = null or gridCellList = [] or count(gridCellList) = 0)</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:endEvent id="Event_0ld7huy">
       <bpmn:incoming>Flow_0jht5r4</bpmn:incoming>
@@ -528,7 +528,7 @@
         <zeebe:ioMapping>
           <zeebe:input source="noAuth" target="authentication.type" />
           <zeebe:input source="GET" target="method" />
-          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/gridcell/GridCell/by-operator-ids?operatorIds=&#34; + string(utilityoperator_id)" target="url" />
+          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/gridcell/GridCell/by-operator-ids?operatorIds=&#34; + string(utilityoperatorId)" target="url" />
           <zeebe:input source="={&#10;  &#34;Content-Type&#34;: &#34;Application/json&#34;,&#10;  &#34;accept&#34;: &#34;Application/json&#34;&#10;}" target="headers" />
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />

@@ -10,7 +10,7 @@
       "id": "Field_0ie3wmp"
     },
     {
-      "text": "=\"ID: \" + string(gridCellId) + \"<br/> name: \" + string(name)  + \"<br/> Max Load: \" + string(maxLoad) +\n\"<br/> Postal Code:\" +   string(postalCode)\n",
+      "text": "=\"ID: \" + string(gridCellId) + \"<br/> Address: \" + string(address)  + \"<br/> Max Load: \" + string(maxLoad) +\n\"<br/> Postal Code:\" +   string(postalCode)\n",
       "type": "text",
       "layout": {
         "row": "Row_03b91bd",
@@ -37,17 +37,6 @@
       "id": "Field_16u6m2p"
     },
     {
-      "computeOn": "change",
-      "type": "expression",
-      "layout": {
-        "row": "Row_09zgnue",
-        "columns": null
-      },
-      "id": "Field_1es9jx2",
-      "key": "repeatingId",
-      "expression": "=some p in gridCellList satisfies p.id = id and p.id != gridCellId"
-    },
-    {
       "text": "# All",
       "type": "text",
       "layout": {
@@ -66,27 +55,14 @@
       "id": "Field_1biabvq"
     },
     {
-      "text": "Max Load already exists!",
-      "type": "text",
-      "layout": {
-        "row": "Row_0ywdmar",
-        "columns": null
-      },
-      "id": "Field_1gmuiyj",
-      "conditional": {
-        "hide": "=not(repeatingId)"
-      }
-    },
-    {
-      "label": "Checkbox",
+      "label": "Allow gridcell update?",
       "type": "checkbox",
       "layout": {
         "row": "Row_0ywdmar",
-        "columns": 3
+        "columns": 15
       },
       "id": "Field_1bneafl",
-      "key": "promise",
-      "description": "Allow gridcell update"
+      "key": "promise"
     }
   ],
   "type": "default",

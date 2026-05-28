@@ -19,17 +19,6 @@
       "id": "Field_06uqaw3"
     },
     {
-      "computeOn": "change",
-      "type": "expression",
-      "layout": {
-        "row": "Row_09zgnue",
-        "columns": null
-      },
-      "id": "Field_1es9jx2",
-      "key": "repeatingFiscalNumber",
-      "expression": "=some p in prosumerList satisfies p.fiscalNumber = fiscalnumber"
-    },
-    {
       "text": "# All",
       "type": "text",
       "layout": {
@@ -48,27 +37,14 @@
       "id": "Field_1biabvq"
     },
     {
-      "text": "Fiscal Number already exists!",
-      "type": "text",
-      "layout": {
-        "row": "Row_0ywdmar",
-        "columns": null
-      },
-      "id": "Field_1gmuiyj",
-      "conditional": {
-        "hide": "=not(repeatingFiscalNumber)"
-      }
-    },
-    {
-      "label": "Checkbox",
+      "label": "Allow prosumer creation ?",
       "type": "checkbox",
       "layout": {
         "row": "Row_0ywdmar",
-        "columns": 3
+        "columns": 16
       },
       "id": "Field_1bneafl",
-      "key": "promise",
-      "description": "Allow prosumer creation"
+      "key": "promise"
     }
   ],
   "type": "default",

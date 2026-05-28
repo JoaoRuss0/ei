@@ -124,25 +124,25 @@ class AssetLinkResourceTest {
     @Test
     void testCreateTopic() {
         given()
-                .pathParam("assetId", 100)
-                .pathParam("gridCellId", "ZONE_A")
-                .when().post("/AssetLink/topic/{assetId}/{gridCellId}")
+                .pathParam("prosumerId", 100)
+                .pathParam("utilityOperatorId", 200)
+                .when().post("/AssetLink/topic/{prosumerId}/{utilityOperatorId}")
                 .then()
                 .statusCode(204);
 
-        Mockito.verify(topicService).createAssetLinkTopic(100L, "ZONE_A");
+        Mockito.verify(topicService).createAssetLinkTopic(100L, 200L);
     }
 
     @Test
     void testDeleteTopic() {
         given()
-                .pathParam("assetId", 100)
-                .pathParam("gridCellId", "ZONE_A")
-                .when().delete("/AssetLink/topic/{assetId}/{gridCellId}")
+                .pathParam("prosumerId", 100)
+                .pathParam("utilityOperatorId", 200)
+                .when().delete("/AssetLink/topic/{prosumerId}/{utilityOperatorId}")
                 .then()
                 .statusCode(204);
 
-        Mockito.verify(topicService).deleteAssetLinkTopic(100L, "ZONE_A");
+        Mockito.verify(topicService).deleteAssetLinkTopic(100L, 200L);
     }
 
     @Test

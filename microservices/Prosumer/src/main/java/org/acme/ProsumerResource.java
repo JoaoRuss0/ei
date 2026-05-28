@@ -31,7 +31,7 @@ public class ProsumerResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS Prosumer").execute()
-        .flatMap(r -> client.query("CREATE TABLE Prosumer (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, FiscalNumber BIGINT UNSIGNED, location VARCHAR(255) NOT NULL)").execute())
+        .flatMap(r -> client.query("CREATE TABLE Prosumer (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, FiscalNumber BIGINT UNSIGNED UNIQUE, location VARCHAR(255) NOT NULL)").execute())
         .flatMap(r -> client.query("INSERT INTO Prosumer (name,FiscalNumber,location) VALUES ('client1','123456','Lisbon')").execute())
         .flatMap(r -> client.query("INSERT INTO Prosumer (name,FiscalNumber,location) VALUES ('client2','987654','Setúbal')").execute())
         .flatMap(r -> client.query("INSERT INTO Prosumer (name,FiscalNumber,location) VALUES ('client3','123987','OPorto')").execute())
@@ -55,8 +55,10 @@ public class ProsumerResource {
     @POST
     public Uni<Response> create(Prosumer prosumer) {
         return prosumer.save(client , prosumer.name , prosumer.FiscalNumber , prosumer.location)
-                .onItem().transform(id -> URI.create("/Prosumer/" + id))
-                .onItem().transform(uri -> Response.created(uri).build());
+                .onItem().transform(id -> Response.created(URI.create("/Prosumer/" + id))
+                        .entity(java.util.Map.of("id", id))
+                        .type(MediaType.APPLICATION_JSON)
+                        .build());
     }
     
     @DELETE

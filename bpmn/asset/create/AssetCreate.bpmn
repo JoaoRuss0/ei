@@ -277,6 +277,7 @@
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
+          <zeebe:header key="resultExpression" value="={&#10;  assetId: response.body.id&#10;}" />
           <zeebe:header key="elementTemplateVersion" value="12" />
           <zeebe:header key="elementTemplateId" value="io.camunda.connectors.HttpJson.v2" />
           <zeebe:header key="retryBackoff" value="PT0S" />
@@ -507,7 +508,7 @@
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_1dayv9a" sourceRef="Gateway_1j4agof" targetRef="Activity_e67ad815-e9da-4c51-868d-951fdcd37132" />
     <bpmn:sequenceFlow id="Flow_05uk3g0" sourceRef="Gateway_1j4agof" targetRef="Activity_0yrey7y">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=some a in assets satisfies p.name = name</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=some a in assetList satisfies a.name = name</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
   </bpmn:process>
   <bpmn:message id="Message_193pqte" name="Message_193pqte">

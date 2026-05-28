@@ -37,17 +37,6 @@
       "id": "Field_16u6m2p"
     },
     {
-      "computeOn": "change",
-      "type": "expression",
-      "layout": {
-        "row": "Row_09zgnue",
-        "columns": null
-      },
-      "id": "Field_1es9jx2",
-      "key": "repeatingDummy",
-      "expression": "=false"
-    },
-    {
       "text": "# All",
       "type": "text",
       "layout": {
@@ -66,27 +55,14 @@
       "id": "Field_1biabvq"
     },
     {
-      "text": "(no uniqueness check)",
-      "type": "text",
-      "layout": {
-        "row": "Row_0ywdmar",
-        "columns": null
-      },
-      "id": "Field_1gmuiyj",
-      "conditional": {
-        "hide": "=not(repeatingDummy)"
-      }
-    },
-    {
-      "label": "Checkbox",
+      "label": "Allow asset update?",
       "type": "checkbox",
       "layout": {
         "row": "Row_0ywdmar",
-        "columns": 3
+        "columns": 15
       },
       "id": "Field_1bneafl",
-      "key": "promise",
-      "description": "Allow asset update"
+      "key": "promise"
     }
   ],
   "type": "default",

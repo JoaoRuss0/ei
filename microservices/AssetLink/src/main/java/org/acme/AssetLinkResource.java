@@ -92,18 +92,18 @@ public class AssetLinkResource {
     }
 
     @POST
-    @Path("topic/{assetId}/{gridCellId}")
+    @Path("topic/{prosumerId}/{utilityOperatorId}")
     @Blocking
-    public Response createTopic(Long assetId, String gridCellId) {
-        topicService.createAssetLinkTopic(assetId, gridCellId);
+    public Response createTopic(Long prosumerId, Long utilityOperatorId) {
+        topicService.createAssetLinkTopic(prosumerId, utilityOperatorId);
         return Response.noContent().build();
     }
 
     @DELETE
-    @Path("topic/{assetId}/{gridCellId}")
+    @Path("topic/{prosumerId}/{utilityOperatorId}")
     @Blocking
-    public Response deleteTopic(Long assetId, String gridCellId) {
-        topicService.deleteAssetLinkTopic(assetId, gridCellId);
+    public Response deleteTopic(Long prosumerId, Long utilityOperatorId) {
+        topicService.deleteAssetLinkTopic(prosumerId, utilityOperatorId);
         return Response.noContent().build();
     }
 }

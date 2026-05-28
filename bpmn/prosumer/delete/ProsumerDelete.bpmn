@@ -540,8 +540,8 @@
     <bpmn:sequenceFlow id="Flow_0q0edqv" sourceRef="Gateway_0uwl40f" targetRef="Gateway_0l4j98k" />
     <bpmn:sequenceFlow id="Flow_0afzwj4" sourceRef="Gateway_0l4j98k" targetRef="Activity_0yrey7y" />
     <bpmn:sequenceFlow id="Flow_1bohhtb" sourceRef="Gateway_0l4j98k" targetRef="Activity_e67ad815-e9da-4c51-868d-951fdcd37132">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=assetLinks = null or assetLinks = [] or count(assetLinks) = 0 or 
-assets = null or assets = [] or count(assets) = 0</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=(assetLinks = null or assetLinks = [] or count(assetLinks) = 0)
+ and (assets = null or assets = [] or count(assets) = 0)</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:exclusiveGateway id="Gateway_0l4j98k" default="Flow_0afzwj4">
       <bpmn:incoming>Flow_0q0edqv</bpmn:incoming>

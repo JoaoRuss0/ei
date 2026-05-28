@@ -1,0 +1,24 @@
+{
+  "components": [
+    {
+      "label": "Re-do request?",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_0dxsdte",
+        "columns": null
+      },
+      "id": "Field_13mdm6a",
+      "key": "newrequest",
+      "defaultValue": true
+    }
+  ],
+  "type": "default",
+  "id": "Form_Re_Do_Request_Delete_Asset_Link",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

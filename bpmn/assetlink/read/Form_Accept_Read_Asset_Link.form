@@ -1,0 +1,42 @@
+{
+  "components": [
+    {
+      "text": "# Asset Link",
+      "type": "text",
+      "layout": {
+        "row": "Row_179ar8t",
+        "columns": null
+      },
+      "id": "Field_0kqc9tu"
+    },
+    {
+      "text": "=\"ID: \" + string(assetLink.id) +\n\"<br/>Prosumer ID: \" + string(assetLink.idProsumer) +\n\"<br/>Utility Operator ID: \" + string(assetLink.idUtilityOperator)",
+      "type": "text",
+      "layout": {
+        "row": "Row_179ar8t",
+        "columns": null
+      },
+      "id": "Field_0kqc9tw"
+    },
+    {
+      "label": "Acknowledge the Asset Link read result",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_0qgy54d",
+        "columns": null
+      },
+      "id": "Field_1bn5agz",
+      "key": "accept",
+      "defaultValue": true
+    }
+  ],
+  "type": "default",
+  "id": "Form_Accept_Read_Asset_Link",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

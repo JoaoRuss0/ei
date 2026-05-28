@@ -1,28 +1,28 @@
 {
   "components": [
     {
-      "text": "# Create Asset Link",
+      "text": "# Telemetry Consumption",
       "type": "text",
       "layout": {
-        "row": "Row_179ar8t",
+        "row": "Row_04wy1m8",
         "columns": null
       },
-      "id": "Field_0jbg471"
+      "id": "Field_0opfy7y"
     },
     {
-      "label": "=\"Is it possible to promise the creation of asset link between prosumer \" + prossumerID + \" and utility operator \" + UtilityOperatorID + \"request?\"",
+      "label": "Is the telemetry consumption acceptable?",
       "type": "checkbox",
       "layout": {
-        "row": "Row_1ocy58n",
+        "row": "Row_1plwgff",
         "columns": null
       },
-      "id": "Field_1u7vprv",
-      "key": "promise",
+      "id": "Field_1bn5agz",
+      "key": "accept",
       "defaultValue": true
     }
   ],
   "type": "default",
-  "id": "Form_Promise_AssetLinkMng",
+  "id": "Form_Accept_Telemetry_Consumption_Asset_Link",
   "executionPlatform": "Camunda Cloud",
   "executionPlatformVersion": "8.8.0",
   "exporter": {

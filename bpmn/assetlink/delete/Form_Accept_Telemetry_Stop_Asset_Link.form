@@ -1,0 +1,33 @@
+{
+  "components": [
+    {
+      "text": "# Stop Telemetry Consumption",
+      "type": "text",
+      "layout": {
+        "row": "Row_04wy1m8",
+        "columns": null
+      },
+      "id": "Field_0opfy7y"
+    },
+    {
+      "label": "Is stopping the telemetry consumption acceptable?",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_1plwgff",
+        "columns": null
+      },
+      "id": "Field_1bn5agz",
+      "key": "accept",
+      "defaultValue": true
+    }
+  ],
+  "type": "default",
+  "id": "Form_Accept_Telemetry_Stop_Asset_Link",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

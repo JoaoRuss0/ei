@@ -1,0 +1,41 @@
+{
+  "components": [
+    {
+      "text": "# Asset Links",
+      "type": "text",
+      "layout": {
+        "row": "Row_0qk8fbk",
+        "columns": null
+      },
+      "id": "Field_0ngc9y2"
+    },
+    {
+      "text": "=string join(\n  for a in assetLinks return\n    \"ID: \" + string(a.id) +\n    \"<br/>Prosumer ID: \" + string(a.idProsumer) +\n    \"<br/>Utility Operator ID: \" + string(a.idUtilityOperator),\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_03b91bd",
+        "columns": null
+      },
+      "id": "Field_06uqaw3"
+    },
+    {
+      "label": "AssetLinkID to delete?",
+      "type": "number",
+      "layout": {
+        "row": "Row_03b91bd",
+        "columns": null
+      },
+      "id": "Field_1gwhrps",
+      "key": "AssetLinkID"
+    }
+  ],
+  "type": "default",
+  "id": "FormChoiceAssetLinkForDelete",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

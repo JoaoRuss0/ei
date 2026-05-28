@@ -1,24 +1,24 @@
 {
   "components": [
     {
-      "label": "Is the creation acceptable?",
-      "type": "checkbox",
+      "label": "ID",
+      "type": "number",
       "layout": {
-        "row": "Row_1plwgff",
+        "row": "Row_196yxvu",
         "columns": null
       },
-      "id": "Field_1bn5agz",
-      "key": "accept",
-      "defaultValue": true
+      "id": "Field_1wc2119",
+      "key": "AssetLinkID",
+      "description": "AssetLink ID"
     }
   ],
   "type": "default",
-  "id": "Form_Accept_AssetLinkMng",
+  "id": "Form_Request_Read_Asset_Link",
   "executionPlatform": "Camunda Cloud",
   "executionPlatformVersion": "8.8.0",
   "exporter": {
     "name": "Camunda Modeler",
-    "version": "5.44.0"
+    "version": "5.47.0"
   },
   "schemaVersion": 19
 }

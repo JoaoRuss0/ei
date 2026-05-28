@@ -1,0 +1,33 @@
+{
+  "components": [
+    {
+      "text": "# Create Asset Link",
+      "type": "text",
+      "layout": {
+        "row": "Row_1plwgff",
+        "columns": null
+      },
+      "id": "Field_1jibra0"
+    },
+    {
+      "label": "Is the asset link creation acceptable?",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_0qgy54d",
+        "columns": null
+      },
+      "id": "Field_1bn5agz",
+      "key": "accept",
+      "defaultValue": true
+    }
+  ],
+  "type": "default",
+  "id": "Form_Accept_Create_Asset_Link",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

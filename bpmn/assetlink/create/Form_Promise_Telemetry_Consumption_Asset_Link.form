@@ -1,0 +1,33 @@
+{
+  "components": [
+    {
+      "text": "# Create Asset Link",
+      "type": "text",
+      "layout": {
+        "row": "Row_179ar8t",
+        "columns": null
+      },
+      "id": "Field_0jbg471"
+    },
+    {
+      "label": "=\"Is it possible to promise the consumption of telemetry for asset link between prosumer \" + prossumerID + \" and utility operator \" + UtilityOperatorID + \" request?\"",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_1ocy58n",
+        "columns": null
+      },
+      "id": "Field_1u7vprv",
+      "key": "promise",
+      "defaultValue": true
+    }
+  ],
+  "type": "default",
+  "id": "Form_Promise_Telemetry_Consumption_Asset_Link",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

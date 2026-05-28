@@ -1,0 +1,33 @@
+{
+  "components": [
+    {
+      "text": "# Asset Link Read Rejection",
+      "type": "text",
+      "layout": {
+        "row": "Row_1plwgff",
+        "columns": null
+      },
+      "id": "Field_0tnupbp"
+    },
+    {
+      "label": "Do you agree with the arguments for rejection?",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_1fnevqu",
+        "columns": null
+      },
+      "id": "Field_1bn5agz",
+      "key": "reject",
+      "defaultValue": false
+    }
+  ],
+  "type": "default",
+  "id": "Form_Reject_Asset_Link",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

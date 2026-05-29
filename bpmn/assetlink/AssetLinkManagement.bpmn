@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_AL_CRUD" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.47.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.9.0">
   <bpmn:collaboration id="Collaboration_AL_CRUD">
-    <bpmn:participant id="Participant_AL_CRUD" name="ASSET LINK" processRef="AssetLink_CRUD_Management" />
+    <bpmn:participant id="Participant_AL_CRUD" name="CUSTOMER" processRef="AssetLink_CRUD_Management" />
   </bpmn:collaboration>
   <bpmn:process id="AssetLink_CRUD_Management" name="AssetLink_CRUD_Management" isExecutable="true">
     <bpmn:laneSet id="LaneSet_AL_CRUD">
@@ -84,9 +84,11 @@
     <bpmndi:BPMNPlane id="BPMNPlane_AL_CRUD" bpmnElement="Collaboration_AL_CRUD">
       <bpmndi:BPMNShape id="Participant_AL_CRUD_di" bpmnElement="Participant_AL_CRUD" isHorizontal="true">
         <dc:Bounds x="160" y="60" width="710" height="370" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_AL_CRUD_di" bpmnElement="Lane_AL_CRUD" isHorizontal="true">
         <dc:Bounds x="190" y="60" width="680" height="370" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="StartEvent_AL_CRUD_di" bpmnElement="StartEvent_AL_CRUD">
         <dc:Bounds x="222" y="192" width="36" height="36" />
@@ -113,31 +115,44 @@
         <dc:Bounds x="782" y="192" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_AL_CRUD_1_di" bpmnElement="Flow_AL_CRUD_1">
-        <di:waypoint x="258" y="210" /><di:waypoint x="290" y="210" />
+        <di:waypoint x="258" y="210" />
+        <di:waypoint x="290" y="210" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_AL_CRUD_2_di" bpmnElement="Flow_AL_CRUD_2">
-        <di:waypoint x="390" y="210" /><di:waypoint x="425" y="210" />
+        <di:waypoint x="390" y="210" />
+        <di:waypoint x="425" y="210" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_AL_CRUD_ToRead_di" bpmnElement="Flow_AL_CRUD_ToRead">
-        <di:waypoint x="450" y="185" /><di:waypoint x="450" y="120" /><di:waypoint x="540" y="120" />
+        <di:waypoint x="450" y="185" />
+        <di:waypoint x="450" y="120" />
+        <di:waypoint x="540" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_AL_CRUD_ToCreate_di" bpmnElement="Flow_AL_CRUD_ToCreate">
-        <di:waypoint x="475" y="210" /><di:waypoint x="540" y="210" />
+        <di:waypoint x="475" y="210" />
+        <di:waypoint x="540" y="210" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_AL_CRUD_ToDelete_di" bpmnElement="Flow_AL_CRUD_ToDelete">
-        <di:waypoint x="450" y="235" /><di:waypoint x="450" y="320" /><di:waypoint x="540" y="320" />
+        <di:waypoint x="450" y="235" />
+        <di:waypoint x="450" y="320" />
+        <di:waypoint x="540" y="320" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_AL_CRUD_FromRead_di" bpmnElement="Flow_AL_CRUD_FromRead">
-        <di:waypoint x="640" y="120" /><di:waypoint x="720" y="120" /><di:waypoint x="720" y="185" />
+        <di:waypoint x="640" y="120" />
+        <di:waypoint x="720" y="120" />
+        <di:waypoint x="720" y="185" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_AL_CRUD_FromCreate_di" bpmnElement="Flow_AL_CRUD_FromCreate">
-        <di:waypoint x="640" y="210" /><di:waypoint x="695" y="210" />
+        <di:waypoint x="640" y="210" />
+        <di:waypoint x="695" y="210" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_AL_CRUD_FromDelete_di" bpmnElement="Flow_AL_CRUD_FromDelete">
-        <di:waypoint x="640" y="320" /><di:waypoint x="720" y="320" /><di:waypoint x="720" y="235" />
+        <di:waypoint x="640" y="320" />
+        <di:waypoint x="720" y="320" />
+        <di:waypoint x="720" y="235" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_AL_CRUD_End_di" bpmnElement="Flow_AL_CRUD_End">
-        <di:waypoint x="745" y="210" /><di:waypoint x="782" y="210" />
+        <di:waypoint x="745" y="210" />
+        <di:waypoint x="782" y="210" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

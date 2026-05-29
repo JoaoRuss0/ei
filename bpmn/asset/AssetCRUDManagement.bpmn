@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1o384rh" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.47.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.9.0">
   <bpmn:collaboration id="Collaboration_1yez1uy">
-    <bpmn:participant id="Participant_0tc28xi" name="ASSET" processRef="Asset_CRUD_Management" />
+    <bpmn:participant id="Participant_0tc28xi" name="PROSUMER" processRef="Asset_CRUD_Management" />
   </bpmn:collaboration>
   <bpmn:process id="Asset_CRUD_Management" isExecutable="true">
     <bpmn:laneSet id="LaneSet_15m6zoe">

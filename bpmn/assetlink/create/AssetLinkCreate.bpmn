@@ -134,7 +134,7 @@
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_3p4hhrm&#34;,&#10;  &#34;correlationKey&#34;:  string(UtilityOperatorID) + string(prossumerID)&#10;}" target="body" />
+          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_3p4hhrm&#34;,&#10;  &#34;correlationKey&#34;: businessKey + &#34;-accept&#34;&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
@@ -185,7 +185,7 @@
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_2r1j62e&#34;,&#10;  &#34;correlationKey&#34;:  string(UtilityOperatorID) + string(prossumerID),&#10;  &#34;variables&#34;:&#10;  {&#10;    &#34;prossumerID&#34;: prossumerID,&#10;    &#34;UtilityOperatorID&#34;: UtilityOperatorID&#10;  }&#10;}" target="body" />
+          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_2r1j62e&#34;,&#10;  &#34;variables&#34;:&#10;  {&#10;    &#34;prosumerID&#34;: prosumerID,&#10;    &#34;UtilityOperatorID&#34;: UtilityOperatorID,&#10;    &#34;businessKey&#34;: businessKey&#10;  }&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
@@ -204,6 +204,7 @@
       <bpmn:extensionElements>
         <zeebe:userTask />
         <zeebe:formDefinition formId="Form_Re_Do_Request_Asset_Link" />
+        <zeebe:assignmentDefinition assignee="demo" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0k2cpik</bpmn:incoming>
       <bpmn:outgoing>Flow_0hld3jm</bpmn:outgoing>
@@ -220,10 +221,9 @@
         <bpmn:flowNodeRef>Event_7cc63575-9adf-4762-ab60-c02fa4833a0c</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_0cb90a1e-39a3-495d-a3ac-2553492163ee</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_fdcd84ce-514c-4a3a-a44c-da80d1c96a60</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_07lckkq</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_11d59ia</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1n6w6s0</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1f9kf1o</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_11d59ia</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_0ef45123-e62a-43d1-ae41-47ab2a18856c" name="Executor TK01">
         <bpmn:flowNodeRef>Event_ae6cefc1-5f4e-4807-9900-6da813149481</bpmn:flowNodeRef>
@@ -318,12 +318,13 @@
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;idProsumer&#34;: prossumerID,&#10;  &#34;id&#34;: 0,&#10;  &#34;idUtilityOperator&#34;: UtilityOperatorID&#10;}" target="body" />
+          <zeebe:input source="={&#10;  &#34;idProsumer&#34;: prosumerID,&#10;  &#34;id&#34;: 0,&#10;  &#34;idUtilityOperator&#34;: UtilityOperatorID&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
           <zeebe:header key="elementTemplateVersion" value="12" />
           <zeebe:header key="elementTemplateId" value="io.camunda.connectors.HttpJson.v2" />
+          <zeebe:header key="resultExpression" value="={&#10;  StatusreceivedMessage: response.status,&#10;  assetLinkId: response.body.id&#10;}" />
           <zeebe:header key="retryBackoff" value="PT0S" />
         </zeebe:taskHeaders>
       </bpmn:extensionElements>
@@ -339,50 +340,6 @@
       <bpmn:incoming>Flow_0e1e6114-1125-4a31-8900-7cb95ee9ba16</bpmn:incoming>
       <bpmn:outgoing>Flow_11bdiq4</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:serviceTask id="Activity_07lckkq" name="Retrieve AssetID" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="12" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
-      <bpmn:extensionElements>
-        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
-        <zeebe:ioMapping>
-          <zeebe:input source="=false" target="ignoreNullValues" />
-          <zeebe:input source="noAuth" target="authentication.type" />
-          <zeebe:input source="GET" target="method" />
-          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/assetlink/AssetLink/&#34;+ prossumerID + &#34;/&#34; + UtilityOperatorID" target="url" />
-          <zeebe:input source="=false" target="storeResponse" />
-          <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
-          <zeebe:input source="=20" target="readTimeoutInSeconds" />
-        </zeebe:ioMapping>
-        <zeebe:taskHeaders>
-          <zeebe:header key="elementTemplateVersion" value="12" />
-          <zeebe:header key="elementTemplateId" value="io.camunda.connectors.HttpJson.v2" />
-          <zeebe:header key="resultExpression" value="={&#10; StatusreceivedMessage: response.status,&#10; fullresponse: response.body,&#10; AssetID: response.body.id&#10;}" />
-          <zeebe:header key="retryBackoff" value="PT0S" />
-        </zeebe:taskHeaders>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_07sufrg</bpmn:incoming>
-      <bpmn:outgoing>Flow_1dfzzlv</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_11d59ia" name="Retrieve UtilityOperatorName" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="12" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
-      <bpmn:extensionElements>
-        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
-        <zeebe:ioMapping>
-          <zeebe:input source="=false" target="ignoreNullValues" />
-          <zeebe:input source="noAuth" target="authentication.type" />
-          <zeebe:input source="GET" target="method" />
-          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/utilityoperator/UtilityOperator/&#34; + UtilityOperatorID" target="url" />
-          <zeebe:input source="=false" target="storeResponse" />
-          <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
-          <zeebe:input source="=20" target="readTimeoutInSeconds" />
-        </zeebe:ioMapping>
-        <zeebe:taskHeaders>
-          <zeebe:header key="elementTemplateVersion" value="12" />
-          <zeebe:header key="elementTemplateId" value="io.camunda.connectors.HttpJson.v2" />
-          <zeebe:header key="resultExpression" value="={&#10; StatusreceivedMessage: response.status,&#10; fullresponse: response.body,&#10; UtilityOperatorName: response.body.name&#10;}" />
-          <zeebe:header key="retryBackoff" value="PT0S" />
-        </zeebe:taskHeaders>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_6800485f-fe5f-43a1-bcf5-ef985ab29623</bpmn:incoming>
-      <bpmn:outgoing>Flow_07sufrg</bpmn:outgoing>
-    </bpmn:serviceTask>
     <bpmn:serviceTask id="Activity_18rp91s" name="Promise AssetLink association order" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="12" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
@@ -394,7 +351,7 @@
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_2s57mqp&#34;,&#10;  &#34;correlationKey&#34;:  string(UtilityOperatorID) + string(prossumerID)&#10;}&#10;" target="body" />
+          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_2s57mqp&#34;,&#10;  &#34;correlationKey&#34;: businessKey + &#34;-promise&#34;&#10;}&#10;" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
@@ -417,7 +374,7 @@
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_2mp8beu&#34;,&#10;  &#34;correlationKey&#34;:  string(UtilityOperatorID) + string(prossumerID),&#10;  &#34;variables&#34;: &#10;  {&#10;    &#34;UtilityOperator&#34;: UtilityOperatorName,&#10;    &#34;AssetLinkID&#34;: AssetID,&#10;    &#34;UtilityOperatorID&#34;: UtilityOperatorID, &#10;    &#34;prossumerID&#34;: prossumerID&#10;  }&#10;}" target="body" />
+          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_2mp8beu&#34;,&#10;  &#34;variables&#34;: &#10;  {&#10;    &#34;UtilityOperator&#34;: UtilityOperatorName,&#10;    &#34;AssetLinkID&#34;: assetLinkId,&#10;    &#34;businessKey&#34;: businessKey&#10;  }&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
@@ -426,7 +383,7 @@
           <zeebe:header key="retryBackoff" value="PT0S" />
         </zeebe:taskHeaders>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1dfzzlv</bpmn:incoming>
+      <bpmn:incoming>Flow_07sufrg</bpmn:incoming>
       <bpmn:outgoing>Flow_0e2s8ui</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="Activity_00xj0tw" name="Declare AssetLink association order" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="12" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
@@ -440,7 +397,7 @@
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_1qktfb5&#34;,&#10;  &#34;correlationKey&#34;:  string(UtilityOperatorID) + string(prossumerID)&#10;}" target="body" />
+          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_1qktfb5&#34;,&#10;  &#34;correlationKey&#34;: businessKey + &#34;-declare&#34;&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
@@ -463,7 +420,7 @@
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_3mbgiuk&#34;,&#10;  &#34;correlationKey&#34;:  string(UtilityOperatorID) + string(prossumerID)&#10;}" target="body" />
+          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_3mbgiuk&#34;,&#10;  &#34;correlationKey&#34;: businessKey + &#34;-accept-telemetry&#34;&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
@@ -520,8 +477,7 @@
     <bpmn:sequenceFlow id="Flow_5e2bfceb-89ea-4f84-b5c6-5b6617d5966f" sourceRef="Activity_9a1f746e-fa58-4118-9e43-d8ae475999d1" targetRef="Gateway_0q8i4ex" />
     <bpmn:sequenceFlow id="Flow_b99ea1eb-9f3c-45d4-9361-d7f23611c1c1" sourceRef="Activity_18rp91s" targetRef="Activity_0ae7711" />
     <bpmn:sequenceFlow id="Flow_11bdiq4" sourceRef="Activity_fdcd84ce-514c-4a3a-a44c-da80d1c96a60" targetRef="Activity_1f9kf1o" />
-    <bpmn:sequenceFlow id="Flow_07sufrg" sourceRef="Activity_11d59ia" targetRef="Activity_07lckkq" />
-    <bpmn:sequenceFlow id="Flow_1dfzzlv" sourceRef="Activity_07lckkq" targetRef="Activity_1n6w6s0" />
+    <bpmn:sequenceFlow id="Flow_07sufrg" sourceRef="Activity_11d59ia" targetRef="Activity_1n6w6s0" />
     <bpmn:sequenceFlow id="Flow_1s56zm4" sourceRef="Gateway_0q8i4ex" targetRef="Activity_18rp91s" />
     <bpmn:sequenceFlow id="Flow_1s7k7i2" sourceRef="Activity_0yrey7y" targetRef="Event_0zy0pmr" />
     <bpmn:sequenceFlow id="Flow_0s3if8b" sourceRef="Gateway_0q8i4ex" targetRef="Activity_0yrey7y">
@@ -534,8 +490,30 @@
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_06zfhmn" sourceRef="Gateway_152cnsx" targetRef="Activity_9a1f746e-fa58-4118-9e43-d8ae475999d1" />
     <bpmn:sequenceFlow id="Flow_1duis5i" sourceRef="Gateway_152cnsx" targetRef="Activity_0yrey7y">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=some al in assetLinks satisfies as.idProsumer = prossumerID and as.idUtilityOperator = UtilityOperatorID</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=some al in assetLinks satisfies string(al.idProsumer) = prosumerID and string(al.idUtilityOperator) = UtilityOperatorID</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="Activity_11d59ia" name="Retrieve UtilityOperatorName" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="12" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=false" target="ignoreNullValues" />
+          <zeebe:input source="noAuth" target="authentication.type" />
+          <zeebe:input source="GET" target="method" />
+          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/utilityoperator/UtilityOperator/&#34; + UtilityOperatorID" target="url" />
+          <zeebe:input source="=false" target="storeResponse" />
+          <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
+          <zeebe:input source="=20" target="readTimeoutInSeconds" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="elementTemplateVersion" value="12" />
+          <zeebe:header key="elementTemplateId" value="io.camunda.connectors.HttpJson.v2" />
+          <zeebe:header key="resultExpression" value="={&#10; StatusreceivedMessage: response.status,&#10; fullresponse: response.body,&#10; UtilityOperatorName: response.body.name&#10;}" />
+          <zeebe:header key="retryBackoff" value="PT0S" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_6800485f-fe5f-43a1-bcf5-ef985ab29623</bpmn:incoming>
+      <bpmn:outgoing>Flow_07sufrg</bpmn:outgoing>
+    </bpmn:serviceTask>
   </bpmn:process>
   <bpmn:process id="TelemetryManagement" name="TelemetryManagement" isExecutable="true">
     <bpmn:laneSet id="LaneSet_8d4a8c91-4f59-475e-85a9-8dccb99460de">
@@ -600,7 +578,7 @@
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_3l0mi53&#34;,&#10;  &#34;correlationKey&#34;:  string(UtilityOperatorID) + string(prossumerID)&#10;}" target="body" />
+          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_3l0mi53&#34;,&#10;  &#34;correlationKey&#34;: businessKey + &#34;-promise-telemetry&#34;&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
@@ -623,7 +601,7 @@
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_2b43ets&#34;,&#10;  &#34;correlationKey&#34;:  string(UtilityOperatorID) + string(prossumerID)&#10;}" target="body" />
+          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_2b43ets&#34;,&#10;  &#34;correlationKey&#34;: businessKey + &#34;-declare-telemetry&#34;&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
@@ -648,34 +626,34 @@
   </bpmn:process>
   <bpmn:message id="Message_2s57mqp" name="Message_2s57mqp">
     <bpmn:extensionElements>
-      <zeebe:subscription correlationKey="=string(UtilityOperatorID) + string(prossumerID)" />
+      <zeebe:subscription correlationKey="=businessKey + &#34;-promise&#34;" />
     </bpmn:extensionElements>
   </bpmn:message>
   <bpmn:message id="Message_1qktfb5" name="Message_1qktfb5">
     <bpmn:extensionElements>
-      <zeebe:subscription correlationKey="=string(UtilityOperatorID) + string(prossumerID)" />
+      <zeebe:subscription correlationKey="=businessKey + &#34;-declare&#34;" />
     </bpmn:extensionElements>
   </bpmn:message>
   <bpmn:message id="Message_3l0mi53" name="Message_3l0mi53">
     <bpmn:extensionElements>
-      <zeebe:subscription correlationKey="=string(UtilityOperatorID) + string(prossumerID)" />
+      <zeebe:subscription correlationKey="=businessKey + &#34;-promise-telemetry&#34;" />
     </bpmn:extensionElements>
   </bpmn:message>
   <bpmn:message id="Message_2b43ets" name="Message_2b43ets">
     <bpmn:extensionElements>
-      <zeebe:subscription correlationKey="=string(UtilityOperatorID) + string(prossumerID)" />
+      <zeebe:subscription correlationKey="=businessKey + &#34;-declare-telemetry&#34;" />
     </bpmn:extensionElements>
   </bpmn:message>
   <bpmn:message id="Message_3p4hhrm" name="Message_3p4hhrm">
     <bpmn:extensionElements>
-      <zeebe:subscription correlationKey="=string(UtilityOperatorID) + string(prossumerID)" />
+      <zeebe:subscription correlationKey="=businessKey + &#34;-accept&#34;" />
     </bpmn:extensionElements>
   </bpmn:message>
   <bpmn:message id="Message_314vfbg" name="Message_314vfbg" />
   <bpmn:message id="Message_1p7o4fd" name="Message_1p7o4fd" />
   <bpmn:message id="Message_3mbgiuk" name="Message_3mbgiuk">
     <bpmn:extensionElements>
-      <zeebe:subscription correlationKey="=string(UtilityOperatorID) + string(prossumerID)" />
+      <zeebe:subscription correlationKey="=businessKey + &#34;-accept-telemetry&#34;" />
     </bpmn:extensionElements>
   </bpmn:message>
   <bpmn:message id="Message_2r1j62e" name="Message_2r1j62e" />
@@ -884,14 +862,6 @@
         <dc:Bounds x="1265" y="746" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_0yaxpkc" bpmnElement="Activity_07lckkq" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
-        <dc:Bounds x="675" y="746" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_0j69d46" bpmnElement="Activity_11d59ia" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
-        <dc:Bounds x="540" y="746" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1apee3w_di" bpmnElement="Activity_18rp91s" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
         <dc:Bounds x="789" y="576" width="100" height="80" />
         <bpmndi:BPMNLabel />
@@ -920,6 +890,10 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_152cnsx_di" bpmnElement="Gateway_152cnsx" isMarkerVisible="true">
         <dc:Bounds x="475" y="591" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0j69d46" bpmnElement="Activity_11d59ia" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
+        <dc:Bounds x="660" y="746" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Edge_c0e58f46-aa3c-4f4c-bc90-1c56276b9db8" bpmnElement="Flow_0bedca68-f247-45d9-8839-64b1fef427e8">
         <di:waypoint x="298" y="616" />
@@ -972,8 +946,8 @@
       <bpmndi:BPMNEdge id="Edge_2a583533-b90b-45fa-b1fa-0118207ce189" bpmnElement="Flow_6800485f-fe5f-43a1-bcf5-ef985ab29623">
         <di:waypoint x="1079" y="641" />
         <di:waypoint x="1079" y="686" />
-        <di:waypoint x="590" y="686" />
-        <di:waypoint x="590" y="746" />
+        <di:waypoint x="710" y="686" />
+        <di:waypoint x="710" y="746" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_8b1f605a-ee70-4731-add9-7768fac85f12" bpmnElement="Flow_5e2bfceb-89ea-4f84-b5c6-5b6617d5966f">
         <di:waypoint x="680" y="616" />
@@ -988,11 +962,7 @@
         <di:waypoint x="1445" y="786" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_07sufrg_di" bpmnElement="Flow_07sufrg">
-        <di:waypoint x="640" y="786" />
-        <di:waypoint x="675" y="786" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1dfzzlv_di" bpmnElement="Flow_1dfzzlv">
-        <di:waypoint x="775" y="786" />
+        <di:waypoint x="760" y="786" />
         <di:waypoint x="865" y="786" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1s56zm4_di" bpmnElement="Flow_1s56zm4">
@@ -1099,8 +1069,8 @@
         <di:waypoint x="280" y="598" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_13newa4_di" bpmnElement="Flow_13newa4">
-        <di:waypoint x="1368" y="219" />
-        <di:waypoint x="1368" y="409" />
+        <di:waypoint x="1410" y="220" />
+        <di:waypoint x="1410" y="409" />
         <di:waypoint x="1463" y="409" />
         <di:waypoint x="1463" y="598" />
       </bpmndi:BPMNEdge>

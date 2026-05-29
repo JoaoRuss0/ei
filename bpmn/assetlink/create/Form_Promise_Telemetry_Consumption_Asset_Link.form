@@ -10,7 +10,7 @@
       "id": "Field_0jbg471"
     },
     {
-      "label": "=\"Is it possible to promise the consumption of telemetry for asset link between prosumer \" + prossumerID + \" and utility operator \" + UtilityOperatorID + \" request?\"",
+      "label": "=\"Is it possible to promise the consumption of telemetry for topic \" + string(AssetLinkID) + \"-\" + string(UtilityOperator) + \" ?\"",
       "type": "checkbox",
       "layout": {
         "row": "Row_1ocy58n",

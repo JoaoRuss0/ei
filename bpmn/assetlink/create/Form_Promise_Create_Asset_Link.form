@@ -10,7 +10,7 @@
       "id": "Field_0jbg471"
     },
     {
-      "label": "=\"Is it possible to promise the creation of asset link between prosumer \" + prossumerID + \" and utility operator \" + UtilityOperatorID + \" request?\"",
+      "label": "=\"Is it possible to promise the creation of asset link between prosumer \" + prosumerID + \" and utility operator \" + UtilityOperatorID + \" request?\"",
       "type": "checkbox",
       "layout": {
         "row": "Row_1ocy58n",

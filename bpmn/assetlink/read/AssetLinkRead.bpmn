@@ -464,7 +464,7 @@
   </bpmn:message>
   <bpmn:message id="Message_AL_Rd_Stop" name="Message_AL_Rd_Stop">
     <bpmn:extensionElements>
-      <zeebe:subscription correlationKey="=businessKey" />
+      <zeebe:subscription correlationKey="=businessKey + &#34;-stop&#34;" />
     </bpmn:extensionElements>
   </bpmn:message>
   <bpmn:message id="Message_AL_Rd_Promise" name="Message_AL_Rd_Promise">

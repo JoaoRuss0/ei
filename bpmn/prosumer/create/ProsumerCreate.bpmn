@@ -523,7 +523,7 @@
   </bpmn:message>
   <bpmn:message id="Message_32pq3og" name="Message_32pq3og">
     <bpmn:extensionElements>
-      <zeebe:subscription correlationKey="=businessKey" />
+      <zeebe:subscription correlationKey="=businessKey + &#34;-stop&#34;" />
     </bpmn:extensionElements>
   </bpmn:message>
   <bpmn:message id="Message_3ed762b" name="Message_3ed762b">

@@ -6,6 +6,7 @@ import io.smallrye.common.annotation.Blocking;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
@@ -79,8 +80,9 @@ public class AssetLinkResource {
     @POST
     public Uni<Response> create(AssetLink assetlink) {
         return assetlink.save(client , assetlink.idProsumer , assetlink.idUtilityOperator)
-                .onItem().transform(id -> URI.create("/AssetLink/" + id))
-                .onItem().transform(uri -> Response.created(uri).build());
+                .onItem().transform(id -> Response.created(URI.create("/AssetLink/" + id))
+                        .entity(java.util.Map.of("id", id)).type(MediaType.APPLICATION_JSON)
+                        .build());
     }
     
     @DELETE

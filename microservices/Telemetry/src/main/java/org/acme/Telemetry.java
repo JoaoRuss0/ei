@@ -8,7 +8,6 @@ import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -113,28 +112,26 @@ public class Telemetry
                 .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : null); 
     }
 
-    public static Multi<Telemetry> findLatestForAssetIdsGridCellPair(MySQLPool client, List<AssetIdAndGridCell> toSearch) {
-        if (toSearch.isEmpty()) return Multi.createFrom().empty();
+    public static Multi<Telemetry> findLatestEventsForAssetIds(MySQLPool client, List<Long> assetIds) {
+        if (assetIds.isEmpty()) return Multi.createFrom().empty();
 
-        String pairPlaceholders = toSearch.stream()
-                .map(p -> "(?, ?)")
+        String placeholders = assetIds.stream()
+                .map(id -> "?")
                 .collect(Collectors.joining(","));
 
         String query =
                 "SELECT t.* FROM Telemetry t " +
                         "INNER JOIN ( " +
-                        "  SELECT asset_id, grid_cell_id, MAX(timeStamp) AS max_ts " +
+                        "  SELECT asset_id, MAX(timeStamp) AS max_ts " +
                         "  FROM Telemetry " +
-                        "  WHERE (asset_id, grid_cell_id) IN (" + pairPlaceholders + ") " +
-                        "  GROUP BY asset_id, grid_cell_id " +
+                        "  WHERE asset_id IN (" + placeholders + ") " +
+                        "  GROUP BY asset_id " +
                         ") latest ON t.asset_id = latest.asset_id " +
-                        "       AND t.grid_cell_id = latest.grid_cell_id " +
                         "       AND t.timeStamp = latest.max_ts";
 
         Tuple params = Tuple.tuple();
-        for (AssetIdAndGridCell p : toSearch) {
-            params.addLong(p.assetId());
-            params.addString(p.gridCellId());
+        for (Long id : assetIds) {
+            params.addLong(id);
         }
 
         return client.preparedQuery(query).execute(params)

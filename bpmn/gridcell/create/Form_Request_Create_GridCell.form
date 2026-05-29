@@ -34,9 +34,9 @@
       "description": "Grid Cell Postal Code"
     },
     {
+      "subtype": "datetime",
       "label": "Peak Hours Start",
       "type": "datetime",
-      "subtype": "datetime",
       "dateLabel": "Peak Hours Start Date",
       "timeLabel": "Peak Hours Start Time",
       "use24h": true,
@@ -50,9 +50,9 @@
       "description": "Peak hours start (YYYY-MM-DDTHH:mm:ss)"
     },
     {
+      "subtype": "datetime",
       "label": "Peak Hours End",
       "type": "datetime",
-      "subtype": "datetime",
       "dateLabel": "Peak Hours End Date",
       "timeLabel": "Peak Hours End Time",
       "use24h": true,
@@ -108,6 +108,24 @@
       "id": "Field_yc",
       "key": "yCoords",
       "description": "Y coordinate"
+    },
+    {
+      "text": "# Utility Operators",
+      "type": "text",
+      "layout": {
+        "row": "Row_13ge6cs",
+        "columns": null
+      },
+      "id": "Field_0ax5327"
+    },
+    {
+      "text": "=string join(\n  for p in UtilityOperatorList return\n    \"ID: \" + string(p.id) +\n    \"<br/>Name: \" + p.name +\n    \"<br/>IBAN: \" + string(p.iban) +\n    \"<br/>Location: \" + p.location,\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_1x03pkt",
+        "columns": null
+      },
+      "id": "Field_0cepf8c"
     }
   ],
   "type": "default",

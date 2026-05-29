@@ -3,6 +3,7 @@ package org.acme;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -36,7 +37,6 @@ public class FlexibilityEmissionResource {
     }
 
     private void initdb() {
-        // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS FlexibilityEvent").execute()
         .flatMap(r -> client.query("CREATE TABLE FlexibilityEvent (id SERIAL PRIMARY KEY, asset_id BIGINT UNSIGNED NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, event_type VARCHAR(255) NOT NULL, event_time DATETIME NOT NULL)").execute())
         .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type, event_time) VALUES (1, 1, 'UNAVAILABLE_FOR_BALANCING', '2020-10-10 20:00')").execute())
@@ -48,37 +48,33 @@ public class FlexibilityEmissionResource {
     public Multi<FlexibilityEvent> get() {
         return FlexibilityEvent.findAll(client);
     }
-    
+
+    @GET
+    @Path("/{id}")
+    public Uni<Response> getById(@PathParam("id") Long id) {
+        return FlexibilityEvent.findById(client, id)
+                .onItem().transform(event -> event != null
+                        ? Response.ok(event).build()
+                        : Response.status(Response.Status.NOT_FOUND).build());
+    }
+
     @POST
-    @Path("/evaluate")
-    @Blocking
-    public Response evaluate(EvaluateRequestDTO dto) {
-
-        record PeakHoursInterval(LocalDateTime start, LocalDateTime end){}
-        HashMap<String, PeakHoursInterval> peakHoursPerCell = new HashMap<>();
-        dto.cells().forEach(data -> peakHoursPerCell.put(data.id(), new PeakHoursInterval(data.peakHoursStartTime(), data.peakHoursEndTime())));
-
-        for (TelemetryEvent event : dto.events()) {
-            if (!event.asset_type().equals("BATTERY")) continue;
-            PeakHoursInterval interval = peakHoursPerCell.get(event.grid_cell_id());
-
-            if (event.timeStamp().isAfter(interval.start) && event.timeStamp().isBefore(interval.end) && event.State_of_Charge() > 0.9f) {
-                FlexibilityEvent newEvent = new FlexibilityEvent(event.asset_id(), dto.prosumer_id(), FlexibilityEventType.SELL);
-                boolean result = newEvent.save(client).await().indefinitely();
-                if (!result) return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-
-                offerEmitter.send(newEvent.toJson());
-                continue;
-            }
-
-            if (event.State_of_Charge() >= 0.2f) continue;
-
-            FlexibilityEvent newEvent = new FlexibilityEvent(event.asset_id(), dto.prosumer_id(), FlexibilityEventType.UNAVAILABLE_FOR_BALANCING);
-            boolean result = newEvent.save(client).await().indefinitely();
-            if (!result) return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-            offerEmitter.send(newEvent.toString());
+    public Uni<Response> create(FlexibilityEvent event) {
+        if (event.getEventTime() == null) {
+            event.setEventTime(LocalDateTime.now());
         }
+        return event.save(client)
+                .onItem().transform(saved -> saved != null
+                        ? Response.status(Response.Status.CREATED).entity(saved).build()
+                        : Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
+    }
 
-        return Response.ok().build();
+    @DELETE
+    @Path("/{id}")
+    public Uni<Response> deleteById(@PathParam("id") Long id) {
+        return FlexibilityEvent.delete(client, id)
+                .onItem().transform(deleted -> deleted
+                        ? Response.noContent().build()
+                        : Response.status(Response.Status.NOT_FOUND).build());
     }
 }

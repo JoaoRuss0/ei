@@ -11,7 +11,6 @@ import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 @Path("Telemetry")
@@ -81,8 +80,8 @@ public class TelemetryResource {
 
     @POST
     @Path("latest")
-    public Multi<Telemetry> getLatest(List<AssetIdAndGridCell> toSearch) {
-        return Telemetry.findLatestForAssetIdsGridCellPair(client, toSearch);
+    public Multi<Telemetry> getLatest(@QueryParam("assetIds") List<Long> assetIds) {
+        return Telemetry.findLatestEventsForAssetIds(client, assetIds);
     }
 
     @GET

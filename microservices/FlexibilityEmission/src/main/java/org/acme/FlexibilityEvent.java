@@ -2,6 +2,7 @@ package org.acme;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.vertx.mutiny.mysqlclient.MySQLClient;
 import io.vertx.mutiny.mysqlclient.MySQLPool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.Tuple;
@@ -17,8 +18,6 @@ import java.util.concurrent.atomic.AtomicLong;
 @ToString
 public class FlexibilityEvent {
 
-    private static final AtomicLong nextId = new AtomicLong(0);
-
     public Long id;
     public Long assetId;
     public Long prosumerId;
@@ -26,7 +25,6 @@ public class FlexibilityEvent {
     public FlexibilityEventType eventType;
 
     public FlexibilityEvent(Long assetId, Long prosumerId, FlexibilityEventType eventType) {
-        this.id = nextId.getAndIncrement();
         this.assetId = assetId;
         this.eventTime = LocalDateTime.now();
         this.prosumerId = prosumerId;
@@ -57,8 +55,30 @@ public class FlexibilityEvent {
                 .onItem().transform(FlexibilityEvent::from);
     }
 
-    public Uni<Boolean> save(MySQLPool client) {
-        return client.preparedQuery("INSERT INTO FlexibilityEvent(asset_id, prosumer_id, event_type, event_time) VALUES (?,?,?,?)").execute(Tuple.of(this.assetId, this.prosumerId, this.eventType.name(), this.eventTime.toString()))
-                .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
+    public static Uni<FlexibilityEvent> findById(MySQLPool client, Long id) {
+        return client.preparedQuery(
+                        "SELECT id, asset_id, prosumer_id, event_type, event_time FROM FlexibilityEvent WHERE id = ?")
+                .execute(Tuple.of(id))
+                .onItem().transform(rs -> {
+                    var it = rs.iterator();
+                    return it.hasNext() ? from(it.next()) : null;
+                });
+    }
+
+    public Uni<FlexibilityEvent> save(MySQLPool client) {
+        return client.preparedQuery(
+                        "INSERT INTO FlexibilityEvent(asset_id, prosumer_id, event_type, event_time) VALUES (?,?,?,?)")
+                .execute(Tuple.of(this.assetId, this.prosumerId, this.eventType.name(), this.eventTime.toString()))
+                .onItem().transform(rs -> {
+                    if (rs.rowCount() != 1) return null;
+                    this.id = rs.property(MySQLClient.LAST_INSERTED_ID);
+                    return this;
+                });
+    }
+
+    public static Uni<Boolean> delete(MySQLPool client, Long id) {
+        return client.preparedQuery("DELETE FROM FlexibilityEvent WHERE id = ?")
+                .execute(Tuple.of(id))
+                .onItem().transform(rs -> rs.rowCount() == 1);
     }
 }

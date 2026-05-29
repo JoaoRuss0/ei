@@ -158,6 +158,14 @@ deploy_camunda_resources() {
             -F "resources=@${entry}" > /dev/null
     done < <(find ./bpmn -type f -name "*.form" ! -path "*/Generic-BPMN-Patterns-For-Your-Reuse/*" | sort)
 
+    echo "[DEPLOYING CAMUNDA DMN DECISIONS] ..."
+    while IFS= read -r entry; do
+        echo "  - $entry"
+        curl -s -L -X POST "http://${addressCamunda}:8080/v2/deployments" \
+            -H "Accept: application/json" \
+            -F "resources=@${entry}" > /dev/null
+    done < <(find ./bpmn -type f -name "*.dmn" ! -path "*/Generic-BPMN-Patterns-For-Your-Reuse/*" | sort)
+
     echo "[DEPLOYING CAMUNDA BPMN PROCESSES] ..."
     while IFS= read -r entry; do
         echo "  - $entry"

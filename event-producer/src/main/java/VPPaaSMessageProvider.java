@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.Iterator;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -21,6 +22,9 @@ public class VPPaaSMessageProvider {
     static String DEFAULT_ASSET_ID = null;
     static String DEFAULT_GRID_CELL_ID = null;
     static String DEFAULT_TOPIC = null;
+    static String DEFAULT_ASSET_TYPE = null;   // BATTERY | SOLAR | EV; null = random
+    static Double DEFAULT_SOC = null;          // null = random
+    static String DEFAULT_TIMESTAMP = null;    // ISO e.g. 2026-05-27T10:30:00; null = now-per-message
 
     static Map<String, List<PartitionInfo>> topics;
 
@@ -37,9 +41,7 @@ public class VPPaaSMessageProvider {
     }
 
     private static Message CreateMessage(String topicToSend, Timestamp ts) {
-        if (topicToSend.contains("-") == false) return (null);
-
-        Message newMessage = null;
+        if (!topicToSend.contains("-")) return null;
 
         String[] GridCells = {
                 "TOKYO-NW", "BERLIN-CE", "AUSTIN-DT", "LONDON-SE", "MUMBAI-WP",
@@ -55,38 +57,57 @@ public class VPPaaSMessageProvider {
                 ? DEFAULT_GRID_CELL_ID
                 : GridCells[new Random().nextInt(GridCells.length)];
 
-        switch (ThreadLocalRandom.current().nextInt(0, 3)) {
+        int typeIndex;
+        if (DEFAULT_ASSET_TYPE != null) {
+            switch (DEFAULT_ASSET_TYPE) {
+                case "BATTERY": typeIndex = 0; break;
+                case "SOLAR":   typeIndex = 1; break;
+                case "EV":      typeIndex = 2; break;
+                default:
+                    System.out.println("Unknown --asset-type, falling back to random: " + DEFAULT_ASSET_TYPE);
+                    typeIndex = ThreadLocalRandom.current().nextInt(0, 3);
+            }
+        } else {
+            typeIndex = ThreadLocalRandom.current().nextInt(0, 3);
+        }
+
+        Message newMessage = null;
+
+        switch (typeIndex) {
             case 0:
+                double soc = DEFAULT_SOC != null
+                        ? DEFAULT_SOC
+                        : ThreadLocalRandom.current().nextDouble(0.0, 100.0);
                 newMessage = new BatteryEnergyStorage(ts.toLocalDateTime(),
                         assetId,
                         gridCellId,
-                        Double.valueOf(ThreadLocalRandom.current().nextDouble(0.0, 100.0)),
-                        Double.valueOf(ThreadLocalRandom.current().nextDouble(0.0, 20.0)),
-                        Double.valueOf(ThreadLocalRandom.current().nextDouble(-10.0, 10.0)),
-                        Double.valueOf(ThreadLocalRandom.current().nextDouble(0.0, 5.0)),
-                        Double.valueOf(ThreadLocalRandom.current().nextDouble(0.0, 100.0)),
+                        soc,    // ← assumed SoC slot; adjust if it's a different parameter position
+                        ThreadLocalRandom.current().nextDouble(0.0, 20.0),
+                        ThreadLocalRandom.current().nextDouble(-10.0, 10.0),
+                        ThreadLocalRandom.current().nextDouble(0.0, 5.0),
+                        ThreadLocalRandom.current().nextDouble(0.0, 100.0),
                         new BatteryEnergyStorage().randomLevel());
                 break;
             case 1:
                 newMessage = new SolarInverter(ts.toLocalDateTime(),
                         assetId,
                         gridCellId,
-                        Double.valueOf(ThreadLocalRandom.current().nextDouble(0.0, 7.5)),
-                        Double.valueOf(ThreadLocalRandom.current().nextDouble(0.0, 150)),
-                        Double.valueOf(ThreadLocalRandom.current().nextDouble(245, 255)),
-                        Double.valueOf(ThreadLocalRandom.current().nextDouble(49.5, 50.5)));
+                        ThreadLocalRandom.current().nextDouble(0.0, 7.5),
+                        ThreadLocalRandom.current().nextDouble(0.0, 150),
+                        ThreadLocalRandom.current().nextDouble(245, 255),
+                        ThreadLocalRandom.current().nextDouble(49.5, 50.5));
                 break;
             case 2:
                 newMessage = new EVCharger(ts.toLocalDateTime(),
                         assetId,
                         gridCellId,
-                        Double.valueOf(ThreadLocalRandom.current().nextDouble(0.0, 20.5)),
-                        Double.valueOf(ThreadLocalRandom.current().nextDouble(0.0, 17.8)),
-                        Double.valueOf(ThreadLocalRandom.current().nextDouble(0, 100)),
+                        ThreadLocalRandom.current().nextDouble(0.0, 20.5),
+                        ThreadLocalRandom.current().nextDouble(0.0, 17.8),
+                        ThreadLocalRandom.current().nextDouble(0, 100),
                         new EVCharger().randomLevel());
                 break;
         }
-        return (newMessage);
+        return newMessage;
     }
 
     private static void CheckArguments() {
@@ -96,7 +117,10 @@ public class VPPaaSMessageProvider {
                         "--filterprefix=" + DEFAULT_FILTER_PREFIX + "\n" +
                         "--asset-id=" + (DEFAULT_ASSET_ID == null ? "(random from topic)" : DEFAULT_ASSET_ID) + "\n" +
                         "--grid-cell-id=" + (DEFAULT_GRID_CELL_ID == null ? "(random)" : DEFAULT_GRID_CELL_ID) + "\n" +
-                        "--topic=" + (DEFAULT_TOPIC == null ? "(random discovered)" : DEFAULT_TOPIC));
+                        "--topic=" + (DEFAULT_TOPIC == null ? "(random discovered)" : DEFAULT_TOPIC) + "\n" +
+                        "--asset-type=" + (DEFAULT_ASSET_TYPE == null ? "(random)" : DEFAULT_ASSET_TYPE) + "\n" +
+                        "--soc=" + (DEFAULT_SOC == null ? "(random)" : DEFAULT_SOC.toString()) + "\n" +
+                        "--timestamp=" + (DEFAULT_TIMESTAMP == null ? "(now per message)" : DEFAULT_TIMESTAMP));
     }
 
     private static boolean VerifyArgs(String[] cabecalho) {
@@ -107,16 +131,19 @@ public class VPPaaSMessageProvider {
             else if (cabecalho[i].compareTo("--asset-id") == 0) DEFAULT_ASSET_ID = cabecalho[i + 1];
             else if (cabecalho[i].compareTo("--grid-cell-id") == 0) DEFAULT_GRID_CELL_ID = cabecalho[i + 1];
             else if (cabecalho[i].compareTo("--topic") == 0) DEFAULT_TOPIC = cabecalho[i + 1];
+            else if (cabecalho[i].compareTo("--asset-type") == 0) DEFAULT_ASSET_TYPE = cabecalho[i + 1].toUpperCase();
+            else if (cabecalho[i].compareTo("--soc") == 0) DEFAULT_SOC = Double.valueOf(cabecalho[i + 1]);
+            else if (cabecalho[i].compareTo("--timestamp") == 0) DEFAULT_TIMESTAMP = cabecalho[i + 1];
             else {
                 System.out.println("Bad argument name: " + cabecalho[i]);
-                return (false);
+                return false;
             }
         }
 
         if (DEFAULT_BROKER_LIST_ADDRESS.length() == 0) System.out.println("Broker-list argument is mandatory!");
-        else return (true);
+        else return true;
 
-        return (false);
+        return false;
     }
 
     private static void SendMessage(Message msg, KafkaProducer<String, String> prd, String topicTarget) {
@@ -147,13 +174,16 @@ public class VPPaaSMessageProvider {
     public static void main(String[] args) {
 
         String usage = "The usage of the Message Producer for VPPaaS 2026, for Enterprise Integration 2026 course, is the following.\n\n" +
-                "VPPaaSSimulator --broker-list <brokers> --throughput <value> --filterprefix <value> [--asset-id <id>] [--grid-cell-id <id>] [--topic <topic>]\n\n" +
+                "VPPaaSSimulator --broker-list <brokers> --throughput <value> --filterprefix <value> [--asset-id <id>] [--grid-cell-id <id>] [--topic <topic>] [--asset-type BATTERY|SOLAR|EV] [--soc <value>] [--timestamp <iso>]\n\n" +
                 "--broker-list: broker list with ports (default localhost:9092)\n" +
                 "--throughput: messages per minute (default 10)\n" +
                 "--filterprefix: only topics starting with this prefix are used\n" +
                 "--asset-id: force this asset_id for every message (default: derived from topic)\n" +
                 "--grid-cell-id: force this grid_cell_id for every message (default: random from list)\n" +
-                "--topic: force this single topic, bypassing discovery / random selection\n";
+                "--topic: force this single topic, bypassing discovery / random selection\n" +
+                "--asset-type: force BATTERY | SOLAR | EV (default: random)\n" +
+                "--soc: force State of Charge value (only applies to BATTERY; default: random)\n" +
+                "--timestamp: force this ISO timestamp for every message, e.g. 2026-05-27T10:30:00 (default: current time per message)\n";
 
         Properties kafkaProps = new Properties();
         if (args.length == 0) System.out.println(usage);
@@ -174,7 +204,9 @@ public class VPPaaSMessageProvider {
 
                 while (true) {
                     try {
-                        mili = new Timestamp(System.currentTimeMillis());
+                        mili = DEFAULT_TIMESTAMP != null
+                                ? Timestamp.valueOf(LocalDateTime.parse(DEFAULT_TIMESTAMP))
+                                : new Timestamp(System.currentTimeMillis());
 
                         if (DEFAULT_TOPIC != null || !topics.isEmpty()) {
                             String topic_to_send = RandomTopic();

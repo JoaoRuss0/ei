@@ -42,7 +42,7 @@ public class FlexibilityEmissionResource {
         .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (id, asset_id, prosumer_id, event_type, event_time) VALUES (1, 6, 3, 'SELL',                     '2026-04-15 19:30:00')").execute())
         .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (id, asset_id, prosumer_id, event_type, event_time) VALUES (2, 3, 2, 'SELL',                     '2026-04-20 19:30:00')").execute())
         .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (id, asset_id, prosumer_id, event_type, event_time) VALUES (3, 1, 1, 'UNAVAILABLE_FOR_BALANCING','2026-04-22 03:00:00')").execute())
-        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (id, asset_id, prosumer_id, event_type, event_time) VALUES (4, 8, 4, 'BUY',                      '2026-04-25 12:00:00')").execute())
+        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (id, asset_id, prosumer_id, event_type, event_time) VALUES (4, 9, 4, 'UNAVAILABLE_FOR_BALANCING','2026-04-25 12:00:00')").execute())
         .await().indefinitely();
     }
 

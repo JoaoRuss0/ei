@@ -36,13 +36,6 @@ public class AssetLink {
                 .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : null);
     }
 
-    public static Uni<AssetLink> findById2(MySQLPool client, Long idProsumer_R, Long idUtilityOperator_R) {
-        return client.preparedQuery("SELECT id, idProsumer, idUtilityOperator FROM AssetLink WHERE idProsumer = ? AND idUtilityOperator = ?").execute(Tuple.of(idProsumer_R, idUtilityOperator_R))
-                .onItem().transform(RowSet::iterator)
-                .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : null);
-
-    }
-
     public Uni<Long> save(MySQLPool client, Long idProsumer_R, Long idUtilityOperator_R) {
         return client.preparedQuery("INSERT INTO AssetLink(idProsumer, idUtilityOperator) VALUES (?,?)")
                 .execute(Tuple.of(idProsumer_R, idUtilityOperator_R))

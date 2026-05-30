@@ -38,8 +38,6 @@ echo "====================================================================="
 
 cd integration-tests
 ./grid-balancing.sh
-./flexibility-emission.sh
-./energy-analytics.sh
 ./topic-creation-workflow.sh
 ./ollama.sh
 

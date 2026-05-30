@@ -25,7 +25,7 @@ public class EnergyAnalytics {
     public Long utilityOperatorId;
     public String utilityOperatorName;
     public EnergyAnalyticsType type;
-    public Long gridCellId;
+    public String gridCellId;
     public Double value;
     public LocalDateTime timestamp;
 
@@ -36,7 +36,7 @@ public class EnergyAnalytics {
                 row.getLong("utility_operator_id"),
                 row.getString("utility_operator_name"),
                 EnergyAnalyticsType.valueOf(row.getString("type")),
-                row.getLong("grid_cell_id"),
+                row.getString("grid_cell_id"),
                 row.getDouble("value"),
                 row.getLocalDateTime("timestamp"));
     }
@@ -54,7 +54,7 @@ public class EnergyAnalytics {
                 .addLong(this.utilityOperatorId)
                 .addString(this.utilityOperatorName)
                 .addString(this.type.name())
-                .addLong(this.gridCellId)
+                .addString(this.gridCellId)
                 .addDouble(this.value)
                 .addLocalDateTime(this.timestamp);
 
@@ -90,7 +90,7 @@ public class EnergyAnalytics {
                         .addLong(a.utilityOperatorId)
                         .addString(a.utilityOperatorName)
                         .addString(a.type.name())
-                        .addLong(a.gridCellId)
+                        .addString(a.gridCellId)
                         .addDouble(a.value)
                         .addLocalDateTime(a.timestamp))
                 .collect(Collectors.toList());

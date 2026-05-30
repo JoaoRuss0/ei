@@ -5,8 +5,8 @@ cd ..
 source ./addresses.sh > /dev/null
 cd integration-tests
 
-echo "POSTing data to $GRID_BALANCING_URL/AssetLink/balance..."
-curl -s -f -X POST "$GRID_BALANCING_URL/AssetLink/balance" \
+echo "POSTing data to $GRID_BALANCING_URL/GridBalancing/balance..."
+curl -s -f -X POST "$GRID_BALANCING_URL/GridBalancing/balance" \
     -H "Content-Type: application/json" \
     -d @balance_payload.json
 

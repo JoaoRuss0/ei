@@ -62,27 +62,6 @@ class AssetLinkResourceTest {
     }
 
     @Test
-    void testGetDualSuccess() {
-        given()
-                .pathParam("idProsumer", 4)
-                .pathParam("idUtilityOperator", 2)
-                .when().get("/AssetLink/{idProsumer}/{idUtilityOperator}")
-                .then()
-                .statusCode(200)
-                .body("id", is(4));
-    }
-
-    @Test
-    void testGetDualNotFound() {
-        given()
-                .pathParam("idProsumer", 999)
-                .pathParam("idUtilityOperator", 999)
-                .when().get("/AssetLink/{idProsumer}/{idUtilityOperator}")
-                .then()
-                .statusCode(404);
-    }
-
-    @Test
     void testCreateSuccess() {
         String newLink = """
             {
@@ -126,11 +105,11 @@ class AssetLinkResourceTest {
         given()
                 .pathParam("assetLinkId", 1)
                 .pathParam("utilityOperatorName", "ArcoCegoLisbon")
-                .when().post("/AssetLink/topic/{prosumerId}/{utilityOperatorId}")
+                .when().post("/AssetLink/topic/{assetLinkId}/{utilityOperatorName}")
                 .then()
                 .statusCode(204);
 
-        Mockito.verify(topicService).createAssetLinkTopic(1L, "asd");
+        Mockito.verify(topicService).createAssetLinkTopic(1L, "ArcoCegoLisbon");
     }
 
     @Test
@@ -138,7 +117,7 @@ class AssetLinkResourceTest {
         given()
                 .pathParam("assetLinkId", 1)
                 .pathParam("utilityOperatorName", "ArcoCegoLisbon")
-                .when().delete("/AssetLink/topic/{prosumerId}/{utilityOperatorId}")
+                .when().delete("/AssetLink/topic/{assetLinkId}/{utilityOperatorName}")
                 .then()
                 .statusCode(204);
 

@@ -1,6 +1,8 @@
 package org.acme;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 import io.smallrye.common.annotation.Blocking;
 import jakarta.enterprise.event.Observes;
@@ -27,12 +29,30 @@ public class AssetLinkResource {
     @Inject
     KafkaTopicService topicService;
 
+    // Seeded asset link -> utility operator name (matches UtilityOperator.initdb).
+    // Used to pre-create Kafka topics on startup so the demo flow doesn't require
+    // running the create-link BPMN to start producing telemetry.
+    static final List<Map.Entry<Long, String>> SEED_TOPICS = List.of(
+            Map.entry(1L, "ArcoCegoLisbon"),
+            Map.entry(2L, "PracadeBocage"),
+            Map.entry(3L, "PracadaBoavista"),
+            Map.entry(4L, "PracaDomFranciscoGomes"),
+            Map.entry(5L, "PracadaBoavista")
+    );
+
+    @Inject
+    @ConfigProperty(name = "myapp.seed.create-topics", defaultValue = "true")
+    boolean seedCreateTopics;
+
     void config(@Observes StartupEvent ev) {
         if (schemaCreate) {
             initdb();
+            if (seedCreateTopics) {
+                createSeedTopics();
+            }
         }
     }
-    
+
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS AssetLink").execute()
@@ -43,6 +63,12 @@ public class AssetLinkResource {
         .flatMap(r -> client.query("INSERT INTO AssetLink (id,idProsumer,idUtilityOperator) VALUES (4,4,4)").execute())
         .flatMap(r -> client.query("INSERT INTO AssetLink (id,idProsumer,idUtilityOperator) VALUES (5,1,3)").execute())
         .await().indefinitely();
+    }
+
+    private void createSeedTopics() {
+        for (Map.Entry<Long, String> entry : SEED_TOPICS) {
+            topicService.createAssetLinkTopic(entry.getKey(), entry.getValue());
+        }
     }
 
     @GET
@@ -57,18 +83,10 @@ public class AssetLinkResource {
                 .onItem().transform(assetlink -> assetlink != null ? Response.ok(assetlink) : Response.status(Response.Status.NOT_FOUND))
                 .onItem().transform(ResponseBuilder::build);
     }
-     
-    @GET
-    @Path("{idProsumer}/{idUtilityOperator}")
-    public Uni<Response> getDual(Long idProsumer, Long idUtilityOperator) {
-        return AssetLink.findById2(client, idProsumer, idUtilityOperator)
-                .onItem().transform(assetlink -> assetlink != null ? Response.ok(assetlink) : Response.status(Response.Status.NOT_FOUND)) 
-                .onItem().transform(ResponseBuilder::build); 
-    }
 
     @GET
     @Path("by-prosumer-id/{idProsumer}")
-    public Multi<AssetLink> getDual(Long idProsumer) {
+    public Multi<AssetLink> getByProsumer(Long idProsumer) {
         return AssetLink.findByIdProsumerId(client, idProsumer);
     }
 

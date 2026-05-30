@@ -22,7 +22,7 @@ class FlexibilityEmissionResourceTest {
                 .flatMap(r -> client.query("ALTER TABLE FlexibilityEvent AUTO_INCREMENT = 1").execute())
                 .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (id, asset_id, prosumer_id, event_type, event_time) VALUES (1, 1, 1, 'UNAVAILABLE_FOR_BALANCING', '2026-01-01 20:00')").execute())
                 .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (id, asset_id, prosumer_id, event_type, event_time) VALUES (2, 1, 1, 'SELL', '2026-01-01 21:00')").execute())
-                .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (id, asset_id, prosumer_id, event_type, event_time) VALUES (3, 2, 2, 'BUY', '2026-01-02 10:00')").execute())
+                .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (id, asset_id, prosumer_id, event_type, event_time) VALUES (3, 2, 2, 'UNAVAILABLE_FOR_BALANCING', '2026-01-02 10:00')").execute())
                 .await().indefinitely();
     }
 

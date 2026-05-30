@@ -20,7 +20,7 @@ class EnergyAnalyticsResourceTest {
     void setup() {
         client.query("DELETE FROM EnergyAnalytics").execute()
                 .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, value, timestamp, grid_cell_id) " +
-                        "VALUES ('ENERGY_DISCHARGED_BY_ZONE', 34.2, '2026-01-01 20:00:00', 1)").execute())
+                        "VALUES ('ENERGY_DISCHARGED_BY_ZONE', 34.2, '2026-01-01 20:00:00', 'PORTO_NORTH')").execute())
                 .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, value, timestamp, prosumer_id, prosumer_name) " +
                         "VALUES ('ENERGY_GENERATED_BY_PROSUMER', 50.0, '2026-01-01 20:00:00', 2, 'client2')").execute())
                 .await().indefinitely();
@@ -44,7 +44,7 @@ class EnergyAnalyticsResourceTest {
                     "type": "AVERAGE_SOC",
                     "value": 75.5,
                     "timestamp": "2026-05-01T10:00:00",
-                    "gridCellId": 1
+                    "gridCellId": "PORTO_NORTH"
                   },
                   {
                     "type": "ENERGY_CONSUMED_BY_PROSUMER",

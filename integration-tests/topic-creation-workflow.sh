@@ -27,7 +27,8 @@ create_entity() {
     echo "$id"
 }
 
-UO_PAYLOAD='{"name": "EDP", "location": "Lisbon", "iban": "PT50123456789012345678901"}'
+UO_NAME="EDP"
+UO_PAYLOAD='{"name": "'$UO_NAME'", "location": "Lisbon", "iban": "PT50123456789012345678901"}'
 UO_ID=$(create_entity "$UTILITY_OPERATOR_URL/UtilityOperator" "$UO_PAYLOAD" "Utility Operator")
 
 PRO_PAYLOAD='{"name": "Joao Russo", "location": "Porto", "FiscalNumber": 123456789}'
@@ -44,10 +45,10 @@ LINK_PAYLOAD='{"idProsumer": '$PRO_ID', "idUtilityOperator": '$UO_ID'}'
 LINK_ID=$(create_entity "$ASSET_LINK_URL/AssetLink" "$LINK_PAYLOAD" "Asset Link")
 
 >&2 echo "Requesting topic creation via AssetLink..."
-curl -s -X POST "$ASSET_LINK_URL/AssetLink/topic/$ASSET_ID/$GC_ID"
+curl -s -X POST "$ASSET_LINK_URL/AssetLink/topic/$LINK_ID/$UO_NAME"
 >&2 echo "Topic creation triggered."
 
-TOPIC_NAME="$ASSET_ID-$GC_ID"
+TOPIC_NAME="$LINK_ID-$UO_NAME"
 >&2 echo "Provisioning consumer for topic: $TOPIC_NAME..."
 curl -s -X POST "$TELEMETRY_URL/Telemetry/consume" -H "Content-Type: application/json" -d '{"topicName": "'$TOPIC_NAME'"}'
 >&2 echo "Consumer listening."

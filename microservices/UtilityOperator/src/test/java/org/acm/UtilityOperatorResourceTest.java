@@ -19,10 +19,10 @@ class UtilityOperatorResourceTest {
     void setup() {
         client.query("DELETE FROM UtilityOperator").execute()
                 .flatMap(r -> client.query("ALTER TABLE UtilityOperator AUTO_INCREMENT = 1").execute())
-                .flatMap(r -> client.query("INSERT INTO UtilityOperator (id, name, location, iban) VALUES (1, 'ArcoCegoLisbon', 'Lisboa', '123123123')").execute())
-                .flatMap(r -> client.query("INSERT INTO UtilityOperator (id, name, location, iban) VALUES (2, 'PracadeBocage', 'Setubal', '123123123')").execute())
-                .flatMap(r -> client.query("INSERT INTO UtilityOperator (id, name, location, iban) VALUES (3, 'PracadaBoavista', 'Porto', '123123123')").execute())
-                .flatMap(r -> client.query("INSERT INTO UtilityOperator (id, name, location, iban) VALUES (4, 'PracaDomFranciscoGomes', 'Faro', '123123123')").execute())
+                .flatMap(r -> client.query("INSERT INTO UtilityOperator (id, name, location, iban) VALUES (1, 'ArcoCegoLisbon', 'Lisboa', 'IBAN-1')").execute())
+                .flatMap(r -> client.query("INSERT INTO UtilityOperator (id, name, location, iban) VALUES (2, 'PracadeBocage', 'Setubal', 'IBAN-2')").execute())
+                .flatMap(r -> client.query("INSERT INTO UtilityOperator (id, name, location, iban) VALUES (3, 'PracadaBoavista', 'Porto', 'IBAN-3')").execute())
+                .flatMap(r -> client.query("INSERT INTO UtilityOperator (id, name, location, iban) VALUES (4, 'PracaDomFranciscoGomes', 'Faro', 'IBAN-4')").execute())
                 .await().indefinitely();
     }
 
@@ -46,7 +46,7 @@ class UtilityOperatorResourceTest {
                 .body("id", is(1))
                 .body("name", is("ArcoCegoLisbon"))
                 .body("location", is("Lisboa"))
-                .body("iban", is("123123123"));
+                .body("iban", is("IBAN-1"));
     }
 
     @Test

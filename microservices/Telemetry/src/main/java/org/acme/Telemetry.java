@@ -112,51 +112,6 @@ public class Telemetry
                 .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : null); 
     }
 
-    public static Multi<Telemetry> findLatestEventsForAssetIds(MySQLPool client, List<Long> assetIds) {
-        if (assetIds.isEmpty()) return Multi.createFrom().empty();
-
-        String placeholders = assetIds.stream()
-                .map(id -> "?")
-                .collect(Collectors.joining(","));
-
-        String query =
-                "SELECT t.* FROM Telemetry t " +
-                        "INNER JOIN ( " +
-                        "  SELECT asset_id, MAX(timeStamp) AS max_ts " +
-                        "  FROM Telemetry " +
-                        "  WHERE asset_id IN (" + placeholders + ") " +
-                        "  GROUP BY asset_id " +
-                        ") latest ON t.asset_id = latest.asset_id " +
-                        "       AND t.timeStamp = latest.max_ts";
-
-        Tuple params = Tuple.tuple();
-        for (Long id : assetIds) {
-            params.addLong(id);
-        }
-
-        return client.preparedQuery(query).execute(params)
-                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
-                .onItem().transform(Telemetry::from);
-    }
-
-    public static Multi<Telemetry> findLastHourEvents(MySQLPool client) {
-        return client.query("SELECT * FROM Telemetry WHERE timeStamp > NOW() - INTERVAL 1 HOUR")
-                .execute()
-                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
-                .onItem().transform(Telemetry::from);
-    }
-
-    public static Multi<Telemetry> findForAssetIdAroundTimestamp(MySQLPool client, Long assetId, LocalDateTime timestamp, int n) {
-        return client.preparedQuery(
-                        "(SELECT * FROM Telemetry WHERE asset_id = ? AND timeStamp <= ? ORDER BY timeStamp DESC LIMIT ?) " +
-                                "UNION " +
-                                "(SELECT * FROM Telemetry WHERE asset_id = ? AND timeStamp > ? ORDER BY timeStamp LIMIT ?) " +
-                                "ORDER BY timeStamp ")
-                .execute(Tuple.of(assetId, timestamp, n, assetId, timestamp, n))
-                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
-                .onItem().transform(Telemetry::from);
-    }
-
     public static Multi<Telemetry> findByAssetId(MySQLPool client, Long assetId) {
         return client.preparedQuery("SELECT * FROM Telemetry WHERE asset_id = ?").execute(Tuple.of(assetId))
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
@@ -183,33 +138,6 @@ public class Telemetry
 
         return client.preparedQuery("SELECT * FROM Telemetry WHERE grid_cell_id IN (" + placeholders + ")")
                 .execute(params)
-                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
-                .onItem().transform(Telemetry::from);
-    }
-
-    public static Multi<Telemetry> findByAssetIdsAndGridCellIds(MySQLPool client, List<Long> assetIds, List<String> gridCellIds) {
-        if (assetIds.isEmpty() || gridCellIds.isEmpty()) return Multi.createFrom().empty();
-
-        String assetPlaceholders = assetIds.stream()
-                .map(id -> "?")
-                .collect(Collectors.joining(","));
-        String cellPlaceholders = gridCellIds.stream()
-                .map(id -> "?")
-                .collect(Collectors.joining(","));
-
-        String query = "SELECT * FROM Telemetry " +
-                "WHERE grid_cell_id IN (" + cellPlaceholders + ") " +
-                "AND asset_id IN (" + assetPlaceholders + ")";
-
-        Tuple params = Tuple.tuple();
-        for (String cellId : gridCellIds) {
-            params.addString(cellId);
-        }
-        for (Long id : assetIds) {
-            params.addLong(id);
-        }
-
-        return client.preparedQuery(query).execute(params)
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
                 .onItem().transform(Telemetry::from);
     }

@@ -41,8 +41,9 @@ public class GrigBalancingRecommendationResource {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS GridBalancingRecommendation").execute()
         .flatMap(r -> client.query("CREATE TABLE GridBalancingRecommendation (grid_cell_from_id VARCHAR(255) NOT NULL, grid_cell_to_id VARCHAR(255) NOT NULL, transfer_kw DOUBLE NOT NULL, timestamp DATETIME NOT NULL, UNIQUE KEY UK_EVENT (grid_cell_from_id, grid_cell_to_id, timestamp))").execute())
-        .flatMap(r -> client.query(" INSERT INTO GridBalancingRecommendation (grid_cell_from_id, grid_cell_to_id, transfer_kw, timestamp) VALUES ('PORTO_NORTH', 'LISBON_SOUTH', 10.0, '2020-04-12 02:11')").execute())
-        .flatMap(r -> client.query(" INSERT INTO GridBalancingRecommendation (grid_cell_from_id, grid_cell_to_id, transfer_kw, timestamp) VALUES ('PORTO_NORTH', 'LISBON_SOUTH', 10.0, '2012-10-10 21:21')").execute())
+        .flatMap(r -> client.query("INSERT INTO GridBalancingRecommendation (grid_cell_from_id, grid_cell_to_id, transfer_kw, timestamp) VALUES ('PORTO_NORTH',    'PORTO_SOUTH',  22.0, '2026-04-15 19:00:00')").execute())
+        .flatMap(r -> client.query("INSERT INTO GridBalancingRecommendation (grid_cell_from_id, grid_cell_to_id, transfer_kw, timestamp) VALUES ('SETUBAL_CENTRO', 'LISBON_SOUTH',  5.0, '2026-04-18 19:30:00')").execute())
+        .flatMap(r -> client.query("INSERT INTO GridBalancingRecommendation (grid_cell_from_id, grid_cell_to_id, transfer_kw, timestamp) VALUES ('LISBON_NORTH',   'LISBON_SOUTH',  8.0, '2026-04-19 10:00:00')").execute())
         .await().indefinitely();
     }
 

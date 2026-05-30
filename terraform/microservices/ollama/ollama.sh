@@ -15,4 +15,4 @@ until curl -s http://localhost:11434/api/tags > /dev/null; do
   echo "waited"
 done
 
-ollama pull llama3.2:latest
+ollama pull smollm:135m

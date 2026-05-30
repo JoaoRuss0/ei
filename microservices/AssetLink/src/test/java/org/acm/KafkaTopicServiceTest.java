@@ -13,23 +13,23 @@ class KafkaTopicServiceTest {
 
     @Test
     void testTopicLifecycle() {
-        Long prosumerId = 500L;
-        Long utilityOperatorId = 600L;
+        Long assetLinkId = 500L;
+        String utilityOperatorName = "ArcoCegoLisbon";
 
         Assertions.assertDoesNotThrow(() -> {
-            topicService.createAssetLinkTopic(prosumerId, utilityOperatorId);
+            topicService.createAssetLinkTopic(assetLinkId, utilityOperatorName);
         });
 
         Assertions.assertDoesNotThrow(() -> {
-            topicService.createAssetLinkTopic(prosumerId, utilityOperatorId);
+            topicService.createAssetLinkTopic(assetLinkId, utilityOperatorName);
         }, "Should silently handle TopicExistsException");
 
         Assertions.assertDoesNotThrow(() -> {
-            topicService.deleteAssetLinkTopic(prosumerId, utilityOperatorId);
+            topicService.deleteAssetLinkTopic(assetLinkId, utilityOperatorName);
         });
 
         Assertions.assertDoesNotThrow(() -> {
-            topicService.deleteAssetLinkTopic(prosumerId, utilityOperatorId);
+            topicService.deleteAssetLinkTopic(assetLinkId, utilityOperatorName);
         }, "Should silently handle UnknownTopicOrPartitionException");
     }
 }

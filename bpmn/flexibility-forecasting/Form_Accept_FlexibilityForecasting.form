@@ -10,7 +10,7 @@
       "id": "Field_1vxth4s"
     },
     {
-      "text": "=string join(\n  for r in recommendations return\n    \"From: \" + string(r.gridCellFromId) +\n    \"<br/>To: \" + string(r.gridCellToId) +\n    \"<br/>Transfer (kW): \" + string(r.transferKw) +\n    \"<br/>Time: \" + string(r.timestamp),\n  \"<br/><br/>\"\n)",
+      "text": "=string(recommendations) ",
       "type": "text",
       "layout": {
         "row": "Row_1662eym",

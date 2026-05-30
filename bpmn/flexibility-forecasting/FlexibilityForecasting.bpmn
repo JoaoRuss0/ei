@@ -101,9 +101,9 @@
           <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/ollama/api/generate&#34;" target="url" />
           <zeebe:input source="={&#10;  &#34;Content-Type&#34;: &#34;Application/json&#34;,&#10;  &#34;accept&#34;: &#34;Application/json&#34;&#10;}" target="headers" />
           <zeebe:input source="=false" target="storeResponse" />
-          <zeebe:input source="=600" target="connectionTimeoutInSeconds" />
-          <zeebe:input source="=600" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;model&#34;: &#34;llama3.2&#34;,&#10;  &#34;stream&#34;: false,&#10;  &#34;num_predict&#34;: 128,&#10;  &#34;num_ctx&#34;: 2048,&#10;  &#34;prompt&#34;: &#34;Analyze the following &#39;events&#39; and &#39;telemetry&#39; arrays. Determine the outcome (SUCCESS or FAILURE) for each event. Output a simple json structured as follows: {\&#34;eventId\&#34;: &#60;id&#62;, \&#34;successful\&#34;: \&#34;&#60;true/false&#62;\&#34;}. events: &#34; + string(flexibilityEvents) + &#34; telemetry: &#34; + string(telemetryEvents)&#10;}" target="body" />
+          <zeebe:input source="=6000" target="connectionTimeoutInSeconds" />
+          <zeebe:input source="=6000" target="readTimeoutInSeconds" />
+          <zeebe:input source="={&#10;  &#34;model&#34;: &#34;qwen2:0.5b&#34;,&#10;  &#34;stream&#34;: false,&#10;  &#34;num_predict&#34;: 128,&#10;  &#34;num_ctx&#34;: 2048,&#10;  &#34;prompt&#34;: &#34;Analyze the following &#39;events&#39; and &#39;telemetry&#39; arrays. The telemetry represents the state of the power plant at some point. The events represent the suggested changes. Determine if the outcome of the suggested changes was a \&#34;SUCCESS\&#34; or \&#34;FAILURE\&#34;. Simply state if the overall changes produced a good or bad effect on the grid, nothing else. events: &#34; + string(flexibilityEvents) + &#34; telemetry: &#34; + string(telemetryEvents)&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>

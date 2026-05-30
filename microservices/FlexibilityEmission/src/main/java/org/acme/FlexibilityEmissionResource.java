@@ -39,8 +39,10 @@ public class FlexibilityEmissionResource {
     private void initdb() {
         client.query("DROP TABLE IF EXISTS FlexibilityEvent").execute()
         .flatMap(r -> client.query("CREATE TABLE FlexibilityEvent (id SERIAL PRIMARY KEY, asset_id BIGINT UNSIGNED NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, event_type VARCHAR(255) NOT NULL, event_time DATETIME NOT NULL)").execute())
-        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type, event_time) VALUES (1, 1, 'UNAVAILABLE_FOR_BALANCING', '2020-10-10 20:00')").execute())
-        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (asset_id, prosumer_id, event_type, event_time) VALUES (1, 1, 'SELL', '2020-10-10 21:00')").execute())
+        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (id, asset_id, prosumer_id, event_type, event_time) VALUES (1, 6, 3, 'SELL',                     '2026-04-15 19:30:00')").execute())
+        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (id, asset_id, prosumer_id, event_type, event_time) VALUES (2, 3, 2, 'SELL',                     '2026-04-20 19:30:00')").execute())
+        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (id, asset_id, prosumer_id, event_type, event_time) VALUES (3, 1, 1, 'UNAVAILABLE_FOR_BALANCING','2026-04-22 03:00:00')").execute())
+        .flatMap(r -> client.query("INSERT INTO FlexibilityEvent (id, asset_id, prosumer_id, event_type, event_time) VALUES (4, 8, 4, 'BUY',                      '2026-04-25 12:00:00')").execute())
         .await().indefinitely();
     }
 

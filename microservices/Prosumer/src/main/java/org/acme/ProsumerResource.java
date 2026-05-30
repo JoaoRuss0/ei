@@ -32,10 +32,10 @@ public class ProsumerResource {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS Prosumer").execute()
         .flatMap(r -> client.query("CREATE TABLE Prosumer (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, FiscalNumber BIGINT UNSIGNED UNIQUE, location VARCHAR(255) NOT NULL)").execute())
-        .flatMap(r -> client.query("INSERT INTO Prosumer (name,FiscalNumber,location) VALUES ('client1','123456','Lisbon')").execute())
-        .flatMap(r -> client.query("INSERT INTO Prosumer (name,FiscalNumber,location) VALUES ('client2','987654','Setúbal')").execute())
-        .flatMap(r -> client.query("INSERT INTO Prosumer (name,FiscalNumber,location) VALUES ('client3','123987','OPorto')").execute())
-        .flatMap(r -> client.query("INSERT INTO Prosumer (name,FiscalNumber,location) VALUES ('client4','987123','Faro')").execute())
+        .flatMap(r -> client.query("INSERT INTO Prosumer (id,name,FiscalNumber,location) VALUES (1,'Maria Lisbon','123456','Lisbon')").execute())
+        .flatMap(r -> client.query("INSERT INTO Prosumer (id,name,FiscalNumber,location) VALUES (2,'Joao Setubal','987654','Setubal')").execute())
+        .flatMap(r -> client.query("INSERT INTO Prosumer (id,name,FiscalNumber,location) VALUES (3,'Pedro Porto','123987','Porto')").execute())
+        .flatMap(r -> client.query("INSERT INTO Prosumer (id,name,FiscalNumber,location) VALUES (4,'Ana Faro','987123','Faro')").execute())
         .await().indefinitely();
     }
     

@@ -223,23 +223,24 @@
         <bpmn:flowNodeRef>Activity_fdcd84ce-514c-4a3a-a44c-da80d1c96a60</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1n6w6s0</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_1f9kf1o</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_11d59ia</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_0ef45123-e62a-43d1-ae41-47ab2a18856c" name="Executor TK01">
         <bpmn:flowNodeRef>Event_ae6cefc1-5f4e-4807-9900-6da813149481</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_0f30o0k</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_d3b56817-2356-4a8d-92c3-2ba732773389</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_c61bca2b-2c96-4163-9b8a-72b56b853f50</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_78b85c5c-01dc-4404-8555-ff35920fcebc</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_80c67184-27ec-4ed6-b3a9-a9f92f9da230</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_9a1f746e-fa58-4118-9e43-d8ae475999d1</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0ae7711</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_18rp91s</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_00xj0tw</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_0zy0pmr</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_0q8i4ex</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_0yrey7y</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_152cnsx</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_d3b56817-2356-4a8d-92c3-2ba732773389</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_c61bca2b-2c96-4163-9b8a-72b56b853f50</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_78b85c5c-01dc-4404-8555-ff35920fcebc</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_80c67184-27ec-4ed6-b3a9-a9f92f9da230</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_00xj0tw</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1nrer5x</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_11d59ia</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0ae7711</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
     <bpmn:sequenceFlow id="Flow_0bedca68-f247-45d9-8839-64b1fef427e8" sourceRef="Event_ae6cefc1-5f4e-4807-9900-6da813149481" targetRef="Activity_0f30o0k" />
@@ -280,24 +281,6 @@
       <bpmn:outgoing>Flow_0e1e6114-1125-4a31-8900-7cb95ee9ba16</bpmn:outgoing>
       <bpmn:messageEventDefinition id="EventDefinition_387a1a96-0b15-4950-9a5e-c4212f904642" messageRef="Message_2b43ets" />
     </bpmn:intermediateCatchEvent>
-    <bpmn:intermediateCatchEvent id="Event_d3b56817-2356-4a8d-92c3-2ba732773389" name="Accept received">
-      <bpmn:incoming>Flow_28fd99be-3edf-4e83-9cc6-0111bc7a9625</bpmn:incoming>
-      <bpmn:outgoing>Flow_b3b03f8d-3dac-4737-a9cb-1b523dc44000</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="EventDefinition_e7ec889a-1ce7-475c-8efc-9865d7361d08" messageRef="Message_3p4hhrm" />
-    </bpmn:intermediateCatchEvent>
-    <bpmn:endEvent id="Event_c61bca2b-2c96-4163-9b8a-72b56b853f50">
-      <bpmn:incoming>Flow_b3b03f8d-3dac-4737-a9cb-1b523dc44000</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:parallelGateway id="Gateway_78b85c5c-01dc-4404-8555-ff35920fcebc">
-      <bpmn:incoming>Flow_d36929ea-6cb2-4db4-96c1-a63dbbbd9922</bpmn:incoming>
-      <bpmn:incoming>Flow_1ej7dpa</bpmn:incoming>
-      <bpmn:outgoing>Flow_0tnl161</bpmn:outgoing>
-    </bpmn:parallelGateway>
-    <bpmn:parallelGateway id="Gateway_80c67184-27ec-4ed6-b3a9-a9f92f9da230">
-      <bpmn:incoming>Flow_0dupaxn</bpmn:incoming>
-      <bpmn:outgoing>Flow_d36929ea-6cb2-4db4-96c1-a63dbbbd9922</bpmn:outgoing>
-      <bpmn:outgoing>Flow_6800485f-fe5f-43a1-bcf5-ef985ab29623</bpmn:outgoing>
-    </bpmn:parallelGateway>
     <bpmn:userTask id="Activity_9a1f746e-fa58-4118-9e43-d8ae475999d1" name="Verify if execute product is possible">
       <bpmn:extensionElements>
         <zeebe:userTask />
@@ -307,30 +290,6 @@
       <bpmn:incoming>Flow_06zfhmn</bpmn:incoming>
       <bpmn:outgoing>Flow_5e2bfceb-89ea-4f84-b5c6-5b6617d5966f</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:serviceTask id="Activity_0ae7711" name="Associate AssetLink" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="12" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
-      <bpmn:extensionElements>
-        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
-        <zeebe:ioMapping>
-          <zeebe:input source="noAuth" target="authentication.type" />
-          <zeebe:input source="POST" target="method" />
-          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/assetlink/AssetLink&#34;" target="url" />
-          <zeebe:input source="={&#10;  &#34;Content-Type&#34;: &#34;Application/json&#34;,&#10;  &#34;accept&#34;: &#34;Application/json&#34;&#10;}" target="headers" />
-          <zeebe:input source="=false" target="storeResponse" />
-          <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
-          <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;idProsumer&#34;: prosumerID,&#10;  &#34;id&#34;: 0,&#10;  &#34;idUtilityOperator&#34;: UtilityOperatorID&#10;}" target="body" />
-          <zeebe:input source="=false" target="ignoreNullValues" />
-        </zeebe:ioMapping>
-        <zeebe:taskHeaders>
-          <zeebe:header key="elementTemplateVersion" value="12" />
-          <zeebe:header key="elementTemplateId" value="io.camunda.connectors.HttpJson.v2" />
-          <zeebe:header key="resultExpression" value="={&#10;  StatusreceivedMessage: response.status,&#10;  assetLinkId: response.body.id&#10;}" />
-          <zeebe:header key="retryBackoff" value="PT0S" />
-        </zeebe:taskHeaders>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_b99ea1eb-9f3c-45d4-9361-d7f23611c1c1</bpmn:incoming>
-      <bpmn:outgoing>Flow_0dupaxn</bpmn:outgoing>
-    </bpmn:serviceTask>
     <bpmn:userTask id="Activity_fdcd84ce-514c-4a3a-a44c-da80d1c96a60" name="Check Telemetry Consumer Order">
       <bpmn:extensionElements>
         <zeebe:userTask />
@@ -383,31 +342,8 @@
           <zeebe:header key="retryBackoff" value="PT0S" />
         </zeebe:taskHeaders>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_07sufrg</bpmn:incoming>
+      <bpmn:incoming>Flow_6800485f-fe5f-43a1-bcf5-ef985ab29623</bpmn:incoming>
       <bpmn:outgoing>Flow_0e2s8ui</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Activity_00xj0tw" name="Declare AssetLink association order" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="12" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
-      <bpmn:extensionElements>
-        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
-        <zeebe:ioMapping>
-          <zeebe:input source="noAuth" target="authentication.type" />
-          <zeebe:input source="POST" target="method" />
-          <zeebe:input source="http://localhost:8080/v2/messages/publication" target="url" />
-          <zeebe:input source="={&#10;  &#34;Content-Type&#34;: &#34;Application/json&#34;,&#10;  &#34;accept&#34;: &#34;Application/json&#34;&#10;}" target="headers" />
-          <zeebe:input source="=false" target="storeResponse" />
-          <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
-          <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_1qktfb5&#34;,&#10;  &#34;correlationKey&#34;: businessKey + &#34;-declare&#34;&#10;}" target="body" />
-          <zeebe:input source="=false" target="ignoreNullValues" />
-        </zeebe:ioMapping>
-        <zeebe:taskHeaders>
-          <zeebe:header key="elementTemplateVersion" value="12" />
-          <zeebe:header key="elementTemplateId" value="io.camunda.connectors.HttpJson.v2" />
-          <zeebe:header key="retryBackoff" value="PT0S" />
-        </zeebe:taskHeaders>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0tnl161</bpmn:incoming>
-      <bpmn:outgoing>Flow_28fd99be-3edf-4e83-9cc6-0111bc7a9625</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="Activity_1f9kf1o" name="Accept Telemetry Consumer Order" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="12" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
       <bpmn:extensionElements>
@@ -467,17 +403,12 @@
     <bpmn:sequenceFlow id="Flow_0e2s8ui" sourceRef="Activity_1n6w6s0" targetRef="Event_7cc63575-9adf-4762-ab60-c02fa4833a0c" />
     <bpmn:sequenceFlow id="Flow_4a4c0ecc-1fd9-4aa4-919b-98dd76278914" sourceRef="Event_7cc63575-9adf-4762-ab60-c02fa4833a0c" targetRef="Event_0cb90a1e-39a3-495d-a3ac-2553492163ee" />
     <bpmn:sequenceFlow id="Flow_0e1e6114-1125-4a31-8900-7cb95ee9ba16" sourceRef="Event_0cb90a1e-39a3-495d-a3ac-2553492163ee" targetRef="Activity_fdcd84ce-514c-4a3a-a44c-da80d1c96a60" />
-    <bpmn:sequenceFlow id="Flow_28fd99be-3edf-4e83-9cc6-0111bc7a9625" sourceRef="Activity_00xj0tw" targetRef="Event_d3b56817-2356-4a8d-92c3-2ba732773389" />
-    <bpmn:sequenceFlow id="Flow_b3b03f8d-3dac-4737-a9cb-1b523dc44000" sourceRef="Event_d3b56817-2356-4a8d-92c3-2ba732773389" targetRef="Event_c61bca2b-2c96-4163-9b8a-72b56b853f50" />
-    <bpmn:sequenceFlow id="Flow_d36929ea-6cb2-4db4-96c1-a63dbbbd9922" sourceRef="Gateway_80c67184-27ec-4ed6-b3a9-a9f92f9da230" targetRef="Gateway_78b85c5c-01dc-4404-8555-ff35920fcebc" />
     <bpmn:sequenceFlow id="Flow_1ej7dpa" sourceRef="Activity_1f9kf1o" targetRef="Gateway_78b85c5c-01dc-4404-8555-ff35920fcebc" />
-    <bpmn:sequenceFlow id="Flow_0tnl161" sourceRef="Gateway_78b85c5c-01dc-4404-8555-ff35920fcebc" targetRef="Activity_00xj0tw" />
-    <bpmn:sequenceFlow id="Flow_0dupaxn" sourceRef="Activity_0ae7711" targetRef="Gateway_80c67184-27ec-4ed6-b3a9-a9f92f9da230" />
-    <bpmn:sequenceFlow id="Flow_6800485f-fe5f-43a1-bcf5-ef985ab29623" sourceRef="Gateway_80c67184-27ec-4ed6-b3a9-a9f92f9da230" targetRef="Activity_11d59ia" />
+    <bpmn:sequenceFlow id="Flow_0dupaxn" sourceRef="Activity_0ae7711" targetRef="Activity_11d59ia" />
+    <bpmn:sequenceFlow id="Flow_6800485f-fe5f-43a1-bcf5-ef985ab29623" sourceRef="Gateway_80c67184-27ec-4ed6-b3a9-a9f92f9da230" targetRef="Activity_1n6w6s0" />
     <bpmn:sequenceFlow id="Flow_5e2bfceb-89ea-4f84-b5c6-5b6617d5966f" sourceRef="Activity_9a1f746e-fa58-4118-9e43-d8ae475999d1" targetRef="Gateway_0q8i4ex" />
     <bpmn:sequenceFlow id="Flow_b99ea1eb-9f3c-45d4-9361-d7f23611c1c1" sourceRef="Activity_18rp91s" targetRef="Activity_0ae7711" />
     <bpmn:sequenceFlow id="Flow_11bdiq4" sourceRef="Activity_fdcd84ce-514c-4a3a-a44c-da80d1c96a60" targetRef="Activity_1f9kf1o" />
-    <bpmn:sequenceFlow id="Flow_07sufrg" sourceRef="Activity_11d59ia" targetRef="Activity_1n6w6s0" />
     <bpmn:sequenceFlow id="Flow_1s56zm4" sourceRef="Gateway_0q8i4ex" targetRef="Activity_18rp91s" />
     <bpmn:sequenceFlow id="Flow_1s7k7i2" sourceRef="Activity_0yrey7y" targetRef="Event_0zy0pmr" />
     <bpmn:sequenceFlow id="Flow_0s3if8b" sourceRef="Gateway_0q8i4ex" targetRef="Activity_0yrey7y">
@@ -492,6 +423,76 @@
     <bpmn:sequenceFlow id="Flow_1duis5i" sourceRef="Gateway_152cnsx" targetRef="Activity_0yrey7y">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=some al in assetLinks satisfies string(al.idProsumer) = prosumerID and string(al.idUtilityOperator) = UtilityOperatorID</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
+    <bpmn:intermediateCatchEvent id="Event_d3b56817-2356-4a8d-92c3-2ba732773389" name="Accept received">
+      <bpmn:incoming>Flow_28fd99be-3edf-4e83-9cc6-0111bc7a9625</bpmn:incoming>
+      <bpmn:outgoing>Flow_b3b03f8d-3dac-4737-a9cb-1b523dc44000</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="EventDefinition_e7ec889a-1ce7-475c-8efc-9865d7361d08" messageRef="Message_3p4hhrm" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="Event_c61bca2b-2c96-4163-9b8a-72b56b853f50">
+      <bpmn:incoming>Flow_b3b03f8d-3dac-4737-a9cb-1b523dc44000</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:parallelGateway id="Gateway_78b85c5c-01dc-4404-8555-ff35920fcebc">
+      <bpmn:incoming>Flow_d36929ea-6cb2-4db4-96c1-a63dbbbd9922</bpmn:incoming>
+      <bpmn:incoming>Flow_1ej7dpa</bpmn:incoming>
+      <bpmn:outgoing>Flow_0tnl161</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:parallelGateway id="Gateway_80c67184-27ec-4ed6-b3a9-a9f92f9da230">
+      <bpmn:incoming>Flow_1x4jz2a</bpmn:incoming>
+      <bpmn:outgoing>Flow_d36929ea-6cb2-4db4-96c1-a63dbbbd9922</bpmn:outgoing>
+      <bpmn:outgoing>Flow_6800485f-fe5f-43a1-bcf5-ef985ab29623</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:serviceTask id="Activity_00xj0tw" name="Declare AssetLink association order" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="12" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="noAuth" target="authentication.type" />
+          <zeebe:input source="POST" target="method" />
+          <zeebe:input source="http://localhost:8080/v2/messages/publication" target="url" />
+          <zeebe:input source="={&#10;  &#34;Content-Type&#34;: &#34;Application/json&#34;,&#10;  &#34;accept&#34;: &#34;Application/json&#34;&#10;}" target="headers" />
+          <zeebe:input source="=false" target="storeResponse" />
+          <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
+          <zeebe:input source="=20" target="readTimeoutInSeconds" />
+          <zeebe:input source="={&#10;  &#34;name&#34;:&#34;Message_1qktfb5&#34;,&#10;  &#34;correlationKey&#34;: businessKey + &#34;-declare&#34;&#10;}" target="body" />
+          <zeebe:input source="=false" target="ignoreNullValues" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="elementTemplateVersion" value="12" />
+          <zeebe:header key="elementTemplateId" value="io.camunda.connectors.HttpJson.v2" />
+          <zeebe:header key="retryBackoff" value="PT0S" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0tnl161</bpmn:incoming>
+      <bpmn:outgoing>Flow_28fd99be-3edf-4e83-9cc6-0111bc7a9625</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Activity_1nrer5x" name="Create Topic" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="12" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="noAuth" target="authentication.type" />
+          <zeebe:input source="POST" target="method" />
+          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/assetlink/AssetLink/topic/&#34; + string(assetLinkId) + &#34;/&#34; + string(UtilityOperatorName)" target="url" />
+          <zeebe:input source="={&#10;  &#34;Content-Type&#34;: &#34;Application/json&#34;,&#10;  &#34;accept&#34;: &#34;Application/json&#34;&#10;}" target="headers" />
+          <zeebe:input source="=false" target="storeResponse" />
+          <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
+          <zeebe:input source="=20" target="readTimeoutInSeconds" />
+          <zeebe:input source="={&#10;  &#34;idProsumer&#34;: prosumerID,&#10;  &#34;id&#34;: 0,&#10;  &#34;idUtilityOperator&#34;: UtilityOperatorID&#10;}" target="body" />
+          <zeebe:input source="=false" target="ignoreNullValues" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="elementTemplateVersion" value="12" />
+          <zeebe:header key="elementTemplateId" value="io.camunda.connectors.HttpJson.v2" />
+          <zeebe:header key="resultExpression" value="={&#10;  StatusreceivedMessage: response.status&#10;}" />
+          <zeebe:header key="retryBackoff" value="PT0S" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1gdtu40</bpmn:incoming>
+      <bpmn:outgoing>Flow_1x4jz2a</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_28fd99be-3edf-4e83-9cc6-0111bc7a9625" sourceRef="Activity_00xj0tw" targetRef="Event_d3b56817-2356-4a8d-92c3-2ba732773389" />
+    <bpmn:sequenceFlow id="Flow_b3b03f8d-3dac-4737-a9cb-1b523dc44000" sourceRef="Event_d3b56817-2356-4a8d-92c3-2ba732773389" targetRef="Event_c61bca2b-2c96-4163-9b8a-72b56b853f50" />
+    <bpmn:sequenceFlow id="Flow_d36929ea-6cb2-4db4-96c1-a63dbbbd9922" sourceRef="Gateway_80c67184-27ec-4ed6-b3a9-a9f92f9da230" targetRef="Gateway_78b85c5c-01dc-4404-8555-ff35920fcebc" />
+    <bpmn:sequenceFlow id="Flow_0tnl161" sourceRef="Gateway_78b85c5c-01dc-4404-8555-ff35920fcebc" targetRef="Activity_00xj0tw" />
+    <bpmn:sequenceFlow id="Flow_1x4jz2a" sourceRef="Activity_1nrer5x" targetRef="Gateway_80c67184-27ec-4ed6-b3a9-a9f92f9da230" />
     <bpmn:serviceTask id="Activity_11d59ia" name="Retrieve UtilityOperatorName" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="12" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
@@ -511,8 +512,33 @@
           <zeebe:header key="retryBackoff" value="PT0S" />
         </zeebe:taskHeaders>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_6800485f-fe5f-43a1-bcf5-ef985ab29623</bpmn:incoming>
-      <bpmn:outgoing>Flow_07sufrg</bpmn:outgoing>
+      <bpmn:incoming>Flow_0dupaxn</bpmn:incoming>
+      <bpmn:outgoing>Flow_1gdtu40</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1gdtu40" sourceRef="Activity_11d59ia" targetRef="Activity_1nrer5x" />
+    <bpmn:serviceTask id="Activity_0ae7711" name="Associate AssetLink" zeebe:modelerTemplate="io.camunda.connectors.HttpJson.v2" zeebe:modelerTemplateVersion="12" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjAzMzUgOC45OTk5N0MxNy4wMzM1IDEzLjQ0NzUgMTMuNDI4MSAxNy4wNTI5IDguOTgwNjUgMTcuMDUyOUM0LjUzMzE2IDE3LjA1MjkgMC45Mjc3NjUgMTMuNDQ3NSAwLjkyNzc2NSA4Ljk5OTk3QzAuOTI3NzY1IDQuNTUyNDggNC41MzMxNiAwLjk0NzA4MyA4Ljk4MDY1IDAuOTQ3MDgzQzEzLjQyODEgMC45NDcwODMgMTcuMDMzNSA0LjU1MjQ4IDE3LjAzMzUgOC45OTk5N1oiIGZpbGw9IiM1MDU1NjIiLz4KPHBhdGggZD0iTTQuOTMxMjYgMTQuMTU3MUw2Ljc4MTA2IDMuNzE0NzFIMTAuMTM3NUMxMS4xOTE3IDMuNzE0NzEgMTEuOTgyNCAzLjk4MzIzIDEyLjUwOTUgNC41MjAyN0MxMy4wNDY1IDUuMDQ3MzYgMTMuMzE1IDUuNzMzNTggMTMuMzE1IDYuNTc4OTJDMTMuMzE1IDcuNDQ0MTQgMTMuMDcxNCA4LjE1NTIyIDEyLjU4NDEgOC43MTIxNUMxMi4xMDY3IDkuMjU5MTMgMTEuNDU1MyA5LjYzNzA1IDEwLjYyOTggOS44NDU5TDEyLjA2MTkgMTQuMTU3MUgxMC4zMzE1TDkuMDMzNjQgMTAuMDI0OUg3LjI0MzUxTDYuNTEyNTQgMTQuMTU3MUg0LjkzMTI2Wk03LjQ5NzExIDguNTkyODFIOS4yNDI0OEM5Ljk5ODMyIDguNTkyODEgMTAuNTkwMSA4LjQyMzc0IDExLjAxNzcgOC4wODU2MUMxMS40NTUzIDcuNzM3NTMgMTEuNjc0MSA3LjI2NTEzIDExLjY3NDEgNi42Njg0MkMxMS42NzQxIDYuMTkxMDYgMTEuNTI0OSA1LjgxODExIDExLjIyNjUgNS41NDk1OUMxMC45MjgyIDUuMjcxMTMgMTAuNDU1OCA1LjEzMTkgOS44MDkzNiA1LjEzMTlIOC4xMDg3NEw3LjQ5NzExIDguNTkyODFaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="noAuth" target="authentication.type" />
+          <zeebe:input source="POST" target="method" />
+          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/assetlink/AssetLink&#34;" target="url" />
+          <zeebe:input source="={&#10;  &#34;Content-Type&#34;: &#34;Application/json&#34;,&#10;  &#34;accept&#34;: &#34;Application/json&#34;&#10;}" target="headers" />
+          <zeebe:input source="=false" target="storeResponse" />
+          <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
+          <zeebe:input source="=20" target="readTimeoutInSeconds" />
+          <zeebe:input source="={&#10;  &#34;idProsumer&#34;: prosumerID,&#10;  &#34;id&#34;: 0,&#10;  &#34;idUtilityOperator&#34;: UtilityOperatorID&#10;}" target="body" />
+          <zeebe:input source="=false" target="ignoreNullValues" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="elementTemplateVersion" value="12" />
+          <zeebe:header key="elementTemplateId" value="io.camunda.connectors.HttpJson.v2" />
+          <zeebe:header key="resultExpression" value="={&#10;  StatusreceivedMessage: response.status,&#10;  assetLinkId: response.body.id&#10;}" />
+          <zeebe:header key="retryBackoff" value="PT0S" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_b99ea1eb-9f3c-45d4-9361-d7f23611c1c1</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dupaxn</bpmn:outgoing>
     </bpmn:serviceTask>
   </bpmn:process>
   <bpmn:process id="TelemetryManagement" name="TelemetryManagement" isExecutable="true">
@@ -801,15 +827,15 @@
         <di:waypoint x="750" y="205" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Participant_76df3ca7-833d-4742-b903-00df33f6cedf_di" bpmnElement="Participant_76df3ca7-833d-4742-b903-00df33f6cedf" isHorizontal="true">
-        <dc:Bounds x="185" y="474" width="1471" height="382" />
+        <dc:Bounds x="185" y="474" width="1656" height="382" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_0ef45123-e62a-43d1-ae41-47ab2a18856c_di" bpmnElement="Lane_0ef45123-e62a-43d1-ae41-47ab2a18856c" isHorizontal="true">
-        <dc:Bounds x="215" y="474" width="1441" height="232" />
+        <dc:Bounds x="215" y="474" width="1626" height="232" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_b6dee7aa-be68-4579-971d-7f419b06441d_di" bpmnElement="Lane_b6dee7aa-be68-4579-971d-7f419b06441d" isHorizontal="true">
-        <dc:Bounds x="215" y="706" width="1441" height="150" />
+        <dc:Bounds x="215" y="706" width="1626" height="150" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1ywuizy_di" bpmnElement="Event_ae6cefc1-5f4e-4807-9900-6da813149481">
         <dc:Bounds x="262" y="598" width="36" height="36" />
@@ -833,30 +859,8 @@
           <dc:Bounds x="1126" y="744" width="83" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_d3b56817-2356-4a8d-92c3-2ba732773389_di" bpmnElement="Event_d3b56817-2356-4a8d-92c3-2ba732773389">
-        <dc:Bounds x="1445" y="598" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1424" y="634" width="79" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_c61bca2b-2c96-4163-9b8a-72b56b853f50_di" bpmnElement="Event_c61bca2b-2c96-4163-9b8a-72b56b853f50">
-        <dc:Bounds x="1520" y="598" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1503" y="373" width="24" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_0ccjmqi_di" bpmnElement="Gateway_78b85c5c-01dc-4404-8555-ff35920fcebc">
-        <dc:Bounds x="1143" y="591" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_0hxn8j1_di" bpmnElement="Gateway_80c67184-27ec-4ed6-b3a9-a9f92f9da230">
-        <dc:Bounds x="1054" y="591" width="50" height="50" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1v3ndzs_di" bpmnElement="Activity_9a1f746e-fa58-4118-9e43-d8ae475999d1">
         <dc:Bounds x="580" y="576" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_07ih1o6" bpmnElement="Activity_0ae7711" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
-        <dc:Bounds x="919" y="576" width="100" height="80" />
-        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_12ho847_di" bpmnElement="Activity_fdcd84ce-514c-4a3a-a44c-da80d1c96a60">
         <dc:Bounds x="1265" y="746" width="100" height="80" />
@@ -868,10 +872,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0d24ejr_di" bpmnElement="Activity_1n6w6s0" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
         <dc:Bounds x="865" y="746" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1uc4n7n_di" bpmnElement="Activity_00xj0tw" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
-        <dc:Bounds x="1285" y="576" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_03nwna1_di" bpmnElement="Activity_1f9kf1o" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
@@ -891,8 +891,38 @@
       <bpmndi:BPMNShape id="Gateway_152cnsx_di" bpmnElement="Gateway_152cnsx" isMarkerVisible="true">
         <dc:Bounds x="475" y="591" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_0j69d46" bpmnElement="Activity_11d59ia" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
-        <dc:Bounds x="660" y="746" width="100" height="80" />
+      <bpmndi:BPMNShape id="Event_d3b56817-2356-4a8d-92c3-2ba732773389_di" bpmnElement="Event_d3b56817-2356-4a8d-92c3-2ba732773389">
+        <dc:Bounds x="1630" y="598" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1609" y="634" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_c61bca2b-2c96-4163-9b8a-72b56b853f50_di" bpmnElement="Event_c61bca2b-2c96-4163-9b8a-72b56b853f50">
+        <dc:Bounds x="1705" y="598" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1503" y="373" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0ccjmqi_di" bpmnElement="Gateway_78b85c5c-01dc-4404-8555-ff35920fcebc">
+        <dc:Bounds x="1378" y="591" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0hxn8j1_di" bpmnElement="Gateway_80c67184-27ec-4ed6-b3a9-a9f92f9da230">
+        <dc:Bounds x="1289" y="591" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1uc4n7n_di" bpmnElement="Activity_00xj0tw" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="1470" y="576" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1pl9o67" bpmnElement="Activity_1nrer5x" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
+        <dc:Bounds x="1153" y="576" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0bfyohd" bpmnElement="Activity_11d59ia" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
+        <dc:Bounds x="1030" y="576" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_07ih1o6" bpmnElement="Activity_0ae7711" bioc:stroke="#0d4372" bioc:fill="#bbdefb" color:background-color="#bbdefb" color:border-color="#0d4372">
+        <dc:Bounds x="910" y="576" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Edge_c0e58f46-aa3c-4f4c-bc90-1c56276b9db8" bpmnElement="Flow_0bedca68-f247-45d9-8839-64b1fef427e8">
@@ -917,37 +947,22 @@
         <di:waypoint x="1186" y="786" />
         <di:waypoint x="1265" y="786" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Edge_88115421-93e7-4dbb-a762-da807db80a93" bpmnElement="Flow_28fd99be-3edf-4e83-9cc6-0111bc7a9625">
-        <di:waypoint x="1385" y="616" />
-        <di:waypoint x="1445" y="616" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Edge_51da6cc1-53b1-4179-bf15-7cb1bcfc45ef" bpmnElement="Flow_b3b03f8d-3dac-4737-a9cb-1b523dc44000">
-        <di:waypoint x="1481" y="616" />
-        <di:waypoint x="1520" y="616" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Edge_867e70b8-8c60-4a4a-865c-bc1d05769512" bpmnElement="Flow_d36929ea-6cb2-4db4-96c1-a63dbbbd9922">
-        <di:waypoint x="1104" y="616" />
-        <di:waypoint x="1143" y="616" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1ej7dpa_di" bpmnElement="Flow_1ej7dpa">
         <di:waypoint x="1495" y="746" />
         <di:waypoint x="1495" y="686" />
-        <di:waypoint x="1168" y="686" />
-        <di:waypoint x="1168" y="641" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0tnl161_di" bpmnElement="Flow_0tnl161">
-        <di:waypoint x="1193" y="616" />
-        <di:waypoint x="1285" y="616" />
+        <di:waypoint x="1403" y="686" />
+        <di:waypoint x="1403" y="641" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0dupaxn_di" bpmnElement="Flow_0dupaxn">
-        <di:waypoint x="1019" y="616" />
-        <di:waypoint x="1054" y="616" />
+        <di:waypoint x="1010" y="616" />
+        <di:waypoint x="1030" y="616" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_2a583533-b90b-45fa-b1fa-0118207ce189" bpmnElement="Flow_6800485f-fe5f-43a1-bcf5-ef985ab29623">
-        <di:waypoint x="1079" y="641" />
-        <di:waypoint x="1079" y="686" />
-        <di:waypoint x="710" y="686" />
-        <di:waypoint x="710" y="746" />
+        <di:waypoint x="1314" y="641" />
+        <di:waypoint x="1314" y="730" />
+        <di:waypoint x="800" y="730" />
+        <di:waypoint x="800" y="780" />
+        <di:waypoint x="865" y="780" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_8b1f605a-ee70-4731-add9-7768fac85f12" bpmnElement="Flow_5e2bfceb-89ea-4f84-b5c6-5b6617d5966f">
         <di:waypoint x="680" y="616" />
@@ -955,15 +970,11 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Edge_382beea7-aaaa-4245-8ee8-6f41d5bb1b36" bpmnElement="Flow_b99ea1eb-9f3c-45d4-9361-d7f23611c1c1">
         <di:waypoint x="889" y="616" />
-        <di:waypoint x="919" y="616" />
+        <di:waypoint x="910" y="616" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_11bdiq4_di" bpmnElement="Flow_11bdiq4">
         <di:waypoint x="1365" y="786" />
         <di:waypoint x="1445" y="786" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_07sufrg_di" bpmnElement="Flow_07sufrg">
-        <di:waypoint x="760" y="786" />
-        <di:waypoint x="865" y="786" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1s56zm4_di" bpmnElement="Flow_1s56zm4">
         <di:waypoint x="750" y="616" />
@@ -985,6 +996,30 @@
         <di:waypoint x="500" y="591" />
         <di:waypoint x="500" y="550" />
         <di:waypoint x="675" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_88115421-93e7-4dbb-a762-da807db80a93" bpmnElement="Flow_28fd99be-3edf-4e83-9cc6-0111bc7a9625">
+        <di:waypoint x="1570" y="616" />
+        <di:waypoint x="1630" y="616" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_51da6cc1-53b1-4179-bf15-7cb1bcfc45ef" bpmnElement="Flow_b3b03f8d-3dac-4737-a9cb-1b523dc44000">
+        <di:waypoint x="1666" y="616" />
+        <di:waypoint x="1705" y="616" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_867e70b8-8c60-4a4a-865c-bc1d05769512" bpmnElement="Flow_d36929ea-6cb2-4db4-96c1-a63dbbbd9922">
+        <di:waypoint x="1339" y="616" />
+        <di:waypoint x="1378" y="616" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tnl161_di" bpmnElement="Flow_0tnl161">
+        <di:waypoint x="1428" y="616" />
+        <di:waypoint x="1470" y="616" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1x4jz2a_di" bpmnElement="Flow_1x4jz2a">
+        <di:waypoint x="1253" y="616" />
+        <di:waypoint x="1289" y="616" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gdtu40_di" bpmnElement="Flow_1gdtu40">
+        <di:waypoint x="1130" y="616" />
+        <di:waypoint x="1153" y="616" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Participant_b2aa6fc7-e981-472e-be0e-3c861e9b20b3_di" bpmnElement="Participant_b2aa6fc7-e981-472e-be0e-3c861e9b20b3" isHorizontal="true">
         <dc:Bounds x="270" y="915" width="1100" height="150" />
@@ -1057,8 +1092,8 @@
         <di:waypoint x="1072" y="198" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="MessageFlow_b32796fb-8ee6-498a-b75b-d1ac3064a076_di" bpmnElement="MessageFlow_b32796fb-8ee6-498a-b75b-d1ac3064a076">
-        <di:waypoint x="1324" y="576" />
-        <di:waypoint x="1324" y="387" />
+        <di:waypoint x="1509" y="576" />
+        <di:waypoint x="1509" y="387" />
         <di:waypoint x="1164" y="387" />
         <di:waypoint x="1164" y="198" />
       </bpmndi:BPMNEdge>
@@ -1071,8 +1106,8 @@
       <bpmndi:BPMNEdge id="Flow_13newa4_di" bpmnElement="Flow_13newa4">
         <di:waypoint x="1410" y="220" />
         <di:waypoint x="1410" y="409" />
-        <di:waypoint x="1463" y="409" />
-        <di:waypoint x="1463" y="598" />
+        <di:waypoint x="1648" y="409" />
+        <di:waypoint x="1648" y="598" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_13x765b_di" bpmnElement="Flow_13x765b">
         <di:waypoint x="783" y="955" />

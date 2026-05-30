@@ -19,9 +19,9 @@ public class AssetLinkResource {
 
     @Inject
     io.vertx.mutiny.mysqlclient.MySQLPool client;
-    
+
     @Inject
-    @ConfigProperty(name = "myapp.schema.create", defaultValue = "true") 
+    @ConfigProperty(name = "myapp.schema.create", defaultValue = "true")
     boolean schemaCreate ;
 
     @Inject
@@ -37,10 +37,11 @@ public class AssetLinkResource {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS AssetLink").execute()
         .flatMap(r -> client.query("CREATE TABLE AssetLink (id SERIAL PRIMARY KEY, idProsumer BIGINT UNSIGNED, idUtilityOperator BIGINT UNSIGNED, CONSTRAINT UC_Loyal UNIQUE (idProsumer,idUtilityOperator))").execute())
-        .flatMap(r -> client.query(" INSERT INTO AssetLink (idProsumer,idUtilityOperator) VALUES (1,1)").execute())
-        .flatMap(r -> client.query(" INSERT INTO AssetLink (idProsumer,idUtilityOperator) VALUES (2,1)").execute())
-        .flatMap(r -> client.query(" INSERT INTO AssetLink (idProsumer,idUtilityOperator) VALUES (1,3)").execute())
-        .flatMap(r -> client.query(" INSERT INTO AssetLink (idProsumer,idUtilityOperator) VALUES (4,2)").execute())
+        .flatMap(r -> client.query("INSERT INTO AssetLink (id,idProsumer,idUtilityOperator) VALUES (1,1,1)").execute())
+        .flatMap(r -> client.query("INSERT INTO AssetLink (id,idProsumer,idUtilityOperator) VALUES (2,2,2)").execute())
+        .flatMap(r -> client.query("INSERT INTO AssetLink (id,idProsumer,idUtilityOperator) VALUES (3,3,3)").execute())
+        .flatMap(r -> client.query("INSERT INTO AssetLink (id,idProsumer,idUtilityOperator) VALUES (4,4,4)").execute())
+        .flatMap(r -> client.query("INSERT INTO AssetLink (id,idProsumer,idUtilityOperator) VALUES (5,1,3)").execute())
         .await().indefinitely();
     }
 
@@ -53,8 +54,8 @@ public class AssetLinkResource {
     @Path("{id}")
     public Uni<Response> getSingle(Long id) {
         return AssetLink.findById(client, id)
-                .onItem().transform(assetlink -> assetlink != null ? Response.ok(assetlink) : Response.status(Response.Status.NOT_FOUND)) 
-                .onItem().transform(ResponseBuilder::build); 
+                .onItem().transform(assetlink -> assetlink != null ? Response.ok(assetlink) : Response.status(Response.Status.NOT_FOUND))
+                .onItem().transform(ResponseBuilder::build);
     }
      
     @GET
@@ -94,18 +95,18 @@ public class AssetLinkResource {
     }
 
     @POST
-    @Path("topic/{prosumerId}/{utilityOperatorId}")
+    @Path("topic/{assetLinkId}/{utilityOperatorName}")
     @Blocking
-    public Response createTopic(Long prosumerId, Long utilityOperatorId) {
-        topicService.createAssetLinkTopic(prosumerId, utilityOperatorId);
+    public Response createTopic(Long assetLinkId, String utilityOperatorName) {
+        topicService.createAssetLinkTopic(assetLinkId, utilityOperatorName);
         return Response.noContent().build();
     }
 
     @DELETE
-    @Path("topic/{prosumerId}/{utilityOperatorId}")
+    @Path("topic/{assetLinkId}/{utilityOperatorName}")
     @Blocking
-    public Response deleteTopic(Long prosumerId, Long utilityOperatorId) {
-        topicService.deleteAssetLinkTopic(prosumerId, utilityOperatorId);
+    public Response deleteTopic(Long assetLinkId, String utilityOperatorName) {
+        topicService.deleteAssetLinkTopic(assetLinkId, utilityOperatorName);
         return Response.noContent().build();
     }
 }

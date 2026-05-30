@@ -48,10 +48,20 @@ public class EnergyAnalyticsResource {
     private void initdb() {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS EnergyAnalytics").execute()
-        .flatMap(r -> client.query("CREATE TABLE EnergyAnalytics (type ENUM('ENERGY_DISCHARGED_BY_ZONE', 'ENERGY_GENERATED_BY_PROSUMER', 'ENERGY_CONSUMED_BY_PROSUMER', 'AVERAGE_SOC') NOT NULL," +
-                "value DOUBLE NOT NULL, timestamp DATETIME NOT NULL, prosumerId BIGINT UNSIGNED, utilityOperatorId BIGINT UNSIGNED, prosumerName VARCHAR(255), utilityOperatorName VARCHAR(255), gridCellId BIGINT UNSIGNED)").execute())
-        .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, entity_id, value, timestamp) VALUES ('ENERGY_DISCHARGED_BY_ZONE', 'LISBON_SOUTH', 34.2, '2020-10-10 20:00')").execute())
-        .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, entity_id, value, timestamp) VALUES ('ENERGY_GENERATED_BY_PROSUMER', '2', 50, '2020-10-10 20:00')").execute())
+        .flatMap(r -> client.query("CREATE TABLE EnergyAnalytics (" +
+                "type ENUM('ENERGY_DISCHARGED_BY_ZONE','ENERGY_GENERATED_BY_PROSUMER','ENERGY_CONSUMED_BY_PROSUMER','AVERAGE_SOC') NOT NULL," +
+                "value DOUBLE NOT NULL," +
+                "timestamp DATETIME NOT NULL," +
+                "prosumer_id BIGINT UNSIGNED," +
+                "prosumer_name VARCHAR(255)," +
+                "utility_operator_id BIGINT UNSIGNED," +
+                "utility_operator_name VARCHAR(255)," +
+                "grid_cell_id BIGINT UNSIGNED)").execute())
+        .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, value, timestamp, grid_cell_id) VALUES ('ENERGY_DISCHARGED_BY_ZONE',  34.2, '2026-04-15 19:00:00', 1)").execute())
+        .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, value, timestamp, grid_cell_id) VALUES ('ENERGY_DISCHARGED_BY_ZONE',  12.5, '2026-04-15 19:00:00', 2)").execute())
+        .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, value, timestamp, prosumer_id, prosumer_name) VALUES ('ENERGY_GENERATED_BY_PROSUMER', 50.0, '2026-04-15 20:00:00', 3, 'Pedro Porto')").execute())
+        .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, value, timestamp, prosumer_id, prosumer_name) VALUES ('ENERGY_CONSUMED_BY_PROSUMER', 25.0, '2026-04-15 20:00:00', 1, 'Maria Lisbon')").execute())
+        .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, value, timestamp, grid_cell_id) VALUES ('AVERAGE_SOC', 0.78, '2026-04-15 20:00:00', 1)").execute())
         .await().indefinitely();
     }
     

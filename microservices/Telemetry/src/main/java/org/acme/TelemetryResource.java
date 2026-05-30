@@ -10,7 +10,6 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Path("Telemetry")
@@ -55,6 +54,16 @@ public class TelemetryResource {
                         + " EV_SoC FLOAT)").execute())
                 .flatMap(r -> client.query("DROP TABLE IF EXISTS TopicSubscription").execute())
                 .flatMap(r -> client.query("CREATE TABLE TopicSubscription (topic_name VARCHAR(255) PRIMARY KEY, owner_service VARCHAR(255) NOT NULL)").execute())
+                .flatMap(r -> client.query("INSERT INTO Telemetry (timeStamp, asset_id, grid_cell_id, asset_type, State_of_Charge, Current_Output, Status, Current_Generation, Daily_Total, Plug_Status, Charging_Rate, Session_Energy) VALUES "
+                        + "('2026-05-30 19:00:00', 1, 'LISBON_NORTH',   'BATTERY',    0.65,   0.0, 'ONLINE',  NULL, NULL, NULL,        NULL, NULL),"
+                        + "('2026-05-30 19:00:00', 2, 'LISBON_SOUTH',   'SOLAR',      NULL,   NULL, NULL,      5.0, 42.0, NULL,        NULL, NULL),"
+                        + "('2026-05-30 19:00:00', 3, 'SETUBAL_CENTRO', 'BATTERY',    0.85,  10.0, 'ONLINE',  NULL, NULL, NULL,        NULL, NULL),"
+                        + "('2026-05-30 19:00:00', 4, 'SETUBAL_CENTRO', 'EV_CHARGER', NULL,   NULL, 'OK',     NULL, NULL, 'CHARGING',  22.0, 18.0),"
+                        + "('2026-05-30 19:00:00', 5, 'PORTO_NORTH',    'SOLAR',      NULL,   NULL, NULL,      8.0, 65.0, NULL,        NULL, NULL),"
+                        + "('2026-05-30 19:00:00', 6, 'PORTO_NORTH',    'BATTERY',    0.92,   0.0, 'ONLINE',  NULL, NULL, NULL,        NULL, NULL),"
+                        + "('2026-05-30 19:00:00', 7, 'PORTO_NORTH',    'EV_CHARGER', NULL,   NULL, 'OK',     NULL, NULL, 'CHARGING',  80.0, 55.0),"
+                        + "('2026-05-30 19:00:00', 8, 'FARO_CENTRO',    'SOLAR',      NULL,   NULL, NULL,      6.0, 55.0, NULL,        NULL, NULL),"
+                        + "('2026-05-30 19:00:00', 9, 'FARO_CENTRO',    'EV_CHARGER', NULL,   NULL, 'OK',     NULL, NULL, 'PLUGGED',   NULL, 12.0)").execute())
                 .await().indefinitely();
     }
 
@@ -78,24 +87,6 @@ public class TelemetryResource {
         return Telemetry.findAll(client);
     }
 
-    @POST
-    @Path("latest")
-    public Multi<Telemetry> getLatest(@QueryParam("assetIds") List<Long> assetIds) {
-        return Telemetry.findLatestEventsForAssetIds(client, assetIds);
-    }
-
-    @GET
-    @Path("last-hour")
-    public Multi<Telemetry> getLastHourEvents() {
-        return Telemetry.findLastHourEvents(client);
-    }
-
-    @GET
-    @Path("asset/{assetId}/around/{timestamp}/")
-    public Multi<Telemetry> getAssetEventAroundTimestmap(@PathParam("assetId") Long assetId, @PathParam("timestamp") LocalDateTime timestamp) {
-        return Telemetry.findForAssetIdAroundTimestamp(client, assetId, timestamp, 10);
-    }
-
     @GET
     @Path("by-asset/{assetId}")
     public Multi<Telemetry> getByAssetId(@PathParam("assetId") Long assetId) {
@@ -112,14 +103,6 @@ public class TelemetryResource {
     @Path("by-grid-cell-ids/")
     public Multi<Telemetry> getByGridCellId(@QueryParam("gridCellIds") List<String> gridCellIds) {
         return Telemetry.findByGridCellIds(client, gridCellIds);
-    }
-
-    @GET
-    @Path("by-grid-cell-and-assets")
-    public Multi<Telemetry> getByAssetIdsAndGridCell(
-            @QueryParam("gridCellIds") List<String> gridCellIds,
-            @QueryParam("assetIds") List<Long> assetIds) {
-        return Telemetry.findByAssetIdsAndGridCellIds(client, assetIds, gridCellIds);
     }
 
     @GET

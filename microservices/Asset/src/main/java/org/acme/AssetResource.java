@@ -32,8 +32,15 @@ public class AssetResource {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS Asset").execute()
         .flatMap(r -> client.query("CREATE TABLE Asset (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, prosumer_id BIGINT UNSIGNED NOT NULL, asset_type ENUM('BATTERY','SOLAR','EV_CHARGER') NOT NULL)").execute())
-        .flatMap(r -> client.query("INSERT INTO Asset(name, prosumer_id, asset_type) VALUES ('asset-1', 1, 'BATTERY')").execute())
-        .flatMap(r -> client.query("INSERT INTO Asset(name, prosumer_id, asset_type) VALUES ('asset-2', 1, 'BATTERY')").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, asset_type) VALUES (1, 'lisbon-battery-1',   1, 'BATTERY')").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, asset_type) VALUES (2, 'lisbon-solar-1',     1, 'SOLAR')").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, asset_type) VALUES (3, 'setubal-battery-1',  2, 'BATTERY')").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, asset_type) VALUES (4, 'setubal-ev-1',       2, 'EV_CHARGER')").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, asset_type) VALUES (5, 'porto-solar-1',      3, 'SOLAR')").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, asset_type) VALUES (6, 'porto-battery-1',    3, 'BATTERY')").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, asset_type) VALUES (7, 'porto-ev-1',         3, 'EV_CHARGER')").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, asset_type) VALUES (8, 'faro-solar-1',       4, 'SOLAR')").execute())
+        .flatMap(r -> client.query("INSERT INTO Asset(id, name, prosumer_id, asset_type) VALUES (9, 'faro-ev-1',          4, 'EV_CHARGER')").execute())
         .await().indefinitely();
     }
 

@@ -103,7 +103,7 @@
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=600" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=600" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;model&#34;: &#34;llama3.2&#34;,&#10;  &#34;stream&#34;: false,&#10;  &#34;prompt&#34;: &#34;Analyze the following &#39;events&#39; and &#39;telemetry&#39; arrays. Determine the outcome (SUCCESS or FAILURE) for each event. Output a simple json structured as follows: {\&#34;eventId\&#34;: &#60;id&#62;, \&#34;successful\&#34;: \&#34;&#60;true/false&#62;\&#34;}. events: &#34; + string(flexibilityEvents) + &#34; telemetry: &#34; + string(telemetryEvents)&#10;}" target="body" />
+          <zeebe:input source="={&#10;  &#34;model&#34;: &#34;llama3.2&#34;,&#10;  &#34;stream&#34;: false,&#10;  &#34;num_predict&#34;: 128,&#10;  &#34;num_ctx&#34;: 2048,&#10;  &#34;prompt&#34;: &#34;Analyze the following &#39;events&#39; and &#39;telemetry&#39; arrays. Determine the outcome (SUCCESS or FAILURE) for each event. Output a simple json structured as follows: {\&#34;eventId\&#34;: &#60;id&#62;, \&#34;successful\&#34;: \&#34;&#60;true/false&#62;\&#34;}. events: &#34; + string(flexibilityEvents) + &#34; telemetry: &#34; + string(telemetryEvents)&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>

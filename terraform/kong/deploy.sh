@@ -57,13 +57,20 @@ for i in $(seq 1 60); do
   sleep 5
 done
 
-%{ for name, url in MICROSERVICES ~}
-echo "Registering Kong service '${name}' -> ${url}"
-curl -s -X PUT http://localhost:8001/services/${name} \
-  --data "url=${url}" >/dev/null
-curl -s -X PUT http://localhost:8001/services/${name}/routes/${name}-route \
-  --data "paths[]=/${name}" \
-  --data "strip_path=true" >/dev/null
-%{ endfor ~}
+ %{ for name, url in MICROSERVICES ~}
+  echo "Registering Kong service '${name}' -> ${url}"
+  curl -s -X PUT http://localhost:8001/services/${name} \
+    --data "url=${url}" \
+  %{ if name == "ollama" ~}
+    --data "connect_timeout=600000" \
+    --data "read_timeout=600000" \
+    --data "write_timeout=600000" \
+  %{ endif ~}
+    >/dev/null
+  curl -s -X PUT http://localhost:8001/services/${name}/routes/${name}-route \
+    --data "paths[]=/${name}" \
+    --data "strip_path=true" >/dev/null
+  %{ endfor ~}
+
 
 echo "Finished."

@@ -1,0 +1,31 @@
+{
+  "components": [
+    {
+      "text": "# New Energy Analysis",
+      "type": "text",
+      "layout": {
+        "row": "Row_1e68zz1",
+        "columns": null
+      },
+      "id": "Field_1vxth4s"
+    },
+    {
+      "text": "=string join(\n  for a in analytics[item != null] return\n    \"Type: \" + upper case(substring(replace(string(a.type), \"_\", \" \"), 1, 1))\n             + lower case(substring(replace(string(a.type), \"_\", \" \"), 2)) +\n    \"<br/>Entity: \" + string(a.entityId) +\n    \"<br/>Value: \" + string(a.value) +\n    \"<br/>Time: \" + string(a.timestamp),\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_1662eym",
+        "columns": null
+      },
+      "id": "Field_1lqlsyz"
+    }
+  ],
+  "type": "default",
+  "id": "Form_Accept_EnergyAnalytics",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

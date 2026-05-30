@@ -1,10 +1,12 @@
 package org.acme;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.smallrye.common.annotation.Blocking;
+import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -56,7 +58,15 @@ public class EnergyAnalyticsResource {
     public Multi<EnergyAnalytics> get() {
         return EnergyAnalytics.findAll(client);
     }
-    
+
+    @POST
+    @Path("save")
+    public Uni<Response> saveAll(List<EnergyAnalytics> analytics) {
+        return EnergyAnalytics.saveAll(client, analytics)
+                .onItem().transform(saved -> Response.ok(Map.of("saved", saved)).build())
+                .onFailure().recoverWithItem(err -> Response.serverError().entity(err.getMessage()).build());
+    }
+
     @POST
     @Path("analyse")
     @Blocking

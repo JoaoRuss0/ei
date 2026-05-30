@@ -4,10 +4,13 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.mysqlclient.MySQLPool;
 import io.vertx.mutiny.sqlclient.Row;
+import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -38,5 +41,25 @@ public class EnergyAnalytics {
 
     public String toJson() {
         return String.format("{\"type\":\"%s\",\"entityId\":\"%s\",\"value\":%f,\"timestamp\":%s}", this.type.name(), this.entityId, this.value, this.timestamp.toString());
+    }
+
+    public static Uni<Integer> saveAll(MySQLPool client, List<EnergyAnalytics> analytics) {
+        if (analytics == null || analytics.isEmpty()) {
+            return Uni.createFrom().item(0);
+        }
+        List<Tuple> batch = analytics.stream()
+                .map(a -> Tuple.of(a.type.name(), a.entityId, a.value, a.timestamp))
+                .collect(Collectors.toList());
+        return client.preparedQuery("INSERT INTO EnergyAnalytics(type, entity_id, value, timestamp) VALUES (?,?,?,?)")
+                .executeBatch(batch)
+                .onItem().transform(EnergyAnalytics::countRows);
+    }
+
+    private static int countRows(RowSet<Row> rs) {
+        int total = 0;
+        for (RowSet<Row> r = rs; r != null; r = r.next()) {
+            total += r.rowCount();
+        }
+        return total;
     }
 }

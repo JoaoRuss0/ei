@@ -2,6 +2,7 @@ package org.acme;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.vertx.core.json.JsonObject;
 import io.vertx.mutiny.mysqlclient.MySQLPool;
 import io.vertx.mutiny.sqlclient.Row;
 import io.vertx.mutiny.sqlclient.RowSet;
@@ -19,28 +20,63 @@ import java.util.stream.Collectors;
 @ToString
 public class EnergyAnalytics {
 
+    public Long prosumerId;
+    public String prosumerName;
+    public Long utilityOperatorId;
+    public String utilityOperatorName;
     public EnergyAnalyticsType type;
-    public String entityId;
+    public Long gridCellId;
     public Double value;
     public LocalDateTime timestamp;
 
     private static EnergyAnalytics from(Row row) {
-        return new EnergyAnalytics(EnergyAnalyticsType.valueOf(row.getString("type")), row.getString("entity_id"), row.getDouble("value"), row.getLocalDateTime("timestamp"));
+        return new EnergyAnalytics(
+                row.getLong("prosumer_id"),
+                row.getString("prosumer_name"),
+                row.getLong("utility_operator_id"),
+                row.getString("utility_operator_name"),
+                EnergyAnalyticsType.valueOf(row.getString("type")),
+                row.getLong("grid_cell_id"),
+                row.getDouble("value"),
+                row.getLocalDateTime("timestamp"));
     }
 
     public static Multi<EnergyAnalytics> findAll(MySQLPool client) {
-        return client.query("SELECT *  FROM EnergyAnalytics").execute()
+        return client.query("SELECT * FROM EnergyAnalytics").execute()
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
                 .onItem().transform(EnergyAnalytics::from);
     }
 
     public Uni<Boolean> save(MySQLPool client) {
-        return client.preparedQuery("INSERT INTO EnergyAnalytics(type, entity_id, value, timestamp) VALUES (?,?,?,?)").execute(Tuple.of(this.type.name(), this.entityId, this.value, this.timestamp))
-                .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
+        Tuple params = Tuple.tuple()
+                .addLong(this.prosumerId)
+                .addString(this.prosumerName)
+                .addLong(this.utilityOperatorId)
+                .addString(this.utilityOperatorName)
+                .addString(this.type.name())
+                .addLong(this.gridCellId)
+                .addDouble(this.value)
+                .addLocalDateTime(this.timestamp);
+
+        return client.preparedQuery(
+                        "INSERT INTO EnergyAnalytics(prosumer_id, prosumer_name, utility_operator_id, utility_operator_name, type, grid_cell_id, value, timestamp) "
+                                + "VALUES (?,?,?,?,?,?,?,?)")
+                .execute(params)
+                .onItem().transform(rowSet -> rowSet.rowCount() == 1);
     }
 
+
     public String toJson() {
-        return String.format("{\"type\":\"%s\",\"entityId\":\"%s\",\"value\":%f,\"timestamp\":%s}", this.type.name(), this.entityId, this.value, this.timestamp.toString());
+        return new JsonObject()
+                .put("type", this.type == null ? null : this.type.name())
+                .put("prosumerId", this.prosumerId)
+                .put("prosumerName", this.prosumerName)
+                .put("utilityOperatorId", this.utilityOperatorId)
+                .put("utilityOperatorName", this.utilityOperatorName)
+                .put("gridCellId", this.gridCellId)
+                .put("value", this.value)
+                .put("timestamp", this.timestamp == null ? null : this.timestamp.toString())
+                .encode();
     }
 
     public static Uni<Integer> saveAll(MySQLPool client, List<EnergyAnalytics> analytics) {
@@ -48,9 +84,20 @@ public class EnergyAnalytics {
             return Uni.createFrom().item(0);
         }
         List<Tuple> batch = analytics.stream()
-                .map(a -> Tuple.of(a.type.name(), a.entityId, a.value, a.timestamp))
+                .map(a -> Tuple.tuple()
+                        .addLong(a.prosumerId)
+                        .addString(a.prosumerName)
+                        .addLong(a.utilityOperatorId)
+                        .addString(a.utilityOperatorName)
+                        .addString(a.type.name())
+                        .addLong(a.gridCellId)
+                        .addDouble(a.value)
+                        .addLocalDateTime(a.timestamp))
                 .collect(Collectors.toList());
-        return client.preparedQuery("INSERT INTO EnergyAnalytics(type, entity_id, value, timestamp) VALUES (?,?,?,?)")
+
+        return client.preparedQuery(
+                        "INSERT INTO EnergyAnalytics(prosumer_id, prosumer_name, utility_operator_id, utility_operator_name, type, grid_cell_id, value, timestamp) "
+                                + "VALUES (?,?,?,?,?,?,?,?)")
                 .executeBatch(batch)
                 .onItem().transform(EnergyAnalytics::countRows);
     }

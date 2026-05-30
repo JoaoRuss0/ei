@@ -10,7 +10,7 @@
       "id": "Field_1vxth4s"
     },
     {
-      "text": "=string join(\n  for a in analytics[item != null] return\n    \"Type: \" + upper case(substring(replace(string(a.type), \"_\", \" \"), 1, 1))\n             + lower case(substring(replace(string(a.type), \"_\", \" \"), 2)) +\n    \"<br/>Entity: \" + string(a.entityId) +\n    \"<br/>Value: \" + string(a.value) +\n    \"<br/>Time: \" + string(a.timestamp),\n  \"<br/><br/>\"\n)",
+      "text": "=string join(\n  for a in analytics[item != null] return\n    \"Type: \" + upper case(substring(replace(string(a.type), \"_\", \" \"), 1, 1))\n             + lower case(substring(replace(string(a.type), \"_\", \" \"), 2))\n    + (if a.prosumerId != null\n         then \"<br/>Prosumer: \" + (if a.prosumerName != null then a.prosumerName else string(a.prosumerId))\n         else \"\")\n    + (if a.gridCellId != null then \"<br/>Zone: \" + string(a.gridCellId) else \"\")\n    + (if a.utilityOperatorId != null\n         then \"<br/>Operator: \" + (if a.utilityOperatorName != null then a.utilityOperatorName else string(a.utilityOperatorId))\n         else \"\")\n    + \"<br/>Value: \" + string(a.value)\n    + \"<br/>Time: \" + string(a.timestamp),\n  \"<br/><br/>\"\n)",
       "type": "text",
       "layout": {
         "row": "Row_1662eym",

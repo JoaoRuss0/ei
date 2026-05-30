@@ -10,6 +10,7 @@ public record GridUpdateRequest (
         Long maxLoad,
         Long operatorId,
         Long xCoords,
-        Long yCoords
+        Long yCoords,
+        Double currentLoad
 )
 {}

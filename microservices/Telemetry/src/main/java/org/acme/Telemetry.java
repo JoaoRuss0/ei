@@ -168,4 +168,31 @@ public class Telemetry
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
                 .onItem().transform(Telemetry::from);
     }
+
+    public static Multi<Telemetry> findByAssetIdsAndGridCellIds(MySQLPool client, List<Long> assetIds, List<String> gridCellIds) {
+        if (assetIds.isEmpty() || gridCellIds.isEmpty()) return Multi.createFrom().empty();
+
+        String assetPlaceholders = assetIds.stream()
+                .map(id -> "?")
+                .collect(Collectors.joining(","));
+        String cellPlaceholders = gridCellIds.stream()
+                .map(id -> "?")
+                .collect(Collectors.joining(","));
+
+        String query = "SELECT * FROM Telemetry " +
+                "WHERE grid_cell_id IN (" + cellPlaceholders + ") " +
+                "AND asset_id IN (" + assetPlaceholders + ")";
+
+        Tuple params = Tuple.tuple();
+        for (String cellId : gridCellIds) {
+            params.addString(cellId);
+        }
+        for (Long id : assetIds) {
+            params.addLong(id);
+        }
+
+        return client.preparedQuery(query).execute(params)
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(Telemetry::from);
+    }
 }

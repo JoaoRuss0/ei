@@ -1,5 +1,7 @@
 package org.acme;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -52,7 +54,7 @@ public class GrigBalancingRecommendationResource {
     @POST
     @Path("balance")
     @Blocking
-    public Response balance(GridBalancingRequestDTO dto) {
+    public List<GridBalancingRecommendation> balance(GridBalancingRequestDTO dto) {
 
         Map<String, Double> loadByCell = dto.events().stream()
                 .collect(Collectors.groupingBy(
@@ -61,6 +63,8 @@ public class GrigBalancingRecommendationResource {
 
         Map<Coords, GridCellData> byCoords = dto.cells().stream()
                 .collect(Collectors.toMap(c -> new Coords(c.xCoords(), c.yCoords()), c -> c));
+
+        List<GridBalancingRecommendation> recommendations = new ArrayList<>();
 
         for (GridCellData cell : dto.cells()) {
             double load = loadByCell.getOrDefault(cell.id(), 0.0);
@@ -81,6 +85,7 @@ public class GrigBalancingRecommendationResource {
                 GridBalancingRecommendation recommendation = new GridBalancingRecommendation(cell.id(), neighbour.id(), transfer);
                 recommendation.save(client).await().indefinitely();
                 recommendationEmitter.send(recommendation.toJson());
+                recommendations.add(recommendation);
 
                 loadByCell.merge(cell.id(), -transfer, Double::sum);
                 loadByCell.merge(neighbour.id(), transfer, Double::sum);
@@ -90,7 +95,7 @@ public class GrigBalancingRecommendationResource {
             }
         }
 
-        return Response.ok().build();
+        return recommendations;
     }
 
     private double contribution(TelemetryEvent t) {

@@ -32,10 +32,10 @@ public class UtilityOperatorResource {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS UtilityOperator").execute()
         .flatMap(r -> client.query("CREATE TABLE UtilityOperator (id SERIAL PRIMARY KEY, name VARCHAR(255) NOT NULL, location VARCHAR(255) NOT NULL, iban VARCHAR(255) NOT NULL UNIQUE)").execute())
-        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('ArcoCegoLisbon','Lisboa', '123123123')").execute())
-        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('PracadeBocage','Setubal', '123123123')").execute())
-        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('PracadaBoavista','Porto', '123123123')").execute())
-        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('PracaDomFranciscoGomes','Faro', '123123123')").execute())
+        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('ArcoCegoLisbon','Lisboa', '1')").execute())
+        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('PracadeBocage','Setubal', '2')").execute())
+        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('PracadaBoavista','Porto', '3')").execute())
+        .flatMap(r -> client.query("INSERT INTO UtilityOperator (name,location,iban) VALUES ('PracaDomFranciscoGomes','Faro', '4')").execute())
         .await().indefinitely();
     }
     

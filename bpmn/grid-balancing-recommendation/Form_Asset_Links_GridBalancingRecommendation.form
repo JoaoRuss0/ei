@@ -1,0 +1,41 @@
+{
+  "components": [
+    {
+      "label": "Asset Link ID",
+      "type": "number",
+      "layout": {
+        "row": "Row_18j5po1",
+        "columns": null
+      },
+      "id": "Field_1ibnh16",
+      "key": "assetLinkId"
+    },
+    {
+      "text": "# Asset Links",
+      "type": "text",
+      "layout": {
+        "row": "Row_0j6puoi",
+        "columns": null
+      },
+      "id": "Field_1kvgxkl"
+    },
+    {
+      "text": "=string join(\n  for p in ProsumerList return\n    \"ID: \" + string(p.id) +\n    \"<br/>Name: \" + p.name +\n    \"<br/>Fiscal Number: \" + string(p.fiscalNumber) +\n    \"<br/>Location: \" + p.location,\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_1nelt4t",
+        "columns": null
+      },
+      "id": "Field_1413ox1"
+    }
+  ],
+  "type": "default",
+  "id": "Form_Asset_Links_GridBalancingRecommendation",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

@@ -107,5 +107,13 @@ public class TelemetryResource {
     public Multi<Telemetry> getByGridCellId(@PathParam("gridCellId") String gridCellId) {
         return Telemetry.findByGridCellId(client, gridCellId);
     }
+
+    @GET
+    @Path("by-grid-cell-and-assets")
+    public Multi<Telemetry> getByAssetIdsAndGridCell(
+            @QueryParam("gridCellIds") List<String> gridCellIds,
+            @QueryParam("assetIds") List<Long> assetIds) {
+        return Telemetry.findByAssetIdsAndGridCellIds(client, assetIds, gridCellIds);
+    }
 }
 

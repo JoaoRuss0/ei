@@ -142,7 +142,7 @@
     <bpmn:subProcess id="Activity_0mxijc6">
       <bpmn:incoming>Flow_0pau1we</bpmn:incoming>
       <bpmn:outgoing>Flow_0w29qvm</bpmn:outgoing>
-      <bpmn:multiInstanceLoopCharacteristics>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="true">
         <bpmn:extensionElements>
           <zeebe:loopCharacteristics inputCollection="=telemetryEvents" inputElement="telemetryEvent" outputCollection="newFlexibilityEvents" outputElement="=newFlexibilityEvent" />
         </bpmn:extensionElements>
@@ -193,15 +193,15 @@
         <bpmn:incoming>Flow_1p0pm6a</bpmn:incoming>
       </bpmn:endEvent>
       <bpmn:sequenceFlow id="Flow_0puevk8" sourceRef="Activity_0dv2jhg" targetRef="Event_0p8yxsj" />
-      <bpmn:exclusiveGateway id="Gateway_1vq1bum" default="Flow_08uz4ig">
+      <bpmn:exclusiveGateway id="Gateway_1vq1bum" default="Flow_1p0pm6a">
         <bpmn:incoming>Flow_0qykjwz</bpmn:incoming>
         <bpmn:outgoing>Flow_08uz4ig</bpmn:outgoing>
         <bpmn:outgoing>Flow_1p0pm6a</bpmn:outgoing>
       </bpmn:exclusiveGateway>
-      <bpmn:sequenceFlow id="Flow_08uz4ig" sourceRef="Gateway_1vq1bum" targetRef="Activity_0dv2jhg" />
-      <bpmn:sequenceFlow id="Flow_1p0pm6a" sourceRef="Gateway_1vq1bum" targetRef="Event_0p8yxsj">
-        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=new_event_type = "NO_EVENT"</bpmn:conditionExpression>
+      <bpmn:sequenceFlow id="Flow_08uz4ig" sourceRef="Gateway_1vq1bum" targetRef="Activity_0dv2jhg">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=new_event_type = "SELL" or new_event_type = "UNAVAILABLE_FOR_BALANCING"</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_1p0pm6a" sourceRef="Gateway_1vq1bum" targetRef="Event_0p8yxsj" />
     </bpmn:subProcess>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">

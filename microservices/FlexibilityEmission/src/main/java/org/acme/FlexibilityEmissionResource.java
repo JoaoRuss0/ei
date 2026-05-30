@@ -58,6 +58,12 @@ public class FlexibilityEmissionResource {
                         : Response.status(Response.Status.NOT_FOUND).build());
     }
 
+    @GET
+    @Path("/by-prosumer/{prosumerId}")
+    public Multi<FlexibilityEvent> getByProsumerId(@PathParam("prosumerId") Long prosumerId) {
+        return FlexibilityEvent.findByProsumerId(client, prosumerId);
+    }
+
     @POST
     public Uni<Response> create(FlexibilityEvent event) {
         if (event.getEventTime() == null) {

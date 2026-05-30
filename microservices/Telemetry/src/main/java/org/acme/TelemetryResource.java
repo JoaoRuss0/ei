@@ -121,5 +121,11 @@ public class TelemetryResource {
             @QueryParam("assetIds") List<Long> assetIds) {
         return Telemetry.findByAssetIdsAndGridCellIds(client, assetIds, gridCellIds);
     }
+
+    @GET
+    @Path("by-asset-ids/")
+    public Multi<Telemetry> getByAssetIds(@QueryParam("assetIds") List<Long> assetIds) {
+        return Telemetry.findByAssetIds(client, assetIds);
+    }
 }
 

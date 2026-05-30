@@ -81,4 +81,12 @@ public class FlexibilityEvent {
                 .execute(Tuple.of(id))
                 .onItem().transform(rs -> rs.rowCount() == 1);
     }
+
+    public static Multi<FlexibilityEvent> findByProsumerId(MySQLPool client, Long prosumerId) {
+        return client.preparedQuery(
+                        "SELECT id, asset_id, prosumer_id, event_type, event_time FROM FlexibilityEvent WHERE prosumer_id = ? ORDER BY id ASC")
+                .execute(Tuple.of(prosumerId))
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(FlexibilityEvent::from);
+    }
 }

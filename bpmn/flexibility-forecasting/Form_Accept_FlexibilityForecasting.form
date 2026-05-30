@@ -1,0 +1,31 @@
+{
+  "components": [
+    {
+      "text": "# Flexibility Forecasting",
+      "type": "text",
+      "layout": {
+        "row": "Row_1e68zz1",
+        "columns": null
+      },
+      "id": "Field_1vxth4s"
+    },
+    {
+      "text": "=string join(\n  for r in recommendations return\n    \"From: \" + string(r.gridCellFromId) +\n    \"<br/>To: \" + string(r.gridCellToId) +\n    \"<br/>Transfer (kW): \" + string(r.transferKw) +\n    \"<br/>Time: \" + string(r.timestamp),\n  \"<br/><br/>\"\n)",
+      "type": "text",
+      "layout": {
+        "row": "Row_1662eym",
+        "columns": null
+      },
+      "id": "Field_1lqlsyz"
+    }
+  ],
+  "type": "default",
+  "id": "Form_Accept_FlexibilityForecasting",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.47.0"
+  },
+  "schemaVersion": 19
+}

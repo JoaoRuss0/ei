@@ -213,4 +213,22 @@ public class Telemetry
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
                 .onItem().transform(Telemetry::from);
     }
+
+    public static Multi<Telemetry> findByAssetIds(MySQLPool client, List<Long> assetIds) {
+        if (assetIds == null || assetIds.isEmpty()) return Multi.createFrom().empty();
+
+        String placeholders = assetIds.stream()
+                .map(id -> "?")
+                .collect(Collectors.joining(","));
+
+        Tuple params = Tuple.tuple();
+        for (Long id : assetIds) {
+            params.addLong(id);
+        }
+
+        return client.preparedQuery("SELECT * FROM Telemetry WHERE asset_id IN (" + placeholders + ")")
+                .execute(params)
+                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
+                .onItem().transform(Telemetry::from);
+    }
 }

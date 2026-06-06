@@ -31,7 +31,13 @@ done
 
 echo ""
 echo "----- DONE -----"
-
+echo ""
+echo ""
+echo ""
+echo ""
+echo ""
+echo ""
+echo ""
 echo "====================================================================="
 echo "Running integration tests to check if events are sent/consumed"
 echo "====================================================================="

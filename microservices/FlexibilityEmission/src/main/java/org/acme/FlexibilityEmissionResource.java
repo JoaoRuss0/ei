@@ -72,6 +72,11 @@ public class FlexibilityEmissionResource {
             event.setEventTime(LocalDateTime.now());
         }
         return event.save(client)
+                .onItem().invoke(saved -> {
+                    if (saved != null) {
+                        offerEmitter.send(saved.toJson());
+                    }
+                })
                 .onItem().transform(saved -> saved != null
                         ? Response.status(Response.Status.CREATED).entity(saved).build()
                         : Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());

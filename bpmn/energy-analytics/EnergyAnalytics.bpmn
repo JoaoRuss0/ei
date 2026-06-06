@@ -95,21 +95,21 @@
     </bpmn:exclusiveGateway>
     <bpmn:scriptTask id="Activity_0oqkhv3" name="ENERGY_DISCHARGED_BY_ZONE">
       <bpmn:extensionElements>
-        <zeebe:script expression="=(&#10;  {&#10;    discharge: (for e in telemetryEvents[asset_type = &#34;BATTERY&#34; and Current_Output != null and Current_Output &#62; 0] return {&#10;      gridCellId: e.grid_cell_id,&#10;      operatorId: gridCells[id = e.grid_cell_id][1].operatorId,&#10;      v: e.Current_Output&#10;    }),&#10;    result: for z in distinct values(discharge.gridCellId) return {&#10;      type: &#34;ENERGY_DISCHARGED_BY_ZONE&#34;,&#10;      utilityOperatorId: discharge[gridCellId = z][1].operatorId,&#10;      utilityOperatorName: utilityOperators[id = discharge[gridCellId = z][1].operatorId][1].name,&#10;      gridCellId: z,&#10;      value: sum(discharge[gridCellId = z].v),&#10;      timestamp: now()&#10;    }&#10;  }&#10;).result" resultVariable="analytics" />
+        <zeebe:script expression="=(&#10;  {&#10;    discharge: (for e in telemetryEvents[asset_type = &#34;BATTERY&#34; and Current_Output != null and Current_Output &#62; 0] return {&#10;      gridCellId: e.grid_cell_id,&#10;      operatorId: gridCells[id = e.grid_cell_id][1].operatorId,&#10;      v: e.Current_Output&#10;    }),&#10;    result: for z in distinct values(discharge.gridCellId) return {&#10;      type: &#34;ENERGY_DISCHARGED_BY_ZONE&#34;,&#10;      utilityOperatorId: discharge[gridCellId = z][1].operatorId,&#10;      utilityOperatorName: utilityOperators[id = discharge[gridCellId = z][1].operatorId][1].name,&#10;      gridCellId: z,&#10;      value: sum(discharge[gridCellId = z].v),&#10;      timestamp: substring(string(now()), 1, 19)&#10;    }&#10;  }&#10;).result" resultVariable="analytics" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0recl2z</bpmn:incoming>
       <bpmn:outgoing>Flow_0g1zpib</bpmn:outgoing>
     </bpmn:scriptTask>
     <bpmn:scriptTask id="Activity_171lomj" name="ENERGY_GENERATED_BY_PROSUMER">
       <bpmn:extensionElements>
-        <zeebe:script expression="=(&#10;  {&#10;    gen: (for e in telemetryEvents[asset_type = &#34;SOLAR&#34; and Daily_Total != null] return {&#10;      prosumerId: assets[id = e.asset_id][1].prosumerId,&#10;      v: e.Daily_Total&#10;    })[prosumerId != null],&#10;    result: for p in distinct values(gen.prosumerId) return {&#10;      type: &#34;ENERGY_GENERATED_BY_PROSUMER&#34;,&#10;      prosumerId: p,&#10;      prosumerName: prosumers[id = p][1].name,&#10;      value: sum(gen[prosumerId = p].v),&#10;      timestamp: now()&#10;    }&#10;  }&#10;).result" resultVariable="analytics" />
+        <zeebe:script expression="=(&#10;  {&#10;    gen: (for e in telemetryEvents[asset_type = &#34;SOLAR&#34; and Daily_Total != null] return {&#10;      prosumerId: assets[id = e.asset_id][1].prosumerId,&#10;      v: e.Daily_Total&#10;    })[prosumerId != null],&#10;    result: for p in distinct values(gen.prosumerId) return {&#10;      type: &#34;ENERGY_GENERATED_BY_PROSUMER&#34;,&#10;      prosumerId: p,&#10;      prosumerName: prosumers[id = p][1].name,&#10;      value: sum(gen[prosumerId = p].v),&#10;      timestamp: substring(string(now()), 1, 19)&#10;    }&#10;  }&#10;).result" resultVariable="analytics" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1onizkm</bpmn:incoming>
       <bpmn:outgoing>Flow_0j1sk23</bpmn:outgoing>
     </bpmn:scriptTask>
     <bpmn:scriptTask id="Activity_1xg96f8" name="AVERAGE_SOC">
       <bpmn:extensionElements>
-        <zeebe:script expression="=(&#10;  {&#10;    soc: telemetryEvents[asset_type = &#34;BATTERY&#34; and State_of_Charge != null],&#10;    result: [&#10;      {&#10;        type: &#34;AVERAGE_SOC&#34;,&#10;        value: mean(soc.State_of_Charge),&#10;        timestamp: now()&#10;      }&#10;    ]&#10;  }&#10;).result" resultVariable="analytics" />
+        <zeebe:script expression="=(&#10;  {&#10;    soc: telemetryEvents[asset_type = &#34;BATTERY&#34; and State_of_Charge != null],&#10;    result: [&#10;      {&#10;        type: &#34;AVERAGE_SOC&#34;,&#10;        value: mean(soc.State_of_Charge),&#10;        timestamp: substring(string(now()), 1, 19)&#10;      }&#10;    ]&#10;  }&#10;).result" resultVariable="analytics" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_05i7xdu</bpmn:incoming>
       <bpmn:outgoing>Flow_1i6xknt</bpmn:outgoing>
@@ -167,7 +167,7 @@
     </bpmn:exclusiveGateway>
     <bpmn:scriptTask id="Activity_19wv6zo" name="ENERGY_CONSUMED_BY_PROSUMER">
       <bpmn:extensionElements>
-        <zeebe:script expression="=(&#10;  {&#10;    cons: (for e in telemetryEvents[asset_type = &#34;EV_CHARGER&#34; and Session_Energy != null] return {&#10;      prosumerId: assets[id = e.asset_id][1].prosumerId,&#10;      v: e.Session_Energy&#10;    })[prosumerId != null],&#10;    result: for p in distinct values(cons.prosumerId) return {&#10;      type: &#34;ENERGY_CONSUMED_BY_PROSUMER&#34;,&#10;      prosumerId: p,&#10;      prosumerName: prosumers[id = p][1].name,&#10;      value: sum(cons[prosumerId = p].v),&#10;      timestamp: now()&#10;    }&#10;  }&#10;).result" resultVariable="analytics" />
+        <zeebe:script expression="=(&#10;  {&#10;    cons: (for e in telemetryEvents[asset_type = &#34;EV_CHARGER&#34; and Session_Energy != null] return {&#10;      prosumerId: assets[id = e.asset_id][1].prosumerId,&#10;      v: e.Session_Energy&#10;    })[prosumerId != null],&#10;    result: for p in distinct values(cons.prosumerId) return {&#10;      type: &#34;ENERGY_CONSUMED_BY_PROSUMER&#34;,&#10;      prosumerId: p,&#10;      prosumerName: prosumers[id = p][1].name,&#10;      value: sum(cons[prosumerId = p].v),&#10;      timestamp: substring(string(now()), 1, 19)&#10;    }&#10;  }&#10;).result" resultVariable="analytics" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0zagl52</bpmn:incoming>
       <bpmn:outgoing>Flow_16z5wvb</bpmn:outgoing>
@@ -177,12 +177,14 @@
         <zeebe:taskDefinition type="io.camunda:http-json:1" retries="3" />
         <zeebe:ioMapping>
           <zeebe:input source="noAuth" target="authentication.type" />
-          <zeebe:input source="GET" target="method" />
-          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/energyanalytics/EnergyAnalytics&#34;" target="url" />
+          <zeebe:input source="POST" target="method" />
+          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/energyanalytics/EnergyAnalytics/save&#34;" target="url" />
           <zeebe:input source="={&#10;  &#34;Content-Type&#34;: &#34;Application/json&#34;,&#10;  &#34;accept&#34;: &#34;Application/json&#34;&#10;}" target="headers" />
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
+          <zeebe:input source="=analytics" target="body" />
+          <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
           <zeebe:header key="elementTemplateVersion" value="12" />

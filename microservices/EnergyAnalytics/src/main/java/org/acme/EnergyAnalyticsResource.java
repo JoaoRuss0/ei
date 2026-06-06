@@ -74,7 +74,25 @@ public class EnergyAnalyticsResource {
     @Path("save")
     public Uni<Response> saveAll(List<EnergyAnalytics> analytics) {
         return EnergyAnalytics.saveAll(client, analytics)
+                .onItem().invoke(saved -> {
+                    if (saved != null && saved > 0 && analytics != null) {
+                        for (EnergyAnalytics a : analytics) {
+                            emit(a);
+                        }
+                    }
+                })
                 .onItem().transform(saved -> Response.ok(Map.of("saved", saved)).build())
                 .onFailure().recoverWithItem(err -> Response.serverError().entity(err.getMessage()).build());
+    }
+
+    private void emit(EnergyAnalytics a) {
+        if (a == null || a.type == null) return;
+        String payload = a.toJson();
+        switch (a.type) {
+            case ENERGY_DISCHARGED_BY_ZONE -> discargedEmitter.send(payload);
+            case ENERGY_GENERATED_BY_PROSUMER -> generatedEmitter.send(payload);
+            case ENERGY_CONSUMED_BY_PROSUMER -> consumedEmitter.send(payload);
+            case AVERAGE_SOC -> averageSocEmitter.send(payload);
+        }
     }
 }

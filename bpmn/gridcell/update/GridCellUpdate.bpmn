@@ -99,7 +99,7 @@
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;processDefinitionId&#34;: &#34;GridCell_Update_Executor&#34;,&#10;  &#34;variables&#34;: &#10;  { &#10;    &#34;gridCellId&#34;: gridCellId,&#10;    &#34;address&#34;: address,&#10;    &#34;postalCode&#34;: postalCode,&#10;    &#34;peakHoursStartTime&#34;: peakHoursStartTime,&#10;    &#34;peakHoursEndTime&#34;: peakHoursEndTime,&#10;    &#34;maxLoad&#34;: maxLoad,&#10;    &#34;operatorId&#34;: operatorId,&#10;    &#34;xCoords&#34;: xCoords,&#10;    &#34;yCoords&#34;: yCoords,&#10;    &#34;businessKey&#34;: businessKey,&#10;    &#34;gridCellList&#34;: gridCellList,&#10;    &#34;currentGridCell&#34;: gridCellList[item.id = gridCellId][1]&#10;  }&#10;}" target="body" />
+          <zeebe:input source="={&#10;  &#34;processDefinitionId&#34;: &#34;GridCell_Update_Executor&#34;,&#10;  &#34;variables&#34;: &#10;  { &#10;    &#34;gridCellId&#34;: gridCellId,&#10;    &#34;address&#34;: address,&#10;    &#34;postalCode&#34;: postalCode,&#10;    &#34;peakHoursStartTime&#34;: substring(peakHoursStartTime,1,19),&#10;    &#34;peakHoursEndTime&#34;: substring(peakHoursEndTime,1,19),&#10;    &#34;maxLoad&#34;: maxLoad,&#10;    &#34;operatorId&#34;: operatorId,&#10;    &#34;xCoords&#34;: xCoords,&#10;    &#34;yCoords&#34;: yCoords,&#10;    &#34;businessKey&#34;: businessKey,&#10;    &#34;gridCellList&#34;: gridCellList,&#10;    &#34;currentGridCell&#34;: gridCellList[item.id = gridCellId][1]&#10;  }&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>
@@ -337,7 +337,7 @@
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />
           <zeebe:input source="=20" target="readTimeoutInSeconds" />
-          <zeebe:input source="={&#10;  &#34;address&#34;: address,&#10;  &#34;postalCode&#34;: postalCode,&#10;  &#34;peakHoursStartTime&#34;: peakHoursStartTime,&#10;  &#34;peakHoursEndTime&#34;: peakHoursEndTime,&#10;  &#34;maxLoad&#34;: maxLoad,&#10;  &#34;operatorId&#34;: operatorId,&#10;  &#34;xCoords&#34;: xCoords,&#10;  &#34;yCoords&#34;: yCoords&#10;}" target="body" />
+          <zeebe:input source="={&#10;  &#34;address&#34;: address,&#10;  &#34;postalCode&#34;: postalCode,&#10;  &#34;peakHoursStartTime&#34;: string(peakHoursStartTime) + &#34;:00&#34;,&#10;  &#34;peakHoursEndTime&#34;: string(peakHoursEndTime) + &#34;:00&#34;,&#10;  &#34;maxLoad&#34;: maxLoad,&#10;  &#34;operatorId&#34;: operatorId,&#10;  &#34;xCoords&#34;: xCoords,&#10;  &#34;yCoords&#34;: yCoords&#10;}" target="body" />
           <zeebe:input source="=false" target="ignoreNullValues" />
         </zeebe:ioMapping>
         <zeebe:taskHeaders>

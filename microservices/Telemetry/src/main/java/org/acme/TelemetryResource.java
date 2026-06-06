@@ -78,12 +78,6 @@ public class TelemetryResource {
                         + " EV_SoC FLOAT)").execute())
                 .flatMap(r -> client.query("DROP TABLE IF EXISTS TopicSubscription").execute())
                 .flatMap(r -> client.query("CREATE TABLE TopicSubscription (topic_name VARCHAR(255) PRIMARY KEY, owner_service VARCHAR(255) NOT NULL)").execute())
-                // Historical telemetry tied to the seeded FlexibilityEvents — gives
-                // FlexibilityForecasting concrete before/after rows per event.
-                //   Event 1 (asset 6 SELL 04-15 19:30): battery discharges after the signal
-                //   Event 2 (asset 3 SELL 04-20 19:30): battery discharges after the signal
-                //   Event 3 (asset 1 UNAVAILABLE 04-22 03:00): battery offline / very low SoC
-                //   Event 4 (asset 9 UNAVAILABLE 04-25 12:00): EV unplugged
                 .flatMap(r -> client.query("INSERT INTO Telemetry (timeStamp, asset_id, grid_cell_id, asset_type, State_of_Charge, Current_Output, Status, Current_Generation, Daily_Total, Plug_Status, Charging_Rate, Session_Energy) VALUES "
                         + "('2026-04-15 19:25:00', 6, 'PORTO_NORTH',    'BATTERY',    0.92,   0.0, 'ONLINE',   NULL, NULL, NULL,        NULL, NULL),"
                         + "('2026-04-15 19:35:00', 6, 'PORTO_NORTH',    'BATTERY',    0.85,  15.0, 'ONLINE',   NULL, NULL, NULL,        NULL, NULL),"
@@ -91,10 +85,6 @@ public class TelemetryResource {
                         + "('2026-04-20 19:35:00', 3, 'SETUBAL_CENTRO', 'BATTERY',    0.82,  12.0, 'ONLINE',   NULL, NULL, NULL,        NULL, NULL),"
                         + "('2026-04-22 03:00:00', 1, 'LISBON_NORTH',   'BATTERY',    0.20,   0.0, 'OFFLINE',  NULL, NULL, NULL,        NULL, NULL),"
                         + "('2026-04-25 12:00:00', 9, 'FARO_CENTRO',    'EV_CHARGER', NULL,   NULL, 'OK',      NULL, NULL, 'UNPLUGGED', NULL, NULL)").execute())
-                // Current snapshot @ 2026-05-30 19:00 — peak hour in Porto/Setubal.
-                // PORTO_NORTH overloaded (+80 EV − 8 solar = +72 vs max_load 50) → run
-                // GridBalancingRecommendation BPMN to get a transfer recommendation.
-                // Asset 6 SoC=0.92 during peak → run FlexibilityEmission BPMN to emit SELL.
                 .flatMap(r -> client.query("INSERT INTO Telemetry (timeStamp, asset_id, grid_cell_id, asset_type, State_of_Charge, Current_Output, Status, Current_Generation, Daily_Total, Plug_Status, Charging_Rate, Session_Energy) VALUES "
                         + "('2026-05-30 19:00:00', 1, 'LISBON_NORTH',   'BATTERY',    0.65,   0.0, 'ONLINE',  NULL, NULL, NULL,        NULL, NULL),"
                         + "('2026-05-30 19:00:00', 2, 'LISBON_SOUTH',   'SOLAR',      NULL,   NULL, NULL,      5.0, 42.0, NULL,        NULL, NULL),"

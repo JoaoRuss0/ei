@@ -1,5 +1,6 @@
 package org.acme;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
@@ -27,6 +28,7 @@ public class EnergyAnalytics {
     public EnergyAnalyticsType type;
     public String gridCellId;
     public Double value;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     public LocalDateTime timestamp;
 
     private static EnergyAnalytics from(Row row) {

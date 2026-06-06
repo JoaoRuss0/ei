@@ -47,7 +47,12 @@
       },
       "id": "Field_phs",
       "key": "peakHoursStartTime",
-      "description": "Peak hours start (YYYY-MM-DDTHH:mm:ss)"
+      "description": "Peak hours start (YYYY-MM-DDTHH:mm:ss)",
+      "timeSerializingFormat": "no_timezone",
+      "validate": {
+        "required": false
+      },
+      "properties": {}
     },
     {
       "subtype": "datetime",

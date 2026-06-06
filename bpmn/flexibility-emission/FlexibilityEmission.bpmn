@@ -84,7 +84,7 @@
         <zeebe:ioMapping>
           <zeebe:input source="noAuth" target="authentication.type" />
           <zeebe:input source="GET" target="method" />
-          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/telemetry/Telemetry?&#34; +&#10;      string join(for a in assets return &#34;assetIds=&#34; + string(a.id), &#34;&#38;&#34;)" target="url" />
+          <zeebe:input source="=&#34;http://{{secrets.KONG_ADDRESS}}:8000/telemetry/Telemetry/by-asset-ids?&#34; +&#10;      string join(for a in assets return &#34;assetIds=&#34; + string(a.id), &#34;&#38;&#34;)" target="url" />
           <zeebe:input source="={&#10;  &#34;accept&#34;: &#34;Application/json&#34;&#10;}" target="headers" />
           <zeebe:input source="=false" target="storeResponse" />
           <zeebe:input source="=20" target="connectionTimeoutInSeconds" />

@@ -1,13 +1,54 @@
-@startuml GridCellManagement
+@startuml Grid Cell Management Business Process
 title Grid Cell Management Business Process
 
-participant Camunda
-participant Kong
-participant "Grid Cell Microservice" as MS
+participant "Utility Operator" as UO
+participant "Camunda" as C
+participant "Grid Cell Manager"
+participant "Kong" as K
+participant "Grid Cell Microservice" as G
+participant "Telemetry Microservice" as T
 
-Camunda -> Kong : CRUD Request
-Kong -> MS : Forward Request
-note right of MS : Process request
-MS -> Kong : Response
-Kong -> Camunda : Forward Response
+UO -> C : CRUD Operation
+C -> "Grid Cell Manager" : Grid Cell CRUD Request
+"Grid Cell Manager" -> K : Get Grid Cell List
+"Grid Cell Manager" -> K : Get Telemetry
+
+K -> G : Forward request
+K -> T : Forward request
+
+T -> K : Return response
+G -> K : Return response
+
+K -> "Grid Cell Manager" : Forward response
+
+"Grid Cell Manager" -> C : Accept/Deny based on received data
+
+note left of C
+  Continues on Accept
+end note
+
+C -> K : CRUD Request
+K -> G : Forward Request
+
+note right of G
+  Process request
+end note
+
+G -> K : Response
+K -> C : Forward Response
+C -> UO : Review Result
+UO -> C : Accept/Deny
+
+note left of C
+  Continues on Deny
+end note
+
+C -> K : Revert Operation
+K -> G : Forward Request
+note right of G
+  Process request
+end note
+G -> K : Response
+K -> C : Forward Response
+C -> UO : Review Result
 @enduml

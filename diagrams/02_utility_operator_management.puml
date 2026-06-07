@@ -1,13 +1,58 @@
-@startuml UtilityOperatorManagement
+@startuml Utility Operator Management Business Process
 title Utility Operator Management Business Process
 
-participant Camunda
-participant Kong
-participant "Utility Operator Microservice" as MS
+participant "Utility Operator" as UO
+participant "Camunda" as C
+participant "Utility Operator Manager"
+participant "Kong" as K
+participant "Utility Operator Microservice" as U
+participant "Asset Link" as AL
+participant "Grid Cell Microservice" as G
 
-Camunda -> Kong : CRUD Request
-Kong -> MS : Forward Request
-note right of MS : Process request
-MS -> Kong : Response
-Kong -> Camunda : Forward Response
+UO -> C : CRUD Operation
+C -> "Utility Operator Manager" : Utility Operator CRUD Request
+"Utility Operator Manager" -> K : Get Utility Operator List
+"Utility Operator Manager" -> K : Get Asset Links
+"Utility Operator Manager" -> K : Get Grid Cells
+
+K -> U : Forward request
+K -> AL : Forward request
+K -> G : Forward request
+
+G -> K : Return response
+AL -> K : Return response
+U -> K : Return response
+
+K -> "Utility Operator Manager" : Forward response
+
+"Utility Operator Manager" -> C : Accept/Deny based on received data
+
+note left of C
+  Continues on Accept
+end note
+
+C -> K : CRUD Request
+K -> U : Forward Request
+
+note right of U
+  Process request
+end note
+
+U -> K : Response
+K -> C : Forward Response
+C -> UO : Review Result
+UO -> C : Accept/Deny
+
+note left of C
+  Continues on Deny
+end note
+
+C -> K : Revert Operation
+K -> U : Forward Request
+note right of U
+  Process request
+end note
+U -> K : Response
+K -> C : Forward Response
+C -> UO : Review Result
 @enduml

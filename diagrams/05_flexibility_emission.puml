@@ -13,43 +13,49 @@ Which will either
 Depending on SOC percentage and on the grid cell peak hour range.
 '/
 
+participant VPaaS
 participant Camunda
 participant Kong
 participant "Prosumer Microservice" as Pros
 participant "Asset Microservice" as Asset
-participant "Telemetry Microservice" as Tel
 participant "Grid Cell Microservice" as GC
+participant "Telemetry Microservice" as Tel
+participant "DMN Table" as DMNT
 participant "Flexibility Emission Microservice" as Flex
 participant Kafka
 
 Camunda -> Kong : Read Request
 Kong -> Pros : Forward Request
-note right of Pros : Process request
 Pros -> Kong : Response
 Kong -> Camunda : Forward Response
 
+VPaaS -> Camunda: Send Prosumer ID
+
 Camunda -> Kong : Read Prosumer Assets Request
 Kong -> Asset : Forward Request
-note right of Asset : Process request
 Asset -> Kong : Response
 Kong -> Camunda : Forward Response
 
-Camunda -> Kong : Read Assets' Latest Telemetry Event Request
-Kong -> Tel : Forward Request
-note right of Tel : Process request
-Tel -> Kong : Response
-Kong -> Camunda : Forward Response
-
-Camunda -> Kong : Read Grid Cells by Id Request
+Camunda -> Kong : Read Grid Cells
 Kong -> GC : Forward Request
-note right of GC : Process request
 GC -> Kong : Response
 Kong -> Camunda : Forward Response
 
-Camunda -> Kong : Evaluate Request
-Kong -> Flex : Forward Request
-note right of Flex : Process request
-Flex -> Kafka : Produce to Topic: flexibility-offers
-Flex -> Kong : Response
+Camunda -> Kong : Read Assets Telemetry Events Request
+Kong -> Tel : Forward Request
+Tel -> Kong : Response
 Kong -> Camunda : Forward Response
+
+loop For each telemetry event
+    Camunda -> DMNT : Decide event type
+    DMNT -> Camunda : Return Event Type (if any)
+    Camunda -> Kong : Create Event
+    Kong -> Flex : Forward Request
+    note right of Flex : Process request
+    Flex -> Kafka : Produce to Topic: flexibility-offers
+    Flex -> Kong : Response
+    Kong -> Camunda : Forward Response
+end
+
+Camunda -> VPaaS : Review Flexibility Events
 @enduml

@@ -1,0 +1,28 @@
+@startuml Asset Link Read Business Process
+title Asset Management Read Business Process
+
+participant "Prosumer"
+participant "Camunda" as C
+participant "Asset Link Manager" as ALM
+participant "Kong" as K
+participant "Asset Link Microservice" as A
+
+Prosumer -> C : CRUD Operation
+C -> ALM : Asset Link Read Request
+ALM -> C : Accept/Deny
+
+note left of C
+  Continues on Accept
+end note
+
+C -> K : Read Request
+K -> A : Forward Request
+
+note right of A
+  Process request
+end note
+
+A -> K : Response
+K -> C : Forward Response
+C -> Prosumer : Review Result
+@enduml

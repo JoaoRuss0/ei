@@ -1,16 +1,58 @@
 @startuml Prosumer Management Business Process
 title Prosumer Management Business Process
 
+participant "Prosumer"
 participant "Camunda" as C
+participant "Prosumer Manager"
 participant "Kong" as K
 participant "Prosumer Microservice" as P
+participant "Asset Link" as AL
+participant "Assets" as A
+
+Prosumer -> C : CRUD Operation
+C -> "Prosumer Manager" : Prosumer CRUD Request
+"Prosumer Manager" -> K : Get Prosumer List
+"Prosumer Manager" -> K : Get Asset Links
+"Prosumer Manager" -> K : Get Assets
+
+K -> P : Forward request
+K -> AL : Forward request
+K -> A : Forward request
+
+A -> K : Return response
+AL -> K : Return response
+P -> K : Return response
+
+K-> "Prosumer Manager" : Forward response
+
+"Prosumer Manager" -> C : Accept/Deny based on received data
+
+note left of C
+  Continues on Accept
+end note
 
 C -> K : CRUD Request
+K -> P : Forward Request
+
+note right of P
+  Process request
+end note
+
+P -> K : Response
+K -> C : Forward Response
+C -> Prosumer : Review Result
+Prosumer -> C : Accept/Deny
+
+note left of C
+  Continues on Deny
+end note
+
+C -> K : Revert Operation
 K -> P : Forward Request
 note right of P
   Process request
 end note
 P -> K : Response
 K -> C : Forward Response
-
+C -> Prosumer : Review Result
 @enduml

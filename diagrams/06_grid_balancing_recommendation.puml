@@ -1,39 +1,56 @@
 @startuml GridBalancingRecommendation
 title Grid Balancing Recommendation Business Process
 
-/'
-Get all grid cells using the Grid Cell Microservice. GET /GridCell
-Get latest telemetry events for those grid cells using the Telemetry Microservice. GET /Telemetry/latest
-(Each telemetry event carries its own grid_cell_id, so we don't need to query Asset by grid cell.)
-Send to Grid Balancing Microservice for processing and produce balancing events. POST /balance
-
-The business process does not need to query the Prosumer, Utility Operator and Asset Link microservices - as it is in
-the project statement - since all the information we need can be obtained from the previous endpoints.
-'/
-
-participant Camunda
+participant VPaaS
+participant Camunda as C
 participant Kong
+participant "Prosumer Microservice" as P
+participant "Asset Link Microservice" as AL
+participant "Utility Operator Microservice" as UO
 participant "Grid Cell Microservice" as GC
-participant "Telemetry Microservice" as Tel
+participant "Telemetry Microservice" as T
 participant "Grid Balancing Microservice" as GB
 participant Kafka
 
-Camunda -> Kong : Read All Grid Cells Request
+
+C -> Kong : Read request
+Kong -> P : Forward Request
+P -> Kong : Response
+Kong -> C : Forward Response
+
+VPaaS -> C : Send Prosumer Id
+
+C -> Kong : Read Prosumer Asset Links request
+Kong -> AL : Forward Request
+AL -> Kong : Response
+Kong -> C : Forward Response
+
+VPaaS -> C : Send Asset Link Id
+
+C -> Kong : Read Asset Link Utility Operator request
+Kong -> UO : Forward Request
+UO -> Kong : Response
+Kong -> C : Forward Response
+
+C -> Kong : Read Utility Operator Grid Cells request
 Kong -> GC : Forward Request
-note right of GC : Process request
 GC -> Kong : Response
-Kong -> Camunda : Forward Response
+Kong -> C : Forward Response
 
-Camunda -> Kong : Read Latest Telemetry Events Request
-Kong -> Tel : Forward Request
-note right of Tel : Process request
-Tel -> Kong : Response
-Kong -> Camunda : Forward Response
+VPaaS -> C : Send Grid Cell Ids
 
-Camunda -> Kong : Analyse Request
+C -> Kong : Read Grid Cell Ids Telemetry Events
+Kong -> T : Forward Request
+T -> Kong : Response
+Kong -> C : Forward Response
+
+C -> Kong : Balance Load Between Grid Cells
 Kong -> GB : Forward Request
-note right of GB : Process request
-GB -> Kafka : Produce to Topic: balancing-recommendation
+GB -> Kafka : Produce to balancing-recommendation
+note right of Kafka: Event Produced
 GB -> Kong : Response
-Kong -> Camunda : Forward Response
+Kong -> C : Forward Response
+
+C -> VPaaS  : Review Balancing Recommendations
+
 @enduml

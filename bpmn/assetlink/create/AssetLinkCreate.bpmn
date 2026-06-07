@@ -1093,8 +1093,8 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="MessageFlow_b32796fb-8ee6-498a-b75b-d1ac3064a076_di" bpmnElement="MessageFlow_b32796fb-8ee6-498a-b75b-d1ac3064a076">
         <di:waypoint x="1509" y="576" />
-        <di:waypoint x="1509" y="387" />
-        <di:waypoint x="1164" y="387" />
+        <di:waypoint x="1509" y="450" />
+        <di:waypoint x="1164" y="450" />
         <di:waypoint x="1164" y="198" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="MessageFlow_cbea70d9-e9d1-4f59-aaba-33b2f9c4e1d9_di" bpmnElement="MessageFlow_cbea70d9-e9d1-4f59-aaba-33b2f9c4e1d9">

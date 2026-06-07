@@ -1013,8 +1013,8 @@
         <di:waypoint x="280" y="598" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_13newa4_di" bpmnElement="Flow_13newa4">
-        <di:waypoint x="1368" y="219" />
-        <di:waypoint x="1368" y="409" />
+        <di:waypoint x="1410" y="220" />
+        <di:waypoint x="1410" y="409" />
         <di:waypoint x="1463" y="409" />
         <di:waypoint x="1463" y="598" />
       </bpmndi:BPMNEdge>
@@ -1044,8 +1044,8 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_15vwtub_di" bpmnElement="Flow_15vwtub">
         <di:waypoint x="500" y="484" />
-        <di:waypoint x="500" y="401" />
-        <di:waypoint x="940" y="401" />
+        <di:waypoint x="500" y="390" />
+        <di:waypoint x="940" y="390" />
         <di:waypoint x="940" y="318" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

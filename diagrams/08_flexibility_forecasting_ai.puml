@@ -1,28 +1,35 @@
 @startuml FlexibilityForecasting
 title Flexibility Forecasting (AI) Business Process
 
-/'
-In order to forecast flexibility outcomes we fetch past flexibility events from the Flexibility Event Microservice. GET /FlexibilityEvent
-We fetch telemetry events for the flexibility event's assets, 10 events before and 10 after the flexibility event's timestamp. GET /Telemetry/asset/{assetId}/around/{timestamp}
-We then send the gathered context to the Ollama server with a prompt asking it to classify each event as SUCCESS or FAILURE and produce a sentiment analysis on the outcome.
-'/
-
+participant VPaaS
 participant Camunda
 participant Kong
-participant "Flexibility Event Microservice" as Flex
-participant "Telemetry Microservice" as Tel
+participant "Prosumer Microservice" as P
+participant "Asset Microservice" as A
+participant "Telemetry Microservice" as T
+participant "Flexibility Event Microservice" as F
 participant Ollama
 
-Camunda -> Kong : Read Past Flexibility Events Request
-Kong -> Flex : Forward Request
-note right of Flex : Process request
-Flex -> Kong : Response
+Camunda -> Kong : Read Prosumers
+Kong -> P : Forward Request
+P -> Kong : Response
 Kong -> Camunda : Forward Response
 
-Camunda -> Kong : Read Telemetry Around Events Request
-Kong -> Tel : Forward Request
-note right of Tel : Process request
-Tel -> Kong : Response
+VPaaS -> Camunda : Send Prosumer Id
+
+Camunda -> Kong : Read Prosumer Assets
+Kong -> A : Forward Request
+A -> Kong : Response
+Kong -> Camunda : Forward Response
+
+Camunda -> Kong : Read Asset Telemetry
+Kong -> T : Forward Request
+T -> Kong : Response
+Kong -> Camunda : Forward Response
+
+Camunda -> Kong : Read Prosumer Flexibility Events
+Kong -> F : Forward Request
+F -> Kong : Response
 Kong -> Camunda : Forward Response
 
 Camunda -> Kong : Forecast Request (prompt + context)
@@ -30,4 +37,6 @@ Kong -> Ollama : Forward Request
 note right of Ollama : Analyze logs,\nclassify outcomes
 Ollama -> Kong : Response
 Kong -> Camunda : Forward Response
+
+Camunda -> VPaaS : Review AI response
 @enduml

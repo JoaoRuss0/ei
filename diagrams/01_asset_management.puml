@@ -1,0 +1,54 @@
+@startuml Asset Management Business Process
+title Asset Management Business Process
+
+participant "Prosumer"
+participant "Camunda" as C
+participant "Asset Manager"
+participant "Kong" as K
+participant "Asset Microservice" as A
+participant "Telemetry Microservice" as T
+
+Prosumer -> C : CRUD Operation
+C -> "Asset Manager" : Asset CRUD Request
+"Asset Manager" -> K : Get Asset List
+"Asset Manager" -> K : Get Telemetry
+
+K -> A : Forward request
+K -> T : Forward request
+
+T -> K : Return response
+A -> K : Return response
+
+K -> "Asset Manager" : Forward response
+
+"Asset Manager" -> C : Accept/Deny based on received data
+
+note left of C
+  Continues on Accept
+end note
+
+C -> K : CRUD Request
+K -> A : Forward Request
+
+note right of A
+  Process request
+end note
+
+A -> K : Response
+K -> C : Forward Response
+C -> Prosumer : Review Result
+Prosumer -> C : Accept/Deny
+
+note left of C
+  Continues on Deny
+end note
+
+C -> K : Revert Operation
+K -> A : Forward Request
+note right of A
+  Process request
+end note
+A -> K : Response
+K -> C : Forward Response
+C -> Prosumer : Review Result
+@enduml

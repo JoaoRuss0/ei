@@ -1,0 +1,74 @@
+@startuml AssetLinkManagement
+title Asset Link Create/Read Business Process
+
+/'
+In order to create an asset link we need to first make a contract between the prosumer and utility operator. POST /AssetLink
+Create a new topic(s) in Ka using the AssetLink microservice POST /AssetLink/topic/{prosumerId}/{utilityOperatorId}
+Activate the consumption of said topic(s) by the Telemetry Microservice POST /Telemetry/consume
+'/
+
+participant Prosumer as P
+participant Camunda as C
+participant "AssetLink Manager" as ALM
+participant "Telemetry Manager" as TM
+participant Kong as K
+participant "AssetLink Microservice" as AL
+participant "Utility Operator Microservice" as UO
+participant "Prosumer Microservice" as PM
+participant Kafka as Ka
+participant "Telemetry Microservice" as T
+
+P -> C: Select Operation
+
+C -> K : Get Utility Operators
+C -> K : Get Prosumers
+C -> K : Get Asset Links
+
+K -> AL : Forward request
+K -> UO : Forward request
+K -> PM : Forward request
+
+PM -> K : Return response
+UO -> K : Return response
+AL -> K : Return response
+
+K -> C : Forward response
+
+P -> C : Create/Delete Operation
+
+C -> ALM : Create/Delete operation
+ALM -> C : Accept/Deny
+
+note left of C : Continues on Accept
+
+C -> K : Create/Delete Asset Link
+K -> AL : Forward request
+note right of AL : Process Request
+AL -> K : Return response
+K -> C : Forward response
+
+C -> K : Retrieve Utility Operator Name
+K -> UO : Forward request
+UO -> K : Return response
+K -> C : Forward response
+
+C -> K : Create/Delete Topic
+K -> AL : Forward request
+AL -> Ka : Create/Delete Topic 'AssetLinkId-UtilityOperatorName'
+AL -> K : Return response
+K -> C : Forward response
+
+C -> TM : Check Consume/Stop Topic
+TM -> C : Approve Consume/Stop Topic
+C -> K : Consume/Stop
+K -> T : Forward request
+note right of T : Process Request
+T -> K : Return response
+K -> C : Forward response
+
+C -> ALM: Review Consume/Stop Topic
+ALM -> C : Approve Telemetry Consume/Stop
+
+C -> P : Review Result
+
+@enduml

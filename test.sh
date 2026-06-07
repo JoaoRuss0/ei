@@ -37,6 +37,11 @@ echo "Running integration tests to check if events are sent/consumed"
 echo "====================================================================="
 
 cd integration-tests
+./asset-lifecycle.sh
+./asset-link-lifecycle.sh
+./prosumer-lifecycle.sh
+./grid-cell-lifecycle.sh
+./utility-operator-lifecycle.sh
 ./topic-creation-workflow.sh
 ./flexibility-emission.sh
 ./grid-balancing.sh

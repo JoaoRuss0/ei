@@ -228,6 +228,7 @@ echo "- Ollama: http://""$(cd terraform/microservices/ollama && terraform state 
 
 echo "[DEPLOYING ALL MICROSERVICES] ..."
 
+(create_kafka_topics                                                       ) > logs/kafka_topics.log          2>&1 & KFT_PID=$!
 (deploy_microservice "Asset"                        "asset"                ) > logs/asset.log                 2>&1 & ASS_PID=$!
 (deploy_microservice "GridCell"                     "grid_cell"            ) > logs/grid_cell.log             2>&1 & GDC_PID=$!
 (deploy_microservice "Prosumer"                     "prosumer"             ) > logs/prosumer.log              2>&1 & PRO_PID=$!
@@ -238,7 +239,7 @@ echo "[DEPLOYING ALL MICROSERVICES] ..."
 (deploy_microservice "GridBalancingRecommendation"  "grid_balancing"       ) > logs/grid_balancing.log        2>&1 & GDB_PID=$!
 (deploy_microservice "Telemetry"                    "telemetry"            ) > logs/telemetry.log             2>&1 & TEL_PID=$!
 
-wait $ASS_PID $GDC_PID $PRO_PID $UTO_PID $ASL_PID $ENA_PID $FLX_PID $GDB_PID $TEL_PID
+wait $ASS_PID $GDC_PID $PRO_PID $UTO_PID $ASL_PID $ENA_PID $FLX_PID $GDB_PID $TEL_PID $KFT_PID
 
 echo "- Asset: http://""$(cd terraform/microservices/asset                                && get_terraform_dns asset)"":8080/q/swagger-ui"
 echo "- GridCell: http://""$(cd terraform/microservices/grid_cell                         && get_terraform_dns gridcell)"":8080/q/swagger-ui"
@@ -269,7 +270,6 @@ export addressKonga="$(cd terraform/konga && terraform state show aws_instance.k
 echo "- Camunda: http://$addressCamunda:8080/operate"
 echo "- Konga: http://$addressKonga:1337/"
 
-create_kafka_topics
 deploy_camunda_resources
 
 echo "[DONE]"

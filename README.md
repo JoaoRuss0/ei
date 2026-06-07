@@ -49,6 +49,11 @@ A microservice-based platform that orchestrates prosumers, utility operators, gr
 │
 ├── integration-tests/                 ← end-to-end scripts driven by curl + kafka-console-consumer
 │   ├── _lib.sh                        ← shared helpers (capture_next_message / await_captured_message)
+│   ├── asset-lifecycle.sh             ← CRUD lifecycle: GET-all → POST → GET → PUT → GET → DELETE → GET-404
+│   ├── asset-link-lifecycle.sh        ← CRD + by-prosumer-id / by-utilityoperator-id lookups (no PUT)
+│   ├── prosumer-lifecycle.sh          ← CRUD lifecycle for Prosumer
+│   ├── grid-cell-lifecycle.sh         ← CRUD lifecycle for GridCell (string ID, UNIQUE coord triple)
+│   ├── utility-operator-lifecycle.sh  ← CRUD lifecycle for UtilityOperator (UNIQUE iban)
 │   ├── topic-creation-workflow.sh     ← full lifecycle: create entities → topic → consume → cleanup
 │   ├── flexibility-emission.sh        ← POST FlexibilityEvent → read flexibility-offers
 │   ├── grid-balancing.sh              ← POST /balance → read balancing-recommendation
@@ -93,13 +98,13 @@ Provisions RDS + Kafka + Ollama + 9 Quarkus microservices + Kong + Konga + Camun
 
 What it does, in order:
 1. Spins up **RDS, Kafka, Ollama** in parallel (logs in `logs/{rds,kafka,ollama}.log`).
-2. Spins up **all 9 microservices** in parallel, passing the RDS + Kafka addresses (`logs/<service>.log`).
+2. Spins up **all 9 microservices** in parallel, passing the RDS + Kafka addresses (`logs/<service>.log`) and creates the six needed Kafka topics.
 3. Generates `terraform/kong/microservices.auto.tfvars.json` with every service's DNS, deploys **Kong**.
 4. Deploys **Camunda** and **Konga** in parallel.
-5. Creates the six Kafka topics that the smallrye-kafka producers expect.
-6. Waits for Camunda to be ready, then POSTs every `.form`, `.dmn`, and `.bpmn` under `bpmn/` to its `/v2/deployments` endpoint.
+5. Waits for Camunda to be ready, then POSTs every `.form`, `.dmn`, and `.bpmn` under `bpmn/` to its `/v2/deployments` endpoint.
 
-After it finishes, each public URL is printed. For programmatic access run `source ./addresses.sh` to populate `$KAFKA_CLUSTER`, `$DB_ADDRESS`, `$KONG_URL`, `$CAMUNDA_URL`, and each `$<SERVICE>_URL`.
+After it finishes, each public URL should be printed.
+To get these addresses, you can also run `./addresses.sh` or `source ./addresses.sh`, if you feel the need to populate `$KAFKA_CLUSTER`, `$DB_ADDRESS`, `$KONG_URL`, `$CAMUNDA_URL`, and each `$<SERVICE>_URL`.
 
 ## Full undeploy
 
@@ -107,7 +112,8 @@ After it finishes, each public URL is printed. For programmatic access run `sour
 ./undeploy.sh
 ```
 
-Runs `terraform destroy -auto-approve` on every module in parallel. Per-module logs go to `logs/<name>_destroy.log`. Idempotent — safe to re-run on a partial state.
+Runs `terraform destroy -auto-approve` on every terraform component in parallel.
+Per-module logs go to `logs/<name>_destroy.log`. Idempotent — safe to re-run on a partial state.
 
 ## Remote-update a specific microservice
 
@@ -157,17 +163,33 @@ Camunda versions each deployment automatically — new process instances pick up
 ```bash
 ./test.sh
 ```
+Runs all `microservices/` unit tests, then the integration-test scripts under `integration-tests/`.
 
-Runs `grid-balancing.sh`, `topic-creation-workflow.sh`, `flexibility-emission.sh`, `energy-analytics.sh`, and `ollama.sh` against the deployed services. Each test:
+Integration scripts run in this order against the deployed services:
 
-- Pre-positions a Kafka consumer on the target topic via `_lib.sh::capture_next_message`
-- POSTs to trigger the producer
-- Awaits the message via `await_captured_message`
-- Deletes every entity it created (reverse-creation order)
+1. **CRUD lifecycle smoke tests** — `asset-lifecycle.sh`, `asset-link-lifecycle.sh`, `prosumer-lifecycle.sh`, `grid-cell-lifecycle.sh`, `utility-operator-lifecycle.sh`. Each one walks read-all → create → read-one → update → read-one → delete → read-one (expect 404), asserts the expected HTTP status at every step, and registers a `trap … EXIT` so the created row is removed even if an assertion fails mid-flight. Payloads are chosen so they never collide with seeded data or with any `UNIQUE` constraint. `asset-link-lifecycle.sh` substitutes the update step with `by-prosumer-id` and `by-utilityoperator-id` lookups, since `AssetLink` has no `PUT` endpoint.
+2. **Event-driven scenarios** — `topic-creation-workflow.sh`, `flexibility-emission.sh`, `grid-balancing.sh`, `energy-analytics.sh`, `ollama.sh`. Each one:
+   - Pre-positions a Kafka consumer on the target topic via `_lib.sh::capture_next_message`
+   - POSTs to trigger the producer
+   - Awaits the message via `await_captured_message`
+   - Deletes every entity it created (reverse-creation order)
 
 `topic-creation-workflow.sh` additionally provisions an AssetLink Kafka topic, runs the bundled `event-producer.jar` against it, verifies Telemetry persisted the row, then stops the Telemetry consumer, deletes the topic, and tears down all five entities it created.
 
-## Useful one-liners
+### Running unit tests for a single microservice
+
+`test.sh` loops over every service in `microservices/`. To run the unit tests for **just one** service, invoke its bundled Maven wrapper directly:
+
+```bash
+# Run the full unit-test suite of one service
+cd microservices/Telemetry && ./mvnw clean test
+```
+
+Replace `Telemetry` with any of `Asset`, `AssetLink`, `EnergyAnalytics`, `FlexibilityEmission`, `GridBalancingRecommendation`, `GridCell`, `Prosumer`, or `UtilityOperator`.
+
+Each service's tests are `@QuarkusTest`s that spin up a real MySQL 8.0 container via Quarkus DevServices (`%test.quarkus.datasource.devservices.enabled=true` in `application.properties`), so **Docker must be running locally**. No deployed AWS infrastructure is required — the suite is fully self-contained.
+
+## Misc
 
 ```bash
 # Export every public address into the current shell
@@ -176,13 +198,9 @@ source ./addresses.sh
 # Tail a service's deploy log
 tail -f logs/telemetry.log
 
-# Consume from a topic with topic label + key + timestamp
+# Consume from a topic
 ./kafka-binary/bin/kafka-console-consumer.sh \
     --bootstrap-server "$KAFKA_CLUSTER" \
     --include "balancing-recommendation|flexibility-offers|energy-discharged-by-zone|generated-energy-by-prosumer|consumed-energy-by-prosumer|average-soc" \
-    --from-beginning --property print.topic=true --property print.key=true --property print.timestamp=true
-
-# Open Camunda Operate
-open "http://$(cd terraform/camunda && terraform output -raw public_dns 2>/dev/null || \
-    terraform state show aws_instance.camunda_engine_instance | awk -F\\\" '/public_dns/{print $2; exit}'):8080/operate"
+    --from-beginning
 ```

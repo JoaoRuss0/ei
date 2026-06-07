@@ -204,3 +204,126 @@ tail -f logs/telemetry.log
     --include "balancing-recommendation|flexibility-offers|energy-discharged-by-zone|generated-energy-by-prosumer|consumed-energy-by-prosumer|average-soc" \
     --from-beginning
 ```
+
+## Seeded data — start any business process out of the box
+
+Every microservice's `initdb()` populates its table with a small but **internally consistent fixture** the first time the service boots. Together they form a complete graph (Prosumers ↔ AssetLinks ↔ UtilityOperators, Assets owned by Prosumers, GridCells owned by Operators, Telemetry tied to Assets and Cells) so you can kick off every BPMN process **without creating a single row by hand**.
+
+Headline figures:
+
+| Entity              | Seeded rows                                                                                                  |
+| ------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `Prosumer`          | 4 — `Maria Lisbon` (1), `Joao Setubal` (2), `Pedro Porto` (3), `Ana Faro` (4)                                |
+| `UtilityOperator`   | 4 — `ArcoCegoLisbon` (1), `PracadeBocage` (2), `PracadaBoavista` (3), `PracaDomFranciscoGomes` (4)           |
+| `Asset`             | 9 — three per city, mixing `BATTERY` / `SOLAR` / `EV_CHARGER`                                                |
+| `GridCell`          | 6 — `PORTO_NORTH`, `PORTO_SOUTH`, `LISBON_NORTH`, `LISBON_SOUTH`, `SETUBAL_CENTRO`, `FARO_CENTRO`            |
+| `AssetLink`         | 5 — one self-link per (prosumer, operator) pair + a cross-link `(Maria Lisbon → PracadaBoavista)`            |
+| `Telemetry`         | 15 — spread across April 15/20/22/25 and May 30 2026; pre-seeded `Status` / `Plug_Status` / kW values        |
+| Kafka topics        | 5 AssetLink topics (`1-ArcoCegoLisbon`, `2-PracadeBocage`, `3-PracadaBoavista`, `4-PracaDomFranciscoGomes`, `5-PracadaBoavista`) auto-created on AssetLink startup and consumed by Telemetry on startup |
+
+The next sections give you concrete BPMN form inputs that are **guaranteed to produce real events** on top of this seeded data — no extra telemetry simulation required.
+
+### Flexibility Emission — guaranteed to emit
+
+The DMN classifies events as `SELL` when `In Peak Hours = true AND State of Charge ≥ 0.9 AND Asset Type = BATTERY`, and as `UNAVAILABLE_FOR_BALANCING` when `State of Charge ≤ 0.2 AND Asset Type = BATTERY`.
+
+Start the `FlexibilityEmission` process and on the prosumer-id form, pick:
+
+- **`prosumerId = 3` (Pedro Porto)** → asset `6` (`porto-battery-1`, BATTERY in `PORTO_NORTH`, peak hours 18:00–21:00) has seeded telemetry at `2026-04-15T19:25` with `SoC=0.92` and `19:35` with `SoC=0.85`. The `19:25` event sits inside Porto's peak window with SoC ≥ 0.9 → DMN fires `SELL`, the microservice POSTs the event and publishes it to the `flexibility-offers` Kafka topic. ✅
+- **`prosumerId = 1` (Maria Lisbon)** → asset `1` (`lisbon-battery-1`, BATTERY in `LISBON_NORTH`) has a seeded `OFFLINE`, `SoC=0.20` row at `2026-04-22T03:00`. SoC ≤ 0.2 fires `UNAVAILABLE_FOR_BALANCING` independently of peak hours. ✅
+
+Verify via the Kafka topic:
+```bash
+./kafka-binary/bin/kafka-console-consumer.sh --bootstrap-server "$KAFKA_CLUSTER" \
+    --topic flexibility-offers --from-beginning
+```
+
+### Grid Balancing Recommendation — guaranteed to emit
+
+The seeded `2026-05-30 19:00` batch deliberately overloads `PORTO_NORTH` (`maxLoad = 50 kW`):
+
+| Telemetry event on `PORTO_NORTH`        | Contribution to load |
+| --------------------------------------- | -------------------- |
+| Asset 5 — SOLAR, `Current_Generation = 8`  | `−8`                  |
+| Asset 6 — BATTERY, ONLINE, `Current_Output = 0` | `0`                   |
+| Asset 7 — EV_CHARGER, CHARGING, `Charging_Rate = 80` | `+80`                |
+| **Net load**                            | **`+72 kW` → overload of 22 kW above maxLoad 50** |
+
+Neighbour cells available for transfer (same coords-grid):
+- `PORTO_SOUTH` at `(0,1)`, `maxLoad = 60`, no events → headroom 60 kW.
+- `LISBON_NORTH` at `(1,0)`, `maxLoad = 80`, no events → headroom 80 kW.
+
+Start the `GridBalancingRecommendation` process and on the operator form pick:
+- **`utilityOperatorId = 3` (PracadaBoavista)** — owner of both Porto cells, so the algorithm sees both the overloaded cell *and* a neighbour with headroom. → emits a `{from: PORTO_NORTH, to: PORTO_SOUTH, transfer_kw: ≈22}` record to the `balancing-recommendation` topic. ✅
+
+Verify:
+```bash
+curl "$GRID_BALANCING_URL/GridBalancing" | jq '.[-1]'
+# or
+./kafka-binary/bin/kafka-console-consumer.sh --bootstrap-server "$KAFKA_CLUSTER" \
+    --topic balancing-recommendation --from-beginning
+```
+
+### Energy Analytics — guaranteed to emit on all four channels
+
+The `EnergyAnalytics` BPMN supports four analysis types; the seeded telemetry is enough to make every one of them produce non-zero values.
+
+- **`ENERGY_DISCHARGED_BY_ZONE` for `PORTO_NORTH`** — asset 6 has a non-zero `Current_Output = 15` row at `2026-04-15T19:35` → emits to topic `energy-discharged-by-zone`.
+- **`ENERGY_GENERATED_BY_PROSUMER` for prosumer 3 (Pedro Porto)** — assets 5 and 8 are SOLAR with seeded `Current_Generation` values (8 kW, 5 kW respectively) → emits to topic `generated-energy-by-prosumer`.
+- **`ENERGY_CONSUMED_BY_PROSUMER` for prosumer 3 (Pedro Porto)** — asset 7 (`porto-ev-1`) has `CHARGING` events with `Charging_Rate = 80` → emits to topic `consumed-energy-by-prosumer`.
+- **`AVERAGE_SOC` for `PORTO_NORTH`** — asset 6 has multiple SoC samples (`0.92`, `0.85`) → emits to topic `average-soc`.
+
+Verify all four at once:
+```bash
+./kafka-binary/bin/kafka-console-consumer.sh --bootstrap-server "$KAFKA_CLUSTER" \
+    --include "energy-discharged-by-zone|generated-energy-by-prosumer|consumed-energy-by-prosumer|average-soc" \
+    --from-beginning
+```
+
+> **Tip.** All of the above work because `myapp.schema.create=true` is the default in `application.properties`, so any service restart re-runs `initdb()`. If you want to test against accumulated state instead, set the property to `false` before redeploying — see the note in the *Remote-update a specific microservice* section.
+
+## Telemetry resilience — `TopicSubscriptionRecoveryService`
+
+Telemetry's per-AssetLink Kafka consumers are not just spawned on the fly by the `AssetLinkCreate` BPMN — every active consumer is also **persisted** to a `TopicSubscription` table (`topic_name PRIMARY KEY`, `owner_service`). This is what makes the service surviveable across restarts and lets a healthy instance take over for a failed one without re-running any BPMN.
+
+### How it works
+
+- Every Telemetry instance has a unique `ServiceId.SERVICE_ID` (UUID) generated at startup.
+- When the AssetLink BPMN calls `POST /Telemetry/consume`, the `KafkaConsumerService`:
+  1. inserts a row into `TopicSubscription` with `owner_service = <this instance's UUID>`,
+  2. spins up a `DynamicTopicConsumer` thread for the topic,
+  3. registers the worker in the in-memory `KafkaDynamicConsumerTracker`.
+- `POST /Telemetry/stop` reverses the process — it only deletes the row if the current instance owns it, so two instances can't accidentally steal each other's subscriptions.
+
+### Recovery on startup
+
+On boot, every Telemetry instance runs `TopicSubscriptionRecoveryService.onStartup()`. It reads the config property:
+
+```properties
+recovery.failed-service-uuids=<comma-separated UUIDs of dead instances>
+```
+
+For every UUID listed, it queries `TopicSubscription` for topics owned by that UUID and **takes over each one**:
+
+```java
+private void takeOver(String topicName) {
+    TopicSubscription.updateOwnerService(client, topicName, ServiceId.SERVICE_ID).await().indefinitely();
+    DynamicTopicConsumer worker = new DynamicTopicConsumer(topicName, kafkaServers, client);
+    worker.start();
+    tracker.track(new Topic(topicName), worker);
+}
+```
+
+After the takeover the new instance is the owner of record, its tracker holds the live consumer thread, and the old UUID is no longer referenced. Telemetry ingestion resumes for the orphaned topics without operator intervention from Camunda.
+
+### Operating notes
+
+- **Empty/unset** `recovery.failed-service-uuids` is the normal case — no recovery runs, the instance only consumes topics created by BPMN flows after its own startup. The seeded topics (`1-ArcoCegoLisbon`, …, `5-PracadaBoavista`) are picked up at boot via the separate seed-topic logic, not via recovery.
+- The property can be set per-instance via `application.properties`, or via `JAVA_TOOL_OPTIONS="-Drecovery.failed-service-uuids=<uuid1>,<uuid2>"` on the live container — useful when you've identified a dead pod and want a sibling to inherit its work.
+- Because the table is shared (every Telemetry instance points at the same RDS schema), **only one** instance should be told to recover a given UUID at a time — otherwise multiple workers would race to take ownership. In practice you only nominate a single recovery target.
+- Subscriptions can also be audited from the DB:
+  ```bash
+  mysql -h "$DB_ADDRESS" -u <user> -p TelemetryDB \
+      -e "SELECT topic_name, owner_service FROM TopicSubscription;"
+  ```
+

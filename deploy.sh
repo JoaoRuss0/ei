@@ -269,11 +269,7 @@ export addressKonga="$(cd terraform/konga && terraform state show aws_instance.k
 echo "- Camunda: http://$addressCamunda:8080/operate"
 echo "- Konga: http://$addressKonga:1337/"
 
-echo "[WAITING FOR CAMUNDA TO BE READY] ..."
-deploy_camunda_resources > logs/camunda_resources.log 2>&1 & CAMRES_PID=$!
-
 create_kafka_topics
-
-wait $CAMRES_PID
+deploy_camunda_resources
 
 echo "[DONE]"

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.smallrye.common.annotation.Blocking;
+import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -38,11 +39,8 @@ public class GrigBalancingRecommendationResource {
     }
 
     private void initdb() {
-        // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS GridBalancingRecommendation").execute()
-        .flatMap(r -> client.query("CREATE TABLE GridBalancingRecommendation (grid_cell_from_id VARCHAR(255) NOT NULL, grid_cell_to_id VARCHAR(255) NOT NULL, transfer_kw DOUBLE NOT NULL, timestamp DATETIME NOT NULL, UNIQUE KEY UK_EVENT (grid_cell_from_id, grid_cell_to_id, timestamp))").execute())
-        // Each recommendation must be between coord-adjacent cells under the SAME operator —
-        // that's what GrigBalancingRecommendationResource.balance() can actually produce.
+        .flatMap(r -> client.query("CREATE TABLE GridBalancingRecommendation (id SERIAL PRIMARY KEY, grid_cell_from_id VARCHAR(255) NOT NULL, grid_cell_to_id VARCHAR(255) NOT NULL, transfer_kw DOUBLE NOT NULL, timestamp DATETIME NOT NULL, UNIQUE KEY UK_EVENT (grid_cell_from_id, grid_cell_to_id, timestamp))").execute())
         .flatMap(r -> client.query("INSERT INTO GridBalancingRecommendation (grid_cell_from_id, grid_cell_to_id, transfer_kw, timestamp) VALUES ('PORTO_NORTH',  'PORTO_SOUTH',  22.0, '2026-04-15 19:00:00')").execute())
         .flatMap(r -> client.query("INSERT INTO GridBalancingRecommendation (grid_cell_from_id, grid_cell_to_id, transfer_kw, timestamp) VALUES ('LISBON_NORTH', 'LISBON_SOUTH',  8.0, '2026-04-19 10:00:00')").execute())
         .flatMap(r -> client.query("INSERT INTO GridBalancingRecommendation (grid_cell_from_id, grid_cell_to_id, transfer_kw, timestamp) VALUES ('PORTO_SOUTH',  'PORTO_NORTH',  4.5, '2026-04-21 20:30:00')").execute())
@@ -52,6 +50,24 @@ public class GrigBalancingRecommendationResource {
     @GET
     public Multi<GridBalancingRecommendation> get() {
         return GridBalancingRecommendation.findAll(client);
+    }
+
+    @GET
+    @Path("{id}")
+    public Uni<Response> getById(@PathParam("id") Long id) {
+        return GridBalancingRecommendation.findById(client, id)
+                .onItem().transform(r -> r != null
+                        ? Response.ok(r).build()
+                        : Response.status(Response.Status.NOT_FOUND).build());
+    }
+
+    @DELETE
+    @Path("{id}")
+    public Uni<Response> deleteById(@PathParam("id") Long id) {
+        return GridBalancingRecommendation.delete(client, id)
+                .onItem().transform(deleted -> deleted
+                        ? Response.noContent().build()
+                        : Response.status(Response.Status.NOT_FOUND).build());
     }
 
     @POST

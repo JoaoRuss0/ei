@@ -142,6 +142,12 @@ public class Telemetry
                 .onItem().transform(Telemetry::from);
     }
 
+    public static Uni<Integer> deleteByAssetId(MySQLPool client, Long assetId) {
+        return client.preparedQuery("DELETE FROM Telemetry WHERE asset_id = ?")
+                .execute(Tuple.of(assetId))
+                .onItem().transform(RowSet::rowCount);
+    }
+
     public static Multi<Telemetry> findByAssetIds(MySQLPool client, List<Long> assetIds) {
         if (assetIds == null || assetIds.isEmpty()) return Multi.createFrom().empty();
 

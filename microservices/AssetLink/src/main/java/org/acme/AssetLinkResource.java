@@ -29,9 +29,6 @@ public class AssetLinkResource {
     @Inject
     KafkaTopicService topicService;
 
-    // Seeded asset link -> utility operator name (matches UtilityOperator.initdb).
-    // Used to pre-create Kafka topics on startup so the demo flow doesn't require
-    // running the create-link BPMN to start producing telemetry.
     static final List<Map.Entry<Long, String>> SEED_TOPICS = List.of(
             Map.entry(1L, "ArcoCegoLisbon"),
             Map.entry(2L, "PracadeBocage"),

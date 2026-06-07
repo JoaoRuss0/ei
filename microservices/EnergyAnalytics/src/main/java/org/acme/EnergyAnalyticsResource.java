@@ -49,6 +49,7 @@ public class EnergyAnalyticsResource {
         // In a production environment this configuration SHOULD NOT be used
         client.query("DROP TABLE IF EXISTS EnergyAnalytics").execute()
         .flatMap(r -> client.query("CREATE TABLE EnergyAnalytics (" +
+                "id SERIAL PRIMARY KEY," +
                 "type ENUM('ENERGY_DISCHARGED_BY_ZONE','ENERGY_GENERATED_BY_PROSUMER','ENERGY_CONSUMED_BY_PROSUMER','AVERAGE_SOC') NOT NULL," +
                 "value DOUBLE NOT NULL," +
                 "timestamp DATETIME NOT NULL," +
@@ -83,6 +84,24 @@ public class EnergyAnalyticsResource {
                 })
                 .onItem().transform(saved -> Response.ok(Map.of("saved", saved)).build())
                 .onFailure().recoverWithItem(err -> Response.serverError().entity(err.getMessage()).build());
+    }
+
+    @GET
+    @Path("{id}")
+    public Uni<Response> getById(@PathParam("id") Long id) {
+        return EnergyAnalytics.findById(client, id)
+                .onItem().transform(a -> a != null
+                        ? Response.ok(a).build()
+                        : Response.status(Response.Status.NOT_FOUND).build());
+    }
+
+    @DELETE
+    @Path("{id}")
+    public Uni<Response> deleteById(@PathParam("id") Long id) {
+        return EnergyAnalytics.delete(client, id)
+                .onItem().transform(deleted -> deleted
+                        ? Response.noContent().build()
+                        : Response.status(Response.Status.NOT_FOUND).build());
     }
 
     private void emit(EnergyAnalytics a) {

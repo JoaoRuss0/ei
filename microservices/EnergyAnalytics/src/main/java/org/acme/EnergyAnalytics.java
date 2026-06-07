@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 @ToString
 public class EnergyAnalytics {
 
+    public Long id;
     public Long prosumerId;
     public String prosumerName;
     public Long utilityOperatorId;
@@ -33,6 +34,7 @@ public class EnergyAnalytics {
 
     private static EnergyAnalytics from(Row row) {
         return new EnergyAnalytics(
+                row.getLong("id"),
                 row.getLong("prosumer_id"),
                 row.getString("prosumer_name"),
                 row.getLong("utility_operator_id"),
@@ -44,9 +46,20 @@ public class EnergyAnalytics {
     }
 
     public static Multi<EnergyAnalytics> findAll(MySQLPool client) {
-        return client.query("SELECT * FROM EnergyAnalytics").execute()
+        return client.query("SELECT * FROM EnergyAnalytics ORDER BY id ASC").execute()
                 .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
                 .onItem().transform(EnergyAnalytics::from);
+    }
+
+    public static Uni<EnergyAnalytics> findById(MySQLPool client, Long id) {
+        return client.preparedQuery("SELECT * FROM EnergyAnalytics WHERE id = ?").execute(Tuple.of(id))
+                .onItem().transform(RowSet::iterator)
+                .onItem().transform(iterator -> iterator.hasNext() ? from(iterator.next()) : null);
+    }
+
+    public static Uni<Boolean> delete(MySQLPool client, Long id) {
+        return client.preparedQuery("DELETE FROM EnergyAnalytics WHERE id = ?").execute(Tuple.of(id))
+                .onItem().transform(rs -> rs.rowCount() == 1);
     }
 
     public Uni<Boolean> save(MySQLPool client) {
@@ -70,6 +83,7 @@ public class EnergyAnalytics {
 
     public String toJson() {
         return new JsonObject()
+                .put("id", this.id)
                 .put("type", this.type == null ? null : this.type.name())
                 .put("prosumerId", this.prosumerId)
                 .put("prosumerName", this.prosumerName)

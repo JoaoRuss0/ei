@@ -19,10 +19,11 @@ class EnergyAnalyticsResourceTest {
     @BeforeEach
     void setup() {
         client.query("DELETE FROM EnergyAnalytics").execute()
-                .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, value, timestamp, grid_cell_id) " +
-                        "VALUES ('ENERGY_DISCHARGED_BY_ZONE', 34.2, '2026-01-01 20:00:00', 'PORTO_NORTH')").execute())
-                .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (type, value, timestamp, prosumer_id, prosumer_name) " +
-                        "VALUES ('ENERGY_GENERATED_BY_PROSUMER', 50.0, '2026-01-01 20:00:00', 2, 'client2')").execute())
+                .flatMap(r -> client.query("ALTER TABLE EnergyAnalytics AUTO_INCREMENT = 1").execute())
+                .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (id, type, value, timestamp, grid_cell_id) " +
+                        "VALUES (1, 'ENERGY_DISCHARGED_BY_ZONE', 34.2, '2026-01-01 20:00:00', 'PORTO_NORTH')").execute())
+                .flatMap(r -> client.query("INSERT INTO EnergyAnalytics (id, type, value, timestamp, prosumer_id, prosumer_name) " +
+                        "VALUES (2, 'ENERGY_GENERATED_BY_PROSUMER', 50.0, '2026-01-01 20:00:00', 2, 'client2')").execute())
                 .await().indefinitely();
     }
 
@@ -80,5 +81,48 @@ class EnergyAnalyticsResourceTest {
                 .then()
                 .statusCode(200)
                 .body("saved", is(0));
+    }
+
+    @Test
+    void testGetByIdSuccess() {
+        given()
+                .pathParam("id", 1)
+                .when().get("/EnergyAnalytics/{id}")
+                .then()
+                .statusCode(200)
+                .body("id", is(1))
+                .body("type", is("ENERGY_DISCHARGED_BY_ZONE"))
+                .body("gridCellId", is("PORTO_NORTH"));
+    }
+
+    @Test
+    void testGetByIdNotFound() {
+        given()
+                .pathParam("id", 999)
+                .when().get("/EnergyAnalytics/{id}")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    void testDeleteByIdSuccess() {
+        given()
+                .pathParam("id", 1)
+                .when().delete("/EnergyAnalytics/{id}")
+                .then()
+                .statusCode(204);
+
+        given().pathParam("id", 1).when().get("/EnergyAnalytics/{id}").then().statusCode(404);
+
+        given().when().get("/EnergyAnalytics").then().statusCode(200).body("size()", is(1));
+    }
+
+    @Test
+    void testDeleteByIdNotFound() {
+        given()
+                .pathParam("id", 999)
+                .when().delete("/EnergyAnalytics/{id}")
+                .then()
+                .statusCode(404);
     }
 }

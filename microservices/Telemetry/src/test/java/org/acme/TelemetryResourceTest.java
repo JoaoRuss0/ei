@@ -133,4 +133,43 @@ class TelemetryResourceTest {
 
         Mockito.verify(kafkaConsumerService).stop(new Topic("test-topic"));
     }
+
+    @Test
+    void testDeleteByAssetIdRemovesAllRowsForAsset() {
+        given()
+                .pathParam("assetId", 1)
+                .when().delete("/Telemetry/by-asset/{assetId}")
+                .then()
+                .statusCode(200)
+                .body("deleted", is(3));
+
+        given()
+                .pathParam("assetId", 1)
+                .when().get("/Telemetry/by-asset/{assetId}")
+                .then()
+                .statusCode(200)
+                .body("size()", is(0));
+
+        given()
+                .when().get("/Telemetry")
+                .then()
+                .statusCode(200)
+                .body("size()", is(3));
+    }
+
+    @Test
+    void testDeleteByAssetIdMissingReturnsZero() {
+        given()
+                .pathParam("assetId", 999)
+                .when().delete("/Telemetry/by-asset/{assetId}")
+                .then()
+                .statusCode(200)
+                .body("deleted", is(0));
+
+        given()
+                .when().get("/Telemetry")
+                .then()
+                .statusCode(200)
+                .body("size()", is(6));
+    }
 }

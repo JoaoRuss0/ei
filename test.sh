@@ -30,12 +30,6 @@ for service in "${SERVICES[@]}"; do
 done
 
 echo ""
-echo "----- DONE -----"
-echo ""
-echo ""
-echo ""
-echo ""
-echo ""
 echo ""
 echo ""
 echo "====================================================================="
@@ -43,8 +37,10 @@ echo "Running integration tests to check if events are sent/consumed"
 echo "====================================================================="
 
 cd integration-tests
-./grid-balancing.sh
 ./topic-creation-workflow.sh
+./flexibility-emission.sh
+./grid-balancing.sh
+./energy-analytics.sh
 ./ollama.sh
 
 echo ""

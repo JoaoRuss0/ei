@@ -1,9 +1,11 @@
 package org.acme;
 
 import io.smallrye.common.annotation.Blocking;
+import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Response;
 
 import org.acme.model.Topic;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -11,6 +13,7 @@ import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Multi;
 
 import java.util.List;
+import java.util.Map;
 
 @Path("Telemetry")
 public class TelemetryResource {
@@ -140,6 +143,13 @@ public class TelemetryResource {
     @Path("by-asset-ids/")
     public Multi<Telemetry> getByAssetIds(@QueryParam("assetIds") List<Long> assetIds) {
         return Telemetry.findByAssetIds(client, assetIds);
+    }
+
+    @DELETE
+    @Path("by-asset/{assetId}")
+    public Uni<Response> deleteByAssetId(@PathParam("assetId") Long assetId) {
+        return Telemetry.deleteByAssetId(client, assetId)
+                .onItem().transform(deleted -> Response.ok(Map.of("deleted", deleted)).build());
     }
 }
 

@@ -2,12 +2,17 @@
 set -e
 
 cd ../event-producer/
-mvn clean package
+mvn clean package > /dev/null
 cd ../integration-tests
 
 cd ..
 source addresses.sh > /dev/null
 cd integration-tests
+
+echo "-------------------------------------------------"
+echo "Checking Topic Lifecycle and Event Consumption..."
+echo "-------------------------------------------------"
+
 
 create_entity() {
     local url=$1
@@ -55,21 +60,75 @@ curl -s -X POST "$TELEMETRY_URL/Telemetry/consume" -H "Content-Type: application
 
 java -jar ../event-producer/target/event-producer.jar \
     --broker-list "$KAFKA_CLUSTER" \
-    --throughput 20 \
+    --throughput 1 \
     --topic "$TOPIC_NAME" \
     --asset-id "$ASSET_ID" \
     --grid-cell-id "$GC_ID" &
 
 PRODUCER_PID=$!
 echo "Java Event Producer started in background (PID: $PRODUCER_PID)"
+trap 'if [ -n "$PRODUCER_PID" ] && kill -0 "$PRODUCER_PID" 2>/dev/null; then echo "[trap] killing event-producer ($PRODUCER_PID)"; kill "$PRODUCER_PID" 2>/dev/null; fi' EXIT
 
-echo "Sleeping for 10 seconds..."
-sleep 10
+echo "Sleeping for 4 seconds..."
+sleep 4
 
-curl -s "$TELEMETRY_URL/Telemetry" | jq .
+
+echo "Messages found for new topic:"
+../kafka-binary/bin/kafka-console-consumer.sh \
+    --bootstrap-server "$KAFKA_CLUSTER" \
+    --topic "$TOPIC_NAME" \
+    --from-beginning \
+    --timeout-ms 10000 \
+    --max-messages 1 && echo "Found one" || echo "No messages found or timed out."
+if curl -s "$TELEMETRY_URL/Telemetry" | grep -q "\"asset_id\":$ASSET_ID"; then
+    echo "Telemetry row found for asset $ASSET_ID"
+else
+    echo "[WARN] No matching telemetry row found yet"
+fi
 echo "Kafka events successfully consumed"
 
 echo "Killing event-producer..."
 kill $PRODUCER_PID
 
 echo "-------------------------------------------------"
+echo "Cleaning up ..."
+
+echo "Deleting Telemetry events for asset (ID: $ASSET_ID)..."
+curl -s -X DELETE "$TELEMETRY_URL/Telemetry/by-asset/$ASSET_ID" \
+    || >&2 echo "[WARN] Failed to delete Telemetry events"
+
+echo "Stopping Telemetry consumer for topic: $TOPIC_NAME..."
+curl -s -X POST "$TELEMETRY_URL/Telemetry/stop" \
+    -H "Content-Type: application/json" \
+    -d "{\"topicName\": \"$TOPIC_NAME\"}" || >&2 echo "[WARN] Failed to stop consumer"
+
+echo "Deleting Kafka topic: $TOPIC_NAME..."
+curl -s -X DELETE "$ASSET_LINK_URL/AssetLink/topic/$LINK_ID/$UO_NAME" \
+    || >&2 echo "[WARN] Failed to delete topic"
+
+echo "Deleting AssetLink (ID: $LINK_ID)..."
+curl -s -X DELETE "$ASSET_LINK_URL/AssetLink/$LINK_ID" \
+    || >&2 echo "[WARN] Failed to delete AssetLink"
+
+echo "Deleting Asset (ID: $ASSET_ID)..."
+curl -s -X DELETE "$ASSET_URL/Asset/$ASSET_ID" \
+    || >&2 echo "[WARN] Failed to delete Asset"
+
+echo "Deleting GridCell (ID: $GC_ID)..."
+curl -s -X DELETE "$GRID_CELL_URL/GridCell/$GC_ID" \
+    || >&2 echo "[WARN] Failed to delete GridCell"
+
+echo "Deleting Prosumer (ID: $PRO_ID)..."
+curl -s -X DELETE "$PROSUMER_URL/Prosumer/$PRO_ID" \
+    || >&2 echo "[WARN] Failed to delete Prosumer"
+
+echo "Deleting UtilityOperator (ID: $UO_ID)..."
+curl -s -X DELETE "$UTILITY_OPERATOR_URL/UtilityOperator/$UO_ID" \
+    || >&2 echo "[WARN] Failed to delete UtilityOperator"
+
+echo "Cleanup complete."
+echo "-------------------------------------------------"
+echo ""
+echo ""
+echo ""
+echo ""

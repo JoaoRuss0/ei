@@ -7,22 +7,25 @@ cd integration-tests
 source ./_lib.sh
 
 echo "-------------------------------------------------"
-echo "Checking Grid Balancing events on kafka..."
+echo "Checking Flexibility Emission events on kafka..."
 echo "-------------------------------------------------"
 
-TOPIC="balancing-recommendation"
+
+PAYLOAD='{"assetId":6,"prosumerId":3,"eventType":"SELL"}'
+TOPIC="flexibility-offers"
 
 echo "Pre-positioning consumer on topic: $TOPIC"
 capture_next_message "$TOPIC" 15000
 
-echo "POSTing data to $GRID_BALANCING_URL/GridBalancing/balance..."
-RESPONSE=$(curl -s -f -X POST "$GRID_BALANCING_URL/GridBalancing/balance" \
+echo "POSTing FlexibilityEvent to $FLEXIBILITY_EMISSION_URL/FlexibilityEmission..."
+RESPONSE=$(curl -s -f -X POST "$FLEXIBILITY_EMISSION_URL/FlexibilityEmission" \
     -H "Content-Type: application/json" \
-    -d @balance_payload.json)
+    -d "$PAYLOAD")
 
-RECOMMENDATION_IDS=$(echo "$RESPONSE" | jq -r '.[].id')
+EVENT_ID=$(echo "$RESPONSE" | jq -r '.id')
 
-echo "Grid balancing logic executed successfully."
+echo
+echo "FlexibilityEvent created (ID: $EVENT_ID)."
 
 echo "Awaiting message on $TOPIC..."
 MESSAGE=$(await_captured_message)
@@ -34,11 +37,9 @@ fi
 
 echo "-------------------------------------------------"
 echo "Cleaning up..."
-for id in $RECOMMENDATION_IDS; do
-    echo "Deleting GridBalancingRecommendation (ID: $id)..."
-    curl -s -X DELETE "$GRID_BALANCING_URL/GridBalancing/$id" \
-        || >&2 echo "[WARN] Failed to delete GridBalancingRecommendation $id"
-done
+echo "Deleting FlexibilityEvent (ID: $EVENT_ID)..."
+curl -s -X DELETE "$FLEXIBILITY_EMISSION_URL/FlexibilityEmission/$EVENT_ID" \
+    || >&2 echo "[WARN] Failed to delete FlexibilityEvent"
 echo "Cleanup complete."
 echo "-------------------------------------------------"
 echo ""

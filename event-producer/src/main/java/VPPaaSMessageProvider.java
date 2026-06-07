@@ -22,9 +22,20 @@ public class VPPaaSMessageProvider {
     static String DEFAULT_ASSET_ID = null;
     static String DEFAULT_GRID_CELL_ID = null;
     static String DEFAULT_TOPIC = null;
-    static String DEFAULT_ASSET_TYPE = null;   // BATTERY | SOLAR | EV; null = random
-    static Double DEFAULT_SOC = null;          // null = random
-    static String DEFAULT_TIMESTAMP = null;    // ISO e.g. 2026-05-27T10:30:00; null = now-per-message
+    static String DEFAULT_ASSET_TYPE = null;       // BATTERY | SOLAR | EV; null = random
+    static Double DEFAULT_SOC = null;              // null = random
+    static Double DEFAULT_CURRENT_OUTPUT = null;   // kW; BATTERY only; +discharge / -charge; null = random.
+                                                   // If --status is not also set, Status is forced to ONLINE so
+                                                   // grid-balancing actually uses the value.
+    static String DEFAULT_STATUS = null;           // BATTERY only; ONLINE | OFFLINE | FAULT | MAINTENANCE; null = random
+    static Double DEFAULT_CHARGING_RATE = null;    // kW; EV only; +charging draws from grid; null = random.
+                                                   // If --plug-status is not also set, PlugStatus is forced to CHARGING
+                                                   // so grid-balancing actually uses the value.
+    static String DEFAULT_PLUG_STATUS = null;      // EV only; AVAILABLE | OCCUPIED | CHARGING | FAULTED; null = random
+    static Double DEFAULT_CURRENT_GENERATION = null; // kW; SOLAR only; positive = generating; null = random.
+                                                     // Note: grid-balancing treats SOLAR as -Current_Generation
+                                                     // (it lowers load) — cannot trigger overload on its own.
+    static String DEFAULT_TIMESTAMP = null;        // ISO e.g. 2026-05-27T10:30:00; null = now-per-message
 
     static Map<String, List<PartitionInfo>> topics;
 
@@ -78,33 +89,78 @@ public class VPPaaSMessageProvider {
                 double soc = DEFAULT_SOC != null
                         ? DEFAULT_SOC
                         : ThreadLocalRandom.current().nextDouble(0.0, 100.0);
+                double currentOutput = DEFAULT_CURRENT_OUTPUT != null
+                        ? DEFAULT_CURRENT_OUTPUT
+                        : ThreadLocalRandom.current().nextDouble(-10.0, 10.0);
+                // Resolution order for Status:
+                //   1. explicit --status
+                //   2. ONLINE if --current-output is set (otherwise the value is silently ignored
+                //      by grid-balancing, which short-circuits on non-ONLINE batteries)
+                //   3. random
+                BatteryEnergyStorage.Level status;
+                if (DEFAULT_STATUS != null) {
+                    try {
+                        status = BatteryEnergyStorage.Level.valueOf(DEFAULT_STATUS);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Unknown --status, falling back to random: " + DEFAULT_STATUS);
+                        status = new BatteryEnergyStorage().randomLevel();
+                    }
+                } else if (DEFAULT_CURRENT_OUTPUT != null) {
+                    status = BatteryEnergyStorage.Level.ONLINE;
+                } else {
+                    status = new BatteryEnergyStorage().randomLevel();
+                }
                 newMessage = new BatteryEnergyStorage(ts.toLocalDateTime(),
                         assetId,
                         gridCellId,
-                        soc,    // ← assumed SoC slot; adjust if it's a different parameter position
+                        soc,
                         ThreadLocalRandom.current().nextDouble(0.0, 20.0),
-                        ThreadLocalRandom.current().nextDouble(-10.0, 10.0),
+                        currentOutput,
                         ThreadLocalRandom.current().nextDouble(0.0, 5.0),
                         ThreadLocalRandom.current().nextDouble(0.0, 100.0),
-                        new BatteryEnergyStorage().randomLevel());
+                        status);
                 break;
             case 1:
+                double currentGeneration = DEFAULT_CURRENT_GENERATION != null
+                        ? DEFAULT_CURRENT_GENERATION
+                        : ThreadLocalRandom.current().nextDouble(0.0, 7.5);
                 newMessage = new SolarInverter(ts.toLocalDateTime(),
                         assetId,
                         gridCellId,
-                        ThreadLocalRandom.current().nextDouble(0.0, 7.5),
+                        currentGeneration,
                         ThreadLocalRandom.current().nextDouble(0.0, 150),
                         ThreadLocalRandom.current().nextDouble(245, 255),
                         ThreadLocalRandom.current().nextDouble(49.5, 50.5));
                 break;
             case 2:
+                double chargingRate = DEFAULT_CHARGING_RATE != null
+                        ? DEFAULT_CHARGING_RATE
+                        : ThreadLocalRandom.current().nextDouble(0.0, 20.5);
+                // Resolution order for PlugStatus:
+                //   1. explicit --plug-status
+                //   2. CHARGING if --charging-rate is set (otherwise the value is silently ignored
+                //      by grid-balancing, which short-circuits on non-CHARGING EVs)
+                //   3. random
+                EVCharger.Level plugStatus;
+                if (DEFAULT_PLUG_STATUS != null) {
+                    try {
+                        plugStatus = EVCharger.Level.valueOf(DEFAULT_PLUG_STATUS);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Unknown --plug-status, falling back to random: " + DEFAULT_PLUG_STATUS);
+                        plugStatus = new EVCharger().randomLevel();
+                    }
+                } else if (DEFAULT_CHARGING_RATE != null) {
+                    plugStatus = EVCharger.Level.CHARGING;
+                } else {
+                    plugStatus = new EVCharger().randomLevel();
+                }
                 newMessage = new EVCharger(ts.toLocalDateTime(),
                         assetId,
                         gridCellId,
-                        ThreadLocalRandom.current().nextDouble(0.0, 20.5),
+                        chargingRate,
                         ThreadLocalRandom.current().nextDouble(0.0, 17.8),
                         ThreadLocalRandom.current().nextDouble(0, 100),
-                        new EVCharger().randomLevel());
+                        plugStatus);
                 break;
         }
         return newMessage;
@@ -120,6 +176,15 @@ public class VPPaaSMessageProvider {
                         "--topic=" + (DEFAULT_TOPIC == null ? "(random discovered)" : DEFAULT_TOPIC) + "\n" +
                         "--asset-type=" + (DEFAULT_ASSET_TYPE == null ? "(random)" : DEFAULT_ASSET_TYPE) + "\n" +
                         "--soc=" + (DEFAULT_SOC == null ? "(random)" : DEFAULT_SOC.toString()) + "\n" +
+                        "--current-output=" + (DEFAULT_CURRENT_OUTPUT == null ? "(random)" : DEFAULT_CURRENT_OUTPUT.toString() + " kW") + "\n" +
+                        "--status=" + (DEFAULT_STATUS == null
+                                ? (DEFAULT_CURRENT_OUTPUT == null ? "(random)" : "ONLINE (auto, because --current-output is set)")
+                                : DEFAULT_STATUS) + "\n" +
+                        "--charging-rate=" + (DEFAULT_CHARGING_RATE == null ? "(random)" : DEFAULT_CHARGING_RATE.toString() + " kW") + "\n" +
+                        "--plug-status=" + (DEFAULT_PLUG_STATUS == null
+                                ? (DEFAULT_CHARGING_RATE == null ? "(random)" : "CHARGING (auto, because --charging-rate is set)")
+                                : DEFAULT_PLUG_STATUS) + "\n" +
+                        "--current-generation=" + (DEFAULT_CURRENT_GENERATION == null ? "(random)" : DEFAULT_CURRENT_GENERATION.toString() + " kW") + "\n" +
                         "--timestamp=" + (DEFAULT_TIMESTAMP == null ? "(now per message)" : DEFAULT_TIMESTAMP));
     }
 
@@ -133,6 +198,11 @@ public class VPPaaSMessageProvider {
             else if (cabecalho[i].compareTo("--topic") == 0) DEFAULT_TOPIC = cabecalho[i + 1];
             else if (cabecalho[i].compareTo("--asset-type") == 0) DEFAULT_ASSET_TYPE = cabecalho[i + 1].toUpperCase();
             else if (cabecalho[i].compareTo("--soc") == 0) DEFAULT_SOC = Double.valueOf(cabecalho[i + 1]);
+            else if (cabecalho[i].compareTo("--current-output") == 0) DEFAULT_CURRENT_OUTPUT = Double.valueOf(cabecalho[i + 1]);
+            else if (cabecalho[i].compareTo("--status") == 0) DEFAULT_STATUS = cabecalho[i + 1].toUpperCase();
+            else if (cabecalho[i].compareTo("--charging-rate") == 0) DEFAULT_CHARGING_RATE = Double.valueOf(cabecalho[i + 1]);
+            else if (cabecalho[i].compareTo("--plug-status") == 0) DEFAULT_PLUG_STATUS = cabecalho[i + 1].toUpperCase();
+            else if (cabecalho[i].compareTo("--current-generation") == 0) DEFAULT_CURRENT_GENERATION = Double.valueOf(cabecalho[i + 1]);
             else if (cabecalho[i].compareTo("--timestamp") == 0) DEFAULT_TIMESTAMP = cabecalho[i + 1];
             else {
                 System.out.println("Bad argument name: " + cabecalho[i]);
@@ -174,7 +244,7 @@ public class VPPaaSMessageProvider {
     public static void main(String[] args) {
 
         String usage = "The usage of the Message Producer for VPPaaS 2026, for Enterprise Integration 2026 course, is the following.\n\n" +
-                "VPPaaSSimulator --broker-list <brokers> --throughput <value> --filterprefix <value> [--asset-id <id>] [--grid-cell-id <id>] [--topic <topic>] [--asset-type BATTERY|SOLAR|EV] [--soc <value>] [--timestamp <iso>]\n\n" +
+                "VPPaaSSimulator --broker-list <brokers> --throughput <value> --filterprefix <value> [--asset-id <id>] [--grid-cell-id <id>] [--topic <topic>] [--asset-type BATTERY|SOLAR|EV] [--soc <value>] [--current-output <value>] [--status ONLINE|OFFLINE|FAULT|MAINTENANCE] [--charging-rate <value>] [--plug-status AVAILABLE|OCCUPIED|CHARGING|FAULTED] [--current-generation <value>] [--timestamp <iso>]\n\n" +
                 "--broker-list: broker list with ports (default localhost:9092)\n" +
                 "--throughput: messages per minute (default 10)\n" +
                 "--filterprefix: only topics starting with this prefix are used\n" +
@@ -183,6 +253,11 @@ public class VPPaaSMessageProvider {
                 "--topic: force this single topic, bypassing discovery / random selection\n" +
                 "--asset-type: force BATTERY | SOLAR | EV (default: random)\n" +
                 "--soc: force State of Charge value (only applies to BATTERY; default: random)\n" +
+                "--current-output: force battery active power in kW (only applies to BATTERY; positive = discharging to grid, negative = charging from grid). Grid-balancing reads this. If --status is not also set, Status is forced to ONLINE so the value is actually counted.\n" +
+                "--status: force battery connection status: ONLINE | OFFLINE | FAULT | MAINTENANCE (only applies to BATTERY; default: random, or ONLINE when --current-output is set without --status)\n" +
+                "--charging-rate: force EV charging power in kW (only applies to EV; positive = drawing from grid). Grid-balancing reads this. If --plug-status is not also set, PlugStatus is forced to CHARGING so the value is actually counted.\n" +
+                "--plug-status: force EV plug status: AVAILABLE | OCCUPIED | CHARGING | FAULTED (only applies to EV; default: random, or CHARGING when --charging-rate is set without --plug-status)\n" +
+                "--current-generation: force solar generation in kW (only applies to SOLAR). Grid-balancing reads this as -Current_Generation, so it can only LOWER load — SOLAR cannot trigger an overload on its own.\n" +
                 "--timestamp: force this ISO timestamp for every message, e.g. 2026-05-27T10:30:00 (default: current time per message)\n";
 
         Properties kafkaProps = new Properties();

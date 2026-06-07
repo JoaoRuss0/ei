@@ -10,7 +10,7 @@
       "id": "Field_1oe06kd"
     },
     {
-      "text": "=\"ID: \" + string(gridCellId) + \"<br/> name: \" + string(gridcell.name)  + \"<br/> Max Load: \" + string(gridcell.maxLoad) +\n\"<br/> Postal Code:\" +   string(gridcell.postalCode)\n",
+      "text": "=\"ID: \" + string(gridCellId) + \"<br/> name: \" + string(gridcell.id)  + \"<br/> Max Load: \" + string(gridcell.maxLoad) +\n\"<br/> Postal Code:\" +   string(gridcell.postalCode)\n",
       "type": "text",
       "layout": {
         "row": "Row_1v881sd",

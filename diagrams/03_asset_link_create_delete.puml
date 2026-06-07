@@ -1,5 +1,5 @@
 @startuml AssetLinkManagement
-title Asset Link Create/Read Business Process
+title Asset Link Create/Deletea Business Process
 
 /'
 In order to create an asset link we need to first make a contract between the prosumer and utility operator. POST /AssetLink
